@@ -22,10 +22,10 @@ def connectBus():
 def parseResponse(gpsLine):
 
   if(gpsLine.count(36) == 1):                           # Check #1, make sure '$' doesnt appear twice
-    if len(gpsLine) &amp;lt; 84:                               # Check #2, 83 is maximun NMEA sentenace length.
+    if len(gpsLine) < 84:                               # Check #2, 83 is maximun NMEA sentenace length.
         CharError = 0;
         for c in gpsLine:                               # Check #3, Make sure that only readiable ASCII charaters and Carriage Return are seen.
-            if (c &amp;lt; 32 or c &amp;gt; 122) and  c != 13:
+            if (c < 32 or c > 122) and  c != 13:
                 CharError+=1
         if (CharError == 0):#    Only proceed if there are no errors.
             gpsChars = ''.join(chr(c) for c in gpsLine)
