@@ -13,6 +13,6 @@ def parseGPS(string):
 
 serialPort = serial.Serial(port, baudrate=9600, timeout=0.5)
 while True:
-    string = serialPort.readline().decode('UTF-8', errors='replace')
-    #print(string)
+    string = serialPort.readline()#.decode('UTF-8', errors='replace')
+    print(string)
     parseGPS(string)
