@@ -7,7 +7,7 @@ Created on Thu Nov 10 16:00:51 2022
 
 #! /usr/bin/python
 import time
-import smbus
+import smbus2
 import signal
 import sys
 
@@ -39,7 +39,7 @@ def parseResponse(gpsLine):
                 for ch in gpsStr[1:]: # Remove the $ and do a manual checksum on the rest of the NMEA sentence
                      chkVal ^= ord(ch)
                 if (chkVal == int(chkSum, 16)): # Compare the calculated checksum with the one in the NMEA sentence
-                     print gpsChars
+                     print(gpsChars)
 
 def handle_ctrl_c(signal, frame):
         sys.exit(130)
@@ -65,8 +65,8 @@ def readGPS():
 
     except IOError:
         connectBus()
-    except Exception,e:
-        print e
+    except Exception as e:
+        print(e)
 
 connectBus()
 
