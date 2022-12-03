@@ -27,14 +27,14 @@ try:
     while True:
         report = gpsd.next()  #
         if report['class'] == 'TPV':
-            print(getattr(report, 'lat', 0.0), "\t",)
-            print(getattr(report, 'lon', 0.0), "\t",)
-            print(getattr(report, 'time', ''), "\t",)
-            print(getattr(report, 'alt', 'nan'), "\t\t",)
-            print(getattr(report, 'epv', 'nan'), "\t",)
-            print(getattr(report, 'ept', 'nan'), "\t",)
-            print(getattr(report, 'speed', 'nan'), "\t",)
-            print(getattr(report, 'climb', 'nan'), "\t")
+            print(getattr(report, 'lat', 0.0), "\t",
+                  getattr(report, 'lon', 0.0), "\t",
+                  getattr(report, 'time', ''), "\t",
+                  getattr(report, 'alt', 'nan'), "\t\t",
+                  getattr(report, 'epv', 'nan'), "\t",
+                  getattr(report, 'ept', 'nan'), "\t",
+                  getattr(report, 'speed', 'nan'), "\t",
+                  getattr(report, 'climb', 'nan'), "\t")
 
         time.sleep(1)
 
