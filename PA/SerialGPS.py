@@ -102,7 +102,7 @@ if __name__ == '__main__':
 
 
   l, p = avg_long, avg_lat;
-  plt.plot(x,y, marker = 'x');
+  plt.scatter(x,y, marker = 'x');
   #plt.plotsize(100, 30);
   plt.title('Some Smart Title');
   plt.xlabel('Longitude');
