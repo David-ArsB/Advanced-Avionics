@@ -45,7 +45,7 @@ class GpsPoller(threading.Thread):
 if __name__ == '__main__':
   gpsp = GpsPoller() # create the thread
 
-  N = 0
+  N = 1
   avg_lat = 0
   avg_long = 0
 
