@@ -107,8 +107,8 @@ if __name__ == '__main__':
   DRMS_95 = 2*sqrt(std_lat**2+std_long**2)
   angle = linspace(0, 2 * pi, 150)
 
-  xCEP = CEP * cos(angle)
-  yCEP = CEP * sin(angle)
+  xCEP = CEP * cos(angle)+avg_long
+  yCEP = CEP * sin(angle)+avg_lat
 
   l, p = avg_long, avg_lat;
   plt.scatter(x,y, marker = 'x');
