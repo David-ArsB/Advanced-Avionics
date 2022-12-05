@@ -48,16 +48,17 @@ if __name__ == '__main__':
   N = 0
   avg_lat = 0
   avg_long = 0
-
+  done = False
   try:
     gpsp.start() # start it up
     while True:
       #It may take a second or two to get good data
       #print gpsd.fix.latitude,', ',gpsd.fix.longitude,'  Time: ',gpsd.utc
-      if N == 10 :
+      if N == 10 and not done:
         N = 0
         avg_lat = 0
         avg_long = 0
+        done = True
 
       os.system('clear')
 
