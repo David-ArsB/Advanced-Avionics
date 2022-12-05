@@ -45,7 +45,7 @@ class GpsPoller(threading.Thread):
 if __name__ == '__main__':
   gpsp = GpsPoller() # create the thread
 
-  N = 1
+  N = 0
   avg_lat = 0
   avg_long = 0
 
@@ -54,6 +54,10 @@ if __name__ == '__main__':
     while True:
       #It may take a second or two to get good data
       #print gpsd.fix.latitude,', ',gpsd.fix.longitude,'  Time: ',gpsd.utc
+      if N == 10 :
+        N = 0
+        avg_lat = 0
+        avg_long = 0
 
       os.system('clear')
 
