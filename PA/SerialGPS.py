@@ -25,6 +25,8 @@ from time import *
 import time
 import threading
 import plotext as plt;
+from numpy import std, sqrt, pi, linspace, cos, sin;
+from coordDist import distCoords;
 
 gpsd = None #seting the global variable
 
@@ -99,11 +101,19 @@ if __name__ == '__main__':
     gpsp.running = False
     gpsp.join() # wait for the thread to finish what it's doing
 
+  std_lat = std(y)
+  std_long = std(x)
+  CEP = 0.59*(std_lat + std_long)
+  DRMS_95 = 2*sqrt(std_lat**2+std_long**2)
+  angle = linspace(0, 2 * pi, 150)
 
+  xCEP = CEP * cos(angle)
+  yCEP = CEP * sin(angle)
 
   l, p = avg_long, avg_lat;
   plt.scatter(x,y, marker = 'x');
   plt.scatter([avg_long], [avg_lat], marker='o', color='red+');
+  plt.plot(xCEP, yCEP, marker='o', color='red+');
   #plt.plotsize(100, 30);
   plt.title('Some Smart Title');
   plt.xlabel('Longitude');
@@ -117,5 +127,6 @@ if __name__ == '__main__':
   #plt.xticks(xticks, xlabels);
   plt.show()
   print('\n\n\n')
-  print('average coords   ', avg_lat, ',', avg_long , '\n\n')
+  print('Average Coords:   ', avg_lat, ',', avg_long)
+  print('CEP:   ', distCoords([0,0],[0.59*(std_long),0.59*(std_lat)]), '\n\n')
   print("Done.\nExiting.")
