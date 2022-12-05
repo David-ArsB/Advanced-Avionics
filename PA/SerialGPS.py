@@ -44,6 +44,11 @@ class GpsPoller(threading.Thread):
 
 if __name__ == '__main__':
   gpsp = GpsPoller() # create the thread
+
+  N = 0
+  avg_lat = 0
+  avg_long = 0
+
   try:
     gpsp.start() # start it up
     while True:
@@ -55,22 +60,27 @@ if __name__ == '__main__':
       print()
       print (' GPS reading')
       print ('----------------------------------------')
-      print ('latitude    ' , gpsd.fix.latitude)
-      print ('longitude   ' , gpsd.fix.longitude)
-      print ('time utc    ' , gpsd.utc,' + ', gpsd.fix.time)
-      print ('altitude (m)' , gpsd.fix.altitude)
-      print ('eps         ' , gpsd.fix.eps)
-      print ('epx         ' , gpsd.fix.epx)
-      print ('epv         ' , gpsd.fix.epv)
-      print ('ept         ' , gpsd.fix.ept)
-      print ('speed (m/s) ' , gpsd.fix.speed)
-      print ('climb       ' , gpsd.fix.climb)
-      print ('track       ' , gpsd.fix.track)
-      print ('mode        ' , gpsd.fix.mode)
+      print ('latitude        ' , gpsd.fix.latitude)
+      print ('longitude       ' , gpsd.fix.longitude)
+      av_lat = (av_lat * N + gpsd.fix.latitude)/(N+1)
+      av_long = (av_long * N + gpsd.fix.longitude)/(N+1)
+      print('average latitude ', av_lat)
+      print('average longitude', avg_long)
+      print ('time utc        ' , gpsd.utc,' + ', gpsd.fix.time)
+      print ('altitude (m)    ' , gpsd.fix.altitude)
+      print ('eps             ' , gpsd.fix.eps)
+      print ('epx             ' , gpsd.fix.epx)
+      print ('epv             ' , gpsd.fix.epv)
+      print ('ept             ' , gpsd.fix.ept)
+      print ('speed (m/s)     ' , gpsd.fix.speed)
+      print ('climb           ' , gpsd.fix.climb)
+      print ('track           ' , gpsd.fix.track)
+      print ('mode            ' , gpsd.fix.mode)
       print()
-      print ('sats        ' , gpsd.satellites)
+      print('sats             ', gpsd.satellites)
 
-      time.sleep(5) #set to whatever
+      time.sleep(1)  # set to whatever
+      N+=1
 
   except (KeyboardInterrupt, SystemExit): #when you press ctrl+c
     print("\nKilling Thread...")
