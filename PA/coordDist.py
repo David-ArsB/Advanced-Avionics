@@ -27,9 +27,9 @@ def distCoords(cd1,cd2):
     long2 = cd2[1] / 180 * pi
 
     d1 = earthRadii * arccos((sin(lat1) * sin(lat2)) + cos(lat1) * cos(lat2) * cos(long2-long1))
-    print(d1*1000)
+    #print(d1*1000)
     d2 = (earthRadii+altitude) * arccos((sin(lat1) * sin(lat2)) + cos(lat1) * cos(lat2) * cos(long2 - long1))
-    print(d2*1000)
+    #print(d2*1000)
 
     # Haversine formula
     dlon = long2 - long1
@@ -40,7 +40,7 @@ def distCoords(cd1,cd2):
 
 
     # calculate the result
-    print(c * earthRadii*1000)
+    return c * earthRadii*1000
 
 
 def orientation(cd1, cd2 ):

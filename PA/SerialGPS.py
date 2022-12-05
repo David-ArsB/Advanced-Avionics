@@ -113,7 +113,7 @@ if __name__ == '__main__':
   l, p = avg_long, avg_lat;
   plt.scatter(x,y, marker = 'x');
   plt.scatter([avg_long], [avg_lat], marker='o', color='red+');
-  plt.plot(xCEP, yCEP, marker='o', color='red+');
+  plt.plot(xCEP, yCEP, color='red+');
   #plt.plotsize(100, 30);
   plt.title('Some Smart Title');
   plt.xlabel('Longitude');
