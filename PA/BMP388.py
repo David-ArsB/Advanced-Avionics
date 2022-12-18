@@ -70,10 +70,10 @@ BMP388_REG_ADD_P11 = 0x45
 class BMP388(object):
     """docstring for BMP388"""
 
-    def __init__(self, address=I2C_ADD_BMP388):
+    def __init__(self, bus, address=I2C_ADD_BMP388):
         self.groundPressure = 101325.0
         self._address = address
-        self._bus = smbus.SMBus(0x01)
+        self._bus = bus
 
         # Load calibration values.
 
@@ -218,9 +218,8 @@ if __name__ == '__main__':
     import time
 
     print("BMP388 Test Program ...\n")
-
-    bmp388 = BMP388()
-    bmp388.setGroundPressure(100910.0)
+    bmp388 = BMP388(smbus.SMBus(0x01))
+    bmp388.setGroundPressure(100510.0)
 
     while True:
         time.sleep(0.5)
