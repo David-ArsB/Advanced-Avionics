@@ -50,9 +50,9 @@ class LIS3MDL(object):
         self._bus = bus
 
         # initialise the magnetometer
-        self._writeByte( LIS3MDL_CTRL_REG1,0b11011100)  # Temp sesnor enabled, High performance, ODR 80 Hz, FAST ODR disabled and Selft test disabled.
-        self._writeByte( LIS3MDL_CTRL_REG2, 0b00100000)  # +/- 8 gauss
-        self._writeByte( LIS3MDL_CTRL_REG3, 0b00000000)  # Continuous-conversion mode
+        self._writeByte(LIS3MDL_CTRL_REG1,0b11011100)  # Temp sesnor enabled, High performance, ODR 80 Hz, FAST ODR disabled and Selft test disabled.
+        self._writeByte(LIS3MDL_CTRL_REG2, 0b00100000)  # +/- 8 gauss
+        self._writeByte(LIS3MDL_CTRL_REG3, 0b00000000)  # Continuous-conversion mode
 
     def _writeByte(self, register, value):
         self._bus.write_byte_data(self._address, register, value)

@@ -58,10 +58,10 @@ class LSM6DSL(object):
 
         # initialise the magnetometer
         # initialise the accelerometer
-        self._writeByte(LSM6DSL_ADDRESS, LSM6DSL_CTRL1_XL, 0b10011111)  # ODR 3.33 kHz, +/- 8g , BW = 400hz
-        self._writeByte(LSM6DSL_ADDRESS, LSM6DSL_CTRL3_C, 0b01000100)  # Enable Block Data update, increment during multi byte read
+        self._writeByte(LSM6DSL_CTRL1_XL, 0b10011111)  # ODR 3.33 kHz, +/- 8g , BW = 400hz
+        self._writeByte(LSM6DSL_CTRL3_C, 0b01000100)  # Enable Block Data update, increment during multi byte read
         # initialise the gyroscope
-        self._writeByte(LSM6DSL_ADDRESS, LSM6DSL_CTRL2_G, 0b10011100)  # ODR 3.3 kHz, 2000 dps
+        self._writeByte(LSM6DSL_CTRL2_G, 0b10011100)  # ODR 3.3 kHz, 2000 dps
 
     def _writeByte(self, register, value):
         self._bus.write_byte_data(self._address, register, value)
