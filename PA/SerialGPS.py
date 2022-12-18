@@ -1,32 +1,14 @@
-# import serial
-# import pynmea2
-#
-# port = "/dev/serial0"
-#
-#
-# def parseGPS(string):
-#     if string.find('GGA') > 0:
-#         msg = pynmea2.parse(string)
-#         print("Timestamp: %s -- Lat: %s %s -- Lon: %s %s -- Altitude: %s %s -- Satellites: %s" % (
-#         msg.timestamp, msg.lat, msg.lat_dir, msg.lon, msg.lon_dir, msg.altitude, msg.altitude_units, msg.num_sats))
-#
-#
-# serialPort = serial.Serial(port, baudrate=9600, timeout=0.5)
-# while True:
-#     string = serialPort.readline()#.decode('UTF-8', errors='replace')
-#     print(string)
-#     parseGPS(string)
-#! /usr/bin/python
-# Written by Dan Mandle http://dan.mandle.me September 2012
-# License: GPL 2.0
-import os
+
+import os,sys
+print(sys.stdin.isatty()) ### True means shell, false means gui
 from gps import *
 from time import *
 import time
 import threading
 import plotext as plt;
-from numpy import std, sqrt, pi, linspace, cos, sin;
+from numpy import std, sqrt, pi, linspace, cos, sin, append;
 from coordDist import distCoords;
+import csv
 
 gpsd = None #seting the global variable
 
@@ -59,7 +41,7 @@ if __name__ == '__main__':
     while True:
       #It may take a second or two to get good data
       #print gpsd.fix.latitude,', ',gpsd.fix.longitude,'  Time: ',gpsd.utc
-      if N == 10 and not done:
+      if N == 5 and not done:
         N = 0
         avg_lat = 0
         avg_long = 0
@@ -101,12 +83,16 @@ if __name__ == '__main__':
     gpsp.running = False
     gpsp.join() # wait for the thread to finish what it's doing
 
+  # Study accuracy
   std_lat = std(y)
   std_long = std(x)
+  # 50% confidence radius
   CEP = 0.59*(std_lat + std_long)
+  # 95% confidence radius
   DRMS_95 = 2*sqrt(std_lat**2+std_long**2)
-  angle = linspace(0, 2 * pi, 150)
 
+  # Generate radius
+  angle = linspace(0, 2 * pi, 150)
   xCEP = CEP * cos(angle)+avg_long
   yCEP = CEP * sin(angle)+avg_lat
 
@@ -126,6 +112,20 @@ if __name__ == '__main__':
   #xlabels = [str(i) + 'π' for i in range(2 * p + 1)];
   #plt.xticks(xticks, xlabels);
   plt.show()
+
+  header = ['Longitude', 'Latitude']
+  data = append(y,x,1)
+
+  # Save the data
+  with open('coords.csv', 'w', encoding='UTF8', newline='') as f:
+    writer = csv.writer(f)
+
+    # write the header
+    writer.writerow(header)
+
+    # write multiple rows
+    writer.writerows(data)
+
   print('\n\n\n')
   print('Average Coords:   ', avg_lat, ',', avg_long)
   print('CEP:   ', distCoords([0,0],[0.59*(std_long),0.59*(std_lat)]), '\n\n')
