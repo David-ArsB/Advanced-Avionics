@@ -3,7 +3,7 @@ CODE TO INTERFACE WITH THE COMPASS ONBOARD THE BERRY-GPS-IMU-v4
 
 """
 import smbus
-from numpy import atan2
+from math import atan2
 
 LIS3MDL_ADDRESS = 0x1C
 
