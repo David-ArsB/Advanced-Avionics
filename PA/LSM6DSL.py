@@ -85,6 +85,7 @@ class LSM6DSL(object):
         acc_h = self._bus.read_byte_data(LSM6DSL_ADDRESS, LSM6DSL_OUTZ_H_XL)
 
         acc_combined = (acc_l | acc_h << 8)
+        print(acc_l)
         return acc_combined if acc_combined < 32768 else acc_combined - 65536
 
     def readGYRx(self):
@@ -114,6 +115,7 @@ if __name__ == '__main__':
     print("LSM6DSL Test Program ...\n")
     LSM6DSL = LSM6DSL(smbus.SMBus(0x01))
     while True:
+        time.sleep(1)
         AccX = LSM6DSL.readACCx()
         AccY = LSM6DSL.readACCy()
         AccZ = LSM6DSL.readACCz()
