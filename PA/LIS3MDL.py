@@ -3,6 +3,7 @@ CODE TO INTERFACE WITH THE COMPASS ONBOARD THE BERRY-GPS-IMU-v4
 
 """
 import smbus
+from numpy import atan2
 
 LIS3MDL_ADDRESS = 0x1C
 
@@ -82,5 +83,5 @@ if __name__ == '__main__':
         magX = LIS3MDL.readMAGx()
         magY = LIS3MDL.readMAGy()
         magZ = LIS3MDL.readMAGz()
-        print(' magX = %.2f magY = %.2f  magZ =%.2f ' % (
-        magX, magY, magZ))
+        print(' magX = %.2f magY = %.2f  magZ =%.2f ' % (magX, magY, magZ))
+        print(' Heading = %.2f' % (atan2(magX,magY)))
