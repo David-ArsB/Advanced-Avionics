@@ -84,4 +84,4 @@ if __name__ == '__main__':
         magY = LIS3MDL.readMAGy()
         magZ = LIS3MDL.readMAGz()
         print(' magX = %.2f magY = %.2f  magZ =%.2f ' % (magX, magY, magZ))
-        print(' Heading = %.2f' % (atan2(magY,magX)))*180/pi
+        print(' Heading = %.2f' % (atan2(magY,magX)*180/pi))
