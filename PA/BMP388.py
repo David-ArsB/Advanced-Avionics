@@ -71,6 +71,7 @@ class BMP388(object):
     """docstring for BMP388"""
 
     def __init__(self, address=I2C_ADD_BMP388):
+        self.groundPressure = 101325.0
         self._address = address
         self._bus = smbus.SMBus(0x01)
 
@@ -200,10 +201,16 @@ class BMP388(object):
 
         adc_P = (msb << 0x10) + (lsb << 0x08) + xlsb
         pressure = self.compensate_pressure(adc_P)
-        altitude = 4433000 * (0x01 - pow(pressure / 100.0 / 101325.0,
+        altitude = 4433000 * (0x01 - pow(pressure / 100.0 / self.groundPressure,
                                          0.1903))
 
         return (temperature, pressure, altitude)
+
+    def setGroundPressure(self, pressure = None):
+        if pressure == None:
+            self.groundPressure = pressure
+        else:
+            self.groundPressure = pressure
 
 
 if __name__ == '__main__':
@@ -213,6 +220,7 @@ if __name__ == '__main__':
     print("BMP388 Test Program ...\n")
 
     bmp388 = BMP388()
+    bmp388.setGroundPressure(100910.0)
 
     while True:
         time.sleep(0.5)
