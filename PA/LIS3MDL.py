@@ -74,14 +74,37 @@ class LIS3MDL(object):
 if __name__ == '__main__':
 
     import time
-
+    ## TILT COMPENSATION REQUIRED AND CALIBRATION
     print("LIS3MDL Test Program ...\n")
     LIS3MDL = LIS3MDL(smbus.SMBus(0x01))
-
+    magMax = [0,0,0]
+    magMin = [0,0,0]
     while True:
         time.sleep(0.5)
         magX = LIS3MDL.readMAGx()
         magY = LIS3MDL.readMAGy()
         magZ = LIS3MDL.readMAGz()
-        print(' magX = %.2f magY = %.2f  magZ =%.2f ' % (magX, magY, magZ))
-        print(' Heading = %.2f' % (atan2(magY,magX)*180/pi))
+
+        if magX > magMax[0]:
+            magMax[0] = magX
+        if magY > magMax[1]:
+            magMax[1] = magY
+        if magZ > magMax[2]:
+            magMax[2] = magZ
+
+        if magX < magMin[0]:
+            magMin[0] = magX
+        if magY < magMin[1]:
+            magMin[1] = magY
+        if magZ < magMin[2]:
+            magMin[2] = magZ
+
+        print(' magXMax = %.2f\n magYMax = %.2f\n  magZMax =%.2f\n ' % (magMax[0], magMax[1], magMax[2]))
+        print(' magXMin = %.2f\n magYMin = %.2f\n  magZMin =%.2f\n ' % (magMin[0], magMin[1], magMin[2]))
+
+
+        #print(' magX = %.2f magY = %.2f  magZ =%.2f ' % (magX, magY, magZ))
+        #print(' Heading = %.2f' % (atan2(magY,magX)*180/pi))
+
+    print(' magXMax = %.2f\n magYMax = %.2f\n  magZMax =%.2f\n ' % (magMax[0], magMax[1], magMax[2]))
+    print(' magXMin = %.2f\n magYMin = %.2f\n  magZMin =%.2f\n ' % (magMin[0], magMin[1], magMin[2]))
