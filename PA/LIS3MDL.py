@@ -33,13 +33,13 @@ LIS3MDL_INT_SRC = 0x31
 LIS3MDL_INT_THS_L = 0x32
 LIS3MDL_INT_THS_H = 0x33
 
-MAGX_MAX = 566.00
-MAGY_MAX = 3452.00
-MAGZ_MAX = 1134.00
+MAGX_MAX = 555.00
+MAGY_MAX = 3270.00
+MAGZ_MAX = 974.00
 
-MAGX_MIN = -2275.00
+MAGX_MIN = -2420.00
 MAGY_MIN = 0.00
-MAGZ_MIN = -2891.00
+MAGZ_MIN = -3654.00
 
 
 class LIS3MDL(object):
@@ -114,14 +114,20 @@ if __name__ == '__main__':
 
         print('===================================================')
         print('Raw:')
+        heading = atan2(magY,magX) * 180 / pi
+        if heading < 0:
+            heading += 360
         print(' magX = %.2f magY = %.2f  magZ =%.2f ' % (magX, magY, magZ))
-        print(' Heading = %.2f\n' % (atan2(magY,magX)*180/pi))
+        print(' Heading = %.2f\n' % (heading))
 
         print('Compensated:')
+        heading = atan2(magY_comp, magX_comp) * 180 / pi
+        if heading < 0 :
+            heading += 360
         print(' magX = %.2f magY = %.2f  magZ =%.2f ' % (magX_comp, magY_comp, magZ_comp))
-        print(' Heading = %.2f' % (atan2(magY_comp, magX_comp) * 180 / pi))
+        print(' Heading = %.2f\n' % (heading))
 
-        print(' magXMax = %.2f\n magYMax = %.2f\n  magZMax =%.2f\n' % (magMax[0], magMax[1], magMax[2]))
-        print(' magXMin = %.2f\n magYMin = %.2f\n  magZMin =%.2f\n' % (magMin[0], magMin[1], magMin[2]))
+        print('MAGX_MAX = %.2f\n MAGY_MAX = %.2f\n  MAGZ_MAX =%.2f\n' % (magMax[0], magMax[1], magMax[2]))
+        print('MAGX_MIN = %.2f\n MAGY_MIN = %.2f\n  MAGZ_MIN =%.2f\n' % (magMin[0], magMin[1], magMin[2]))
 
         print('===================================================\n\n')
