@@ -112,7 +112,7 @@ if __name__ == '__main__':
         if magZ < magMin[2]:
             magMin[2] = magZ
 
-        print('=====================================')
+        print('===================================================')
         print('Raw:')
         print(' magX = %.2f magY = %.2f  magZ =%.2f ' % (magX, magY, magZ))
         print(' Heading = %.2f\n' % (atan2(magY,magX)*180/pi))
@@ -121,7 +121,7 @@ if __name__ == '__main__':
         print(' magX = %.2f magY = %.2f  magZ =%.2f ' % (magX_comp, magY_comp, magZ_comp))
         print(' Heading = %.2f' % (atan2(magY_comp, magX_comp) * 180 / pi))
 
-        print('=====================================\n')
+        print(' magXMax = %.2f\n magYMax = %.2f\n  magZMax =%.2f\n' % (magMax[0], magMax[1], magMax[2]))
+        print(' magXMin = %.2f\n magYMin = %.2f\n  magZMin =%.2f\n' % (magMin[0], magMin[1], magMin[2]))
 
-    print(' magXMax = %.2f\n magYMax = %.2f\n  magZMax =%.2f\n ' % (magMax[0], magMax[1], magMax[2]))
-    print(' magXMin = %.2f\n magYMin = %.2f\n  magZMin =%.2f\n ' % (magMin[0], magMin[1], magMin[2]))
+        print('===================================================\n\n')
