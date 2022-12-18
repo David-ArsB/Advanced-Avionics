@@ -91,7 +91,7 @@ if __name__ == '__main__':
     while True:
         time.sleep(0.5)
         magX = LIS3MDL.readMAGx()
-        magY = -LIS3MDL.readMAGy()
+        magY = LIS3MDL.readMAGy()
         magZ = LIS3MDL.readMAGz()
 
         magX_comp = magX - (MAGX_MIN + MAGX_MAX) / 2
@@ -118,6 +118,12 @@ if __name__ == '__main__':
         if heading < 0:
             heading += 360
         print(' magX = %.2f magY = %.2f  magZ =%.2f ' % (magX, magY, magZ))
+        print(' Heading = %.2f\n' % (heading))
+
+        print('Raw2:')
+        heading = atan2(-magY, magX) * 180 / pi
+        if heading < 0:
+            heading += 360
         print(' Heading = %.2f\n' % (heading))
 
         print('Compensated:')
