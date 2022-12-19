@@ -52,13 +52,18 @@ LSM6DSL_FUNC_SRC1        =  0x53
 class LSM6DSL(object):
     """docstring for LIS3MDL"""
 
+
+
     def __init__(self,  bus, address=LSM6DSL_ADDRESS):
         self._address = address
         self._bus =  bus
+        self.ACC_RANGES = [2, 4, 8, 16]
+        self.ACC_RANGE_CONFIG_BYTE = [0b10010011, 0b10011011, 0b10011111, 0b10010111]
+        self.ACC_RANGE_IDX = 1
+        self.GYRO_RANGES = [125, 250, 500, 1000, 2000]
 
-        # initialise the magnetometer
         # initialise the accelerometer
-        self._writeByte(LSM6DSL_CTRL1_XL, 0b10011111)  # ODR 3.33 kHz, +/- 8g , BW = 400hz
+        self._writeByte(LSM6DSL_CTRL1_XL, self.ACC_RANGE_CONFIG_BYTE[self.ACC_RANGE_IDX])  # ODR 3.33 kHz, +/- 8g , BW = 400hz
         self._writeByte(LSM6DSL_CTRL3_C, 0b01000100)  # Enable Block Data update, increment during multi byte read
         # initialise the gyroscope
         self._writeByte(LSM6DSL_CTRL2_G, 0b10011100)  # ODR 3.3 kHz, 2000 dps
@@ -71,22 +76,24 @@ class LSM6DSL(object):
         acc_h = self._bus.read_byte_data(LSM6DSL_ADDRESS, LSM6DSL_OUTX_H_XL)
 
         acc_combined = (acc_l | acc_h << 8)
-        return acc_combined if acc_combined < 32768 else acc_combined - 65536
+        acc_combined = acc_combined if acc_combined < 32768 else acc_combined - 65536
+        return acc_combined/(2.0**15)*self.ACC_RANGES[self.ACC_RANGE_IDX]
 
     def readACCy(self):
         acc_l = self._bus.read_byte_data(LSM6DSL_ADDRESS, LSM6DSL_OUTY_L_XL)
         acc_h = self._bus.read_byte_data(LSM6DSL_ADDRESS, LSM6DSL_OUTY_H_XL)
 
         acc_combined = (acc_l | acc_h << 8)
-        return acc_combined if acc_combined < 32768 else acc_combined - 65536
+        acc_combined = acc_combined if acc_combined < 32768 else acc_combined - 65536
+        return acc_combined / (2.0 ** 15) * self.ACC_RANGES[self.ACC_RANGE_IDX]
 
     def readACCz(self):
         acc_l = self._bus.read_byte_data(LSM6DSL_ADDRESS, LSM6DSL_OUTZ_L_XL)
         acc_h = self._bus.read_byte_data(LSM6DSL_ADDRESS, LSM6DSL_OUTZ_H_XL)
 
         acc_combined = (acc_l | acc_h << 8)
-        print(acc_l)
-        return acc_combined if acc_combined < 32768 else acc_combined - 65536
+        acc_combined = acc_combined if acc_combined < 32768 else acc_combined - 65536
+        return acc_combined / (2.0 ** 15) * self.ACC_RANGES[self.ACC_RANGE_IDX]
 
     def readGYRx(self):
         gyr_l = self._bus.read_byte_data(LSM6DSL_ADDRESS, LSM6DSL_OUTX_L_G)
