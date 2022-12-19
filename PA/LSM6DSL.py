@@ -60,13 +60,15 @@ class LSM6DSL(object):
         self.ACC_RANGES = [2, 4, 8, 16]
         self.ACC_RANGE_CONFIG_BYTE = [0b10010011, 0b10011011, 0b10011111, 0b10010111]
         self.ACC_RANGE_IDX = 1
-        self.GYRO_RANGES = [125, 250, 500, 1000, 2000]
+        self.GYRO_RANGES = [250, 500, 1000, 2000]
+        self.GYRO_RANGE_CONFIG_BYTE = [0b10010000, 0b10010100, 0b10011000, 0b10011100]
+        self.GYRO_RANGE_IDX = 1
 
         # initialise the accelerometer
         self._writeByte(LSM6DSL_CTRL1_XL, self.ACC_RANGE_CONFIG_BYTE[self.ACC_RANGE_IDX])  # ODR 3.33 kHz, +/- 8g , BW = 400hz
         self._writeByte(LSM6DSL_CTRL3_C, 0b01000100)  # Enable Block Data update, increment during multi byte read
         # initialise the gyroscope
-        self._writeByte(LSM6DSL_CTRL2_G, 0b10011100)  # ODR 3.3 kHz, 2000 dps
+        self._writeByte(LSM6DSL_CTRL2_G, self.GYRO_RANGE_CONFIG_BYTE[self.GYRO_RANGE_IDX])  # ODR 3.3 kHz, 2000 dps
 
     def _writeByte(self, register, value):
         self._bus.write_byte_data(self._address, register, value)
@@ -100,21 +102,24 @@ class LSM6DSL(object):
         gyr_h = self._bus.read_byte_data(LSM6DSL_ADDRESS, LSM6DSL_OUTX_H_G)
 
         gyr_combined = (gyr_l | gyr_h << 8)
-        return gyr_combined if gyr_combined < 32768 else gyr_combined - 65536
+        gyr_combined = gyr_combined if gyr_combined < 32768 else gyr_combined - 65536
+        return gyr_combined / (2.0 ** 15) * self.GYRO_RANGES[self.GYRO_RANGE_IDX]
 
     def readGYRy(self):
         gyr_l = self._bus.read_byte_data(LSM6DSL_ADDRESS, LSM6DSL_OUTY_L_G)
         gyr_h = self._bus.read_byte_data(LSM6DSL_ADDRESS, LSM6DSL_OUTY_H_G)
 
         gyr_combined = (gyr_l | gyr_h << 8)
-        return gyr_combined if gyr_combined < 32768 else gyr_combined - 65536
+        gyr_combined = gyr_combined if gyr_combined < 32768 else gyr_combined - 65536
+        return gyr_combined / (2.0 ** 15) * self.GYRO_RANGES[self.GYRO_RANGE_IDX]
 
     def readGYRz(self):
         gyr_l = self._bus.read_byte_data(LSM6DSL_ADDRESS, LSM6DSL_OUTZ_L_G)
         gyr_h = self._bus.read_byte_data(LSM6DSL_ADDRESS, LSM6DSL_OUTZ_H_G)
 
         gyr_combined = (gyr_l | gyr_h << 8)
-        return gyr_combined if gyr_combined < 32768 else gyr_combined - 65536
+        gyr_combined = gyr_combined if gyr_combined < 32768 else gyr_combined - 65536
+        return gyr_combined / (2.0 ** 15) * self.GYRO_RANGES[self.GYRO_RANGE_IDX]
 
 if __name__ == '__main__':
 
@@ -133,7 +138,7 @@ if __name__ == '__main__':
 
         print('===================================================')
 
-        print('AccX = %.2f g\nAccY = %.2fg\nAccZ =%.2fg\n' % (AccX, AccY, AccZ))
-        print('GyrX = %.2f\nGyrY = %.2f\nGyrZ =%.2f\n' % (GyrX, GyrY, GyrZ))
+        print('AccX = %.2f g\nAccY = %.2f g\nAccZ =%.2f g\n' % (AccX, AccY, AccZ))
+        print('GyrX = %.2f dps\nGyrY = %.2f dps\nGyrZ =%.2f dps\n' % (GyrX, GyrY, GyrZ))
 
         print('===================================================\n\n')
