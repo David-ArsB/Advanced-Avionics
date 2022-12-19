@@ -133,7 +133,7 @@ if __name__ == '__main__':
 
         print('===================================================')
 
-        print('AccX = %.2f\nAccY = %.2f\nAccZ =%.2f\n' % (AccX, AccY, AccZ))
+        print('AccX = %.2f g\nAccY = %.2fg\nAccZ =%.2fg\n' % (AccX, AccY, AccZ))
         print('GyrX = %.2f\nGyrY = %.2f\nGyrZ =%.2f\n' % (GyrX, GyrY, GyrZ))
 
         print('===================================================\n\n')
