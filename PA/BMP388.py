@@ -220,12 +220,23 @@ if __name__ == '__main__':
     print("BMP388 Test Program ...\n")
     bmp388 = BMP388(smbus.SMBus(0x01))
     bmp388.setGroundPressure(102400.0)
-
+    N = 1
+    avg_temp = 0
+    avg_pressure = 0
+    avg_alt = 0
     while True:
         time.sleep(0.5)
         temperature, pressure, altitude = bmp388.get_temperature_and_pressure_and_altitude()
+        avg_temp = (avg_temp * (N - 1) + temperature) / N
+        avg_pressure = (avg_pressure * (N - 1) + pressure) / N
+        avg_alt = (avg_alt * (N - 1) + altitude) / N
+
         print(' Temperature = %.1f Pressure = %.2f  Altitude =%.2f ' % (
         temperature / 100.0, pressure / 100.0, altitude / 100.0))
+        print('Average Temperature = %.1f Pressure = %.2f  Altitude =%.2f \n' % (
+            avg_temp / 100.0, avg_pressure / 100.0, avg_alt / 100.0))
+
+        N+=1
 
 
 
