@@ -219,7 +219,7 @@ if __name__ == '__main__':
 
     print("BMP388 Test Program ...\n")
     bmp388 = BMP388(smbus.SMBus(0x01))
-    bmp388.setGroundPressure(100510.0)
+    bmp388.setGroundPressure(102400.0)
 
     while True:
         time.sleep(0.5)

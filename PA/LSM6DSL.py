@@ -138,7 +138,7 @@ if __name__ == '__main__':
 
         print('===================================================')
 
-        print('AccX = %.2f g\nAccY = %.2f g\nAccZ =%.2f g\n' % (AccX, AccY, AccZ))
-        print('GyrX = %.2f dps\nGyrY = %.2f dps\nGyrZ =%.2f dps\n' % (GyrX, GyrY, GyrZ))
+        print('AccX = %.2f g\nAccY = %.2f g\nAccZ = %.2f g\n' % (AccX, AccY, AccZ))
+        print('GyrX = %.2f dps\nGyrY = %.2f dps\nGyrZ = %.2f dps\n' % (GyrX, GyrY, GyrZ))
 
         print('===================================================\n\n')
