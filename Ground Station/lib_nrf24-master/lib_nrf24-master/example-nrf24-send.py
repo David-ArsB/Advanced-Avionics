@@ -15,7 +15,7 @@ import spidev
 # set the pipe address. this address should be entered on the receiver also
 pipes = [[0xE0, 0xE0, 0xE0, 0xE0, 0xE0], [0xF0, 0xF0, 0xF0, 0xF0, 0xF0]]
 radio = NRF24(GPIO, spidev.SpiDev())  # use the gpio pins
-radio.begin(8, 25)  # start the radio and set the ce,csn pin ce= GPIO08, csn= GPIO25
+radio.begin(0, 25)  # start the radio and set the ce,csn pin ce= GPIO08, csn= GPIO25
 
 time.sleep(1)
 radio.setRetries(15,15)
