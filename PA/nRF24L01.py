@@ -13,7 +13,7 @@ GPIO.setmode(GPIO.BCM)  # set the gpio mode
 # set the pipe address. this address should be entered on the receiver also
 pipes = [[0xE0, 0xE0, 0xF1, 0xF1, 0xE0], [0xF1, 0xF1, 0xF0, 0xF0, 0xE0]]
 radio = NRF24(GPIO, spidev.SpiDev())  # use the gpio pins
-radio.begin(8, 25)  # start the radio and set the ce,csn pin ce= GPIO08, csn= GPIO25
+radio.begin(0, 25)  # start the radio and set the ce,csn pin ce= GPIO08, csn= GPIO25
 radio.setPayloadSize(32)  # set the payload size as 32 bytes
 radio.setChannel(0x76)  # set the channel as 76 hex
 radio.setDataRate(NRF24.BR_1MBPS)  # set radio data rate
