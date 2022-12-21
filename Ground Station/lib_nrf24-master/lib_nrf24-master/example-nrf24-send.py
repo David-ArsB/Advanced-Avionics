@@ -8,6 +8,7 @@
 import RPi.GPIO as GPIO  # import gpio
 from lib_nrf24 import NRF24
 import time
+import spidev
 
 GPIO.setmode(GPIO.BCM)  # set the gpio mode
 # set the pipe address. this address should be entered on the receiver also
