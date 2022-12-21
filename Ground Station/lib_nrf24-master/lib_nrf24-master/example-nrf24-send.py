@@ -20,7 +20,7 @@ radio.begin(0, 25)  # start the radio and set the ce,csn pin ce= GPIO08, csn= GP
 time.sleep(1)
 radio.setRetries(15,15)
 radio.setPayloadSize(32)
-radio.setChannel(0x71)
+radio.setChannel(0x76)
 
 radio.setDataRate(NRF24.BR_2MBPS)
 radio.setPALevel(NRF24.PA_MIN)
@@ -29,8 +29,8 @@ radio.enableDynamicPayloads()
 radio.enableAckPayload()
 
 
-radio.openWritingPipe(pipes[1])
-radio.openReadingPipe(1, pipes[0])
+radio.openWritingPipe(pipes[0])
+radio.openReadingPipe(1, pipes[1])
 radio.printDetails()
 
 
