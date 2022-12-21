@@ -1,22 +1,21 @@
- #!/usr/bin/python
+
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
 # Example program to send packets to the radio link
 #
 
 
-import RPi.GPIO as GPIO  # import gpio
+import RPi.GPIO as GPIO
+GPIO.setmode(GPIO.BCM)
 from lib_nrf24 import NRF24
 import time
 import spidev
 
-GPIO.setmode(GPIO.BCM)  # set the gpio mode
 # set the pipe address. this address should be entered on the receiver also
 pipes = [[0xE0, 0xE0, 0xE0, 0xE0, 0xE0], [0xF0, 0xF0, 0xF0, 0xF0, 0xF0]]
 radio = NRF24(GPIO, spidev.SpiDev())  # use the gpio pins
 radio.begin(0, 25)  # start the radio and set the ce,csn pin ce= GPIO08, csn= GPIO25
-
-
 
 time.sleep(1)
 radio.setRetries(15,15)
@@ -30,8 +29,8 @@ radio.enableDynamicPayloads()
 radio.enableAckPayload()
 
 
-radio.openWritingPipe(pipes[0])
-radio.openReadingPipe(1, pipes[1])
+radio.openWritingPipe(pipes[1])
+radio.openReadingPipe(1, pipes[0])
 radio.printDetails()
 
 
