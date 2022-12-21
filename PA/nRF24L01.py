@@ -21,7 +21,7 @@ radio.setPALevel(NRF24.PA_MIN)  # set PA level
 radio.setAutoAck(True)  # set acknowledgement as true
 radio.enableDynamicPayloads()
 radio.enableAckPayload()
-radio.openWritingPipe(pipes[0])  # open the defined pipe for writing
+radio.openWritingPipe(0xE0E0E0E0E0)  # open the defined pipe for writing
 radio.printDetails()  # print basic details of radio
 sendMessage = list("Hi..Arduino UNO")  # the message to be sent
 
