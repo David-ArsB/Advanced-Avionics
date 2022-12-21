@@ -5,20 +5,21 @@
 #
 
 
-import virtGPIO as GPIO
+import RPi.GPIO as GPIO  # import gpio
 from lib_nrf24 import NRF24
 import time
 
 
 
-pipes = [[0xe7, 0xe7, 0xe7, 0xe7, 0xe7], [0xc2, 0xc2, 0xc2, 0xc2, 0xc2]]
+
+pipes = [[0xE0, 0xE0, 0xE0, 0xE0, 0xE0], [0xF0, 0xF0, 0xF0, 0xF0, 0xF0]]
 
 radio = NRF24(GPIO, GPIO.SpiDev())
-radio.begin(10, 8) #Set spi-ce pin10, and rf24-CE pin 8
+radio.begin(0, 25)  # start the radio and set the ce,csn pin ce= GPIO08, csn= GPIO25
 time.sleep(1)
 radio.setRetries(15,15)
 radio.setPayloadSize(32)
-radio.setChannel(0x60)
+radio.setChannel(0x71)
 
 radio.setDataRate(NRF24.BR_2MBPS)
 radio.setPALevel(NRF24.PA_MIN)
@@ -27,8 +28,8 @@ radio.enableDynamicPayloads()
 radio.enableAckPayload()
 
 
-radio.openWritingPipe(pipes[1])
-radio.openReadingPipe(1, pipes[0])
+radio.openWritingPipe(pipes[0])
+radio.openReadingPipe(1, pipes[1])
 radio.printDetails()
 
 
