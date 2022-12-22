@@ -23,10 +23,10 @@ void setup(void) {
   radio.openReadingPipe(1, pipe) ;        // start reading pipe 
 
   radio.enableDynamicPayloads() ;
-  radio.setPayloadSize(64);
+  //radio.setPayloadSize(64);
   radio.setDataRate(RF24_2MBPS);
   radio.powerUp() ;       
-  radio.startListening() ;        // start listening forever   
+  
 
   
 
@@ -36,7 +36,7 @@ void setup(void) {
 void loop(void) {
 
 
- 
+ radio.startListening() ;        // start listening forever   
 
   char receivedMessage[64] = {0} ;   // set incmng message for 32 bytes
   if (radio.available()) {       // check if message is coming
@@ -45,9 +45,9 @@ void loop(void) {
     
     Serial.println(receivedMessage) ;    // print message on serial monitor 
 
-    Serial.println("Turning off the radio.") ;   // print message on serial monitor
+    Serial.println("Turning off the radio.\n") ;   // print message on serial monitor
 
-    //radio.stopListening() ;   // stop listening radio
+    radio.stopListening() ;   // stop listening radio
 
     
   }
