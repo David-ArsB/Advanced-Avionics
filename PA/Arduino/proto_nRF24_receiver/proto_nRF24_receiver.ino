@@ -27,9 +27,6 @@ void setup(void) {
   radio.setDataRate(RF24_2MBPS);
   radio.powerUp() ;       
   
-
-  
-
 }
 
 
@@ -38,7 +35,7 @@ void loop(void) {
 
  radio.startListening() ;        // start listening forever   
 
-  char receivedMessage[64] = {0} ;   // set incmng message for 32 bytes
+  char receivedMessage[32] = {0} ;   // set incmng message for 32 bytes
   if (radio.available()) {       // check if message is coming
 
     radio.read(receivedMessage, sizeof(receivedMessage));    // read the message and save

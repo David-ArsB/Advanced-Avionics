@@ -27,7 +27,7 @@ radio.setPayloadSize(32)  # set the payload size as 32 bytes
 
 radio.setChannel(0x76)  # set the channel as 76 hex
 
-radio.setDataRate(NRF24.BR_1MBPS)  # set radio data rate
+radio.setDataRate(NRF24.BR_2MBPS)  # set radio data rate
 
 radio.setPALevel(NRF24.PA_MIN)  # set PA level
 
