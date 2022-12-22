@@ -470,6 +470,7 @@ class NRF24:
 
         result = what['tx_ok']
         if what['tx_fail']:
+            print('tx ok')
             self.flush_tx();    # bl  - dont jam up the fifo
         # Handle the ack packet
         if what['rx_ready']:
