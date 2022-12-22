@@ -40,8 +40,8 @@ def parseResponse(gpsLine):
                      chkVal ^= ord(ch)
                 if (chkVal == int(chkSum, 16)): # Compare the calculated checksum with the one in the NMEA sentence
                      print(gpsChars)
-        else:
-            print(gpsLine)
+  else:
+    print(gpsLine)
 
 def handle_ctrl_c(signal, frame):
         sys.exit(130)
