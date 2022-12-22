@@ -62,7 +62,7 @@ def readGPS():
                 break
             else:
                 response.append(c)
-
+        print(response)
         parseResponse(response)
 
     except IOError:
