@@ -37,9 +37,8 @@ N = 1
 
 while True:
 
-    temperature, pressure, altitude = bmp388.get_temperature_and_pressure_and_altitude()
-
     print('===================================================================')
+    temperature, pressure, altitude = bmp388.get_temperature_and_pressure_and_altitude()
     message = list(' Temperature = %.1f Pressure = %.2f  Altitude =%.2f ' % (temperature / 100.0, pressure / 100.0, altitude / 100.0))
     while len(message) < PAYLOAD_SIZE:
         message.append(0)
