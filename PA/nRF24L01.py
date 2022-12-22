@@ -49,7 +49,7 @@ while True:
     radio.startListening()  # Start listening the radio
     while not radio.available(0):
         time.sleep(1 / 100)
-        if time.time() - start > 2:
+        if time.time() - start > 5:
             print("Timed out.")  # print error message if radio disconnected or not functioning anymore
             break
 
