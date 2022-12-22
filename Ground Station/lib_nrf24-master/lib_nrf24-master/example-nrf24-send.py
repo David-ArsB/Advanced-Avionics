@@ -25,9 +25,9 @@ radio.setChannel(0x76)
 
 radio.setDataRate(NRF24.BR_1MBPS)
 radio.setPALevel(NRF24.PA_MIN)
-#radio.setAutoAck(True)
-#radio.enableDynamicPayloads()
-#radio.enableAckPayload()
+radio.setAutoAck(True)
+radio.enableDynamicPayloads()
+radio.enableAckPayload()
 
 
 radio.openWritingPipe(pipes[0])
