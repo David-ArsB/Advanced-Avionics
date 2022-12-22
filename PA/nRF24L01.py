@@ -19,7 +19,7 @@ radio.begin(0, 25)  # start the radio and set the ce,csn pin ce= GPIO08, csn= GP
 PAYLOAD_SIZE = 64
 radio.setPayloadSize(PAYLOAD_SIZE)  # set the payload size as 32 bytes
 radio.setChannel(0x76)  # set the channel as 76 hex
-radio.setDataRate(NRF24.BR_1MBPS)  # set radio data rate
+radio.setDataRate(NRF24.BR_2MBPS)  # set radio data rate
 radio.setPALevel(NRF24.PA_MIN)  # set PA level
 radio.setAutoAck(True)  # set acknowledgement as true
 radio.enableDynamicPayloads()
@@ -49,7 +49,7 @@ while True:
     radio.startListening()  # Start listening the radio
     while not radio.available(0):
         time.sleep(1 / 100)
-        if time.time() - start > 5:
+        if time.time() - start > 8:
             print("Timed out.")  # print error message if radio disconnected or not functioning anymore
             break
 

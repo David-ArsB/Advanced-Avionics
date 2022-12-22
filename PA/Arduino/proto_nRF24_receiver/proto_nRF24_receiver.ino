@@ -23,7 +23,7 @@ void setup(void) {
   radio.openReadingPipe(1, pipe) ;        // start reading pipe 
 
   radio.enableDynamicPayloads() ;
-
+  radio.setPayloadSize(64);
   radio.powerUp() ;       
   radio.startListening() ;        // start listening forever   
 
@@ -37,7 +37,7 @@ void loop(void) {
 
  
 
-  char receivedMessage[32] = {0} ;   // set incmng message for 32 bytes
+  char receivedMessage[64] = {0} ;   // set incmng message for 32 bytes
   if (radio.available()) {       // check if message is coming
 
     radio.read(receivedMessage, sizeof(receivedMessage));    // read the message and save
