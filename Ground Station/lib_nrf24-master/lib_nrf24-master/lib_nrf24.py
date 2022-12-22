@@ -461,16 +461,15 @@ class NRF24:
             if (status & (_BV(NRF24.TX_DS) | _BV(NRF24.MAX_RT))) or (time.time() - sent_at > timeout ):
                 break
             time.sleep(10 / 1000000.0)
-        #obs = self.read_register(NRF24.OBSERVE_TX)
-        #self.print_observe_tx(obs)
-        #self.print_status(status)
+        obs = self.read_register(NRF24.OBSERVE_TX)
+        self.print_observe_tx(obs)
+        self.print_status(status)
         # (for debugging)
 
         what = self.whatHappened()
 
         result = what['tx_ok']
         if what['tx_fail']:
-            print('tx ok')
             self.flush_tx();    # bl  - dont jam up the fifo
         # Handle the ack packet
         if what['rx_ready']:
