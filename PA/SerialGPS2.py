@@ -1,7 +1,7 @@
 
 import serial
 
-port = "/dev/serial0"
+port = "/dev/ttyS0"
 
 
 def parseGPS(data):
