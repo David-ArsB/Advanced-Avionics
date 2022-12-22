@@ -7,7 +7,7 @@ Created on Thu Nov 10 16:00:51 2022
 
 #! /usr/bin/python
 import time
-import smbus2
+import smbus
 import signal
 import sys
 
