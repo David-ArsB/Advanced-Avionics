@@ -16,7 +16,7 @@ import spidev
 # set the pipe address. this address should be entered on the receiver also
 pipes = [[0xE0, 0xE0, 0xE0, 0xE0, 0xE0], [0xF0, 0xF0, 0xF0, 0xF0, 0xF0]]
 radio = NRF24(GPIO, spidev.SpiDev())  # use the gpio pins
-radio.begin(0, 25)  # start the radio and set the ce,csn pin ce= GPIO08, csn= GPIO25
+radio.begin(25, 0)  # start the radio and set the ce,csn pin ce= GPIO08, csn= GPIO25
 
 time.sleep(1)
 radio.setRetries(15,15)
@@ -25,9 +25,9 @@ radio.setChannel(0x76)
 
 radio.setDataRate(NRF24.BR_1MBPS)
 radio.setPALevel(NRF24.PA_MIN)
-radio.setAutoAck(True)
-radio.enableDynamicPayloads()
-radio.enableAckPayload()
+#radio.setAutoAck(True)
+#radio.enableDynamicPayloads()
+#radio.enableAckPayload()
 
 
 radio.openWritingPipe(pipes[0])
