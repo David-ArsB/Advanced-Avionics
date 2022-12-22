@@ -23,7 +23,7 @@ radio = NRF24(GPIO, spidev.SpiDev())  # use the gpio pins
 
 radio.begin(0, 25)  # start the radio and set the ce,csn pin ce= GPIO08, csn= GPIO25
 
-radio.setPayloadSize(32)  # set the payload size as 32 bytes
+radio.setPayloadSize(64)  # set the payload size as 32 bytes
 
 radio.setChannel(0x76)  # set the channel as 76 hex
 
@@ -43,7 +43,7 @@ radio.printDetails()  # print basic detals of radio
 
 sendMessage = list("Hi..Arduino UNO")  # the message to be sent
 
-while len(sendMessage) < 32:
+while len(sendMessage) < 64:
     sendMessage.append(0)
 
 while True:
