@@ -14,7 +14,7 @@ void setup(void) {
 
   radio.begin();        // start radio at ce csn pin 9 and 10
 
-  radio.setPALevel(RF24_PA_MAX) ;   // set power level
+  radio.setPALevel(RF24_PA_MIN) ;   // set power level
 
   radio.setChannel(0x76) ;            // set chanel at 76
 
