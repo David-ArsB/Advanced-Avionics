@@ -17,7 +17,7 @@ gpsReadInterval = 0.03
 
 def connectBus():
     global BUS
-    BUS = smbus.SMBus(1)
+    BUS = smbus.SMBus(0x01)
 
 def parseResponse(gpsLine):
 
