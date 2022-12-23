@@ -37,13 +37,13 @@ void loop(void) {
   
 
   char receivedMessage[32] = {0} ;   // set incmng message for 32 bytes
-  if (radio.available()) {       // check if message is coming
+  while (radio.available()) {       // check if message is coming
 
     radio.read(receivedMessage, sizeof(receivedMessage));    // read the message and save
     
     Serial.println(receivedMessage) ;    // print message on serial monitor 
 
-    //Serial.println("Turning off the radio.\n") ;   // print message on serial monitor
+       // print message on serial monitor
 
     //radio.stopListening() ;   // stop listening radio
 
