@@ -24,7 +24,7 @@ class corePrimaryAircraft():
         self.imu = LSM6DSL(smbus.SMBus(0x01))
         self.compass = LIS3MDL(smbus.SMBus(0x01))
         self.radio = NRF24(GPIO, spidev.SpiDev())
-        self.gps = GpsPoller()
+        #self.gps = GpsPoller()
 
         self._initRadio()
         self._initAltimeter()
@@ -151,7 +151,7 @@ if __name__ == '__main__':
 
     try:
         while True:
-            core.printDataSummary()
+            #core.printDataSummary()
             sendMessage = list("Hi..Arduino UNO")  # the message to be sent
 
             while len(sendMessage) < 32:
