@@ -36,6 +36,8 @@ if __name__ == '__main__':
   done = False
   x = []
   y = []
+
+
   try:
     gpsp.start() # start it up
     while True:
