@@ -143,7 +143,7 @@ class corePrimaryAircraft():
         for block in blocks:
             while len(block) < self.RADIO_PAYLOAD_SIZE:
                 block.append(0)
-
+            print(block)
             self.radio.write(block)  # write the message to radio
 
 if __name__ == '__main__':
