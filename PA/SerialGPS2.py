@@ -38,5 +38,5 @@ print("Receiving GPS data")
 ser = serial.Serial(port, baudrate=9600, timeout=5)
 while True:
     data = ser.readline()
-    print(data)
+    print(data.decode('ascii', errors = 'replace'))
     parseGPS(data)
