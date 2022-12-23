@@ -85,6 +85,7 @@ class BMP388(object):
                                  BMP388_REG_VAL_SOFT_RESET)
                 time.sleep(0.01)
         else:
+            pass
             #print("Pressure sensor NULL!\r\n")
         self._write_byte(BMP388_REG_ADD_PWR_CTRL,
                          BMP388_REG_VAL_PRESS_EN
