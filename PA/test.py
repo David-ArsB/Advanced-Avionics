@@ -13,5 +13,5 @@ def parseGPS(str):
 
 serialPort = serial.Serial(port, baudrate=9600, timeout=0.5)
 while True:
-    str = serialPort.readline()
+    str = serialPort.readline().decode('ascii', errors = 'replace').strip()
     parseGPS(str)
