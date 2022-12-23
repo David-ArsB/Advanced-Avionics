@@ -80,7 +80,7 @@ class corePrimaryAircraft():
         magX = self.compass.readMAGx()
         magY = self.compass.readMAGy()
         magZ = self.compass.readMAGz()
-        heading = atan2(magY, magX) * 180 / pi
+        heading = atan2(-magY, magX) * 180 / pi
         #if heading < 0:
             #heading += 360
         print('COMPASS DATA:')
