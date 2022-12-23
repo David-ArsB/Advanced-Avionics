@@ -61,5 +61,8 @@ class corePrimaryAircraft():
         radio.openWritingPipe(self.RADIO_WRITING_PIPE)  # open the defined pipe for writing
         radio.openReadingPipe(0, self.RADIO_READING_PIPE)  # open the defined pipe for reading
 
+    def _initGPS(self):
+        pass
+
 if __name__ == '__main__':
     core = corePrimaryAircraft()
