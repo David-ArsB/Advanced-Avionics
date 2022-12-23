@@ -116,7 +116,7 @@ class corePrimaryAircraft():
         print('Transmitting to ground station...')
 
         # Print Altimeter Data
-        temperature, pressure, altitude = self.altimeter.get_temperature_and_pressure_and_altitude()/100
+        temperature, pressure, altitude = self.altimeter.get_temperature_and_pressure_and_altitude()
         # Print Compass Data
         magX = self.compass.readMAGxCorr()
         magY = self.compass.readMAGyCorr()
@@ -137,7 +137,7 @@ class corePrimaryAircraft():
 
         numBlocks = 2
         header = list(str('#b',int(numBlocks), ',tph', ',lat', ',long'))
-        block1 = list(str(temperature, ',', pressure, ',', altitude))
+        block1 = list(str(temperature/100, ',', pressure/100, ',', altitude/100))
         block2 = list(str(lat, ',', long))
         blocks = [header, block1, block2]
         for block in blocks:
