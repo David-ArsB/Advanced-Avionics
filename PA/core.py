@@ -137,9 +137,11 @@ class corePrimaryAircraft():
 
         numBlocks = 2
         header = list('#b'+ str(int(numBlocks)) + ',tph' + ',lat' + ',long')
-        block1 = list(str(temperature/100) + ',' + str(pressure/100) + ',' + str(altitude/100))
-        block2 = list(str(lat) + ',' + str(long))
-        blocks = [header, block1, block2]
+        block1 = list(str(temperature/100))
+        block2 = list(str(pressure / 100))
+        block3 = list(str(altitude / 100))
+        block4 = list(str(lat) + ',' + str(long))
+        blocks = [header, block1, block2, block3, block4]
         for block in blocks:
             while len(block) < self.RADIO_PAYLOAD_SIZE:
                 block.append(0)
