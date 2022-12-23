@@ -74,7 +74,7 @@ class corePrimaryAircraft():
         # Print Altimeter Data
         temperature, pressure, altitude = self.altimeter.get_temperature_and_pressure_and_altitude()
         print('$ ALTIMETER DATA:')
-        print('$  -> Temperature = %.1f\n$  -> Pressure = %.2f\n$  -> Altitude =%.2f\n$ ' % (
+        print('$  -> Temperature = %.1f C\n$  -> Pressure = %.2f Pa\n$  -> Altitude =%.2f m\n$ ' % (
             temperature / 100.0, pressure / 100.0, altitude / 100.0))
         # Print Compass Data
         magX = self.compass.readMAGxCorr()
@@ -85,8 +85,8 @@ class corePrimaryAircraft():
         if heading < 0:
             heading += 360
         print('$ COMPASS DATA:')
-        print('$  -> magX = %.2f, magY = %.2f, magZ =%.2f ' % (magX, magY, magZ))
-        print('$  -> Heading = %.2f\n$ ' % (heading))
+        print('$  -> magX = %.2f G, magY = %.2f G, magZ =%.2f G' % (magX, magY, magZ))
+        print('$  -> Heading = %.2f deg N\n$ ' % (heading))
         # Print IMU Data
         AccX = self.imu.readACCx()
         AccY = self.imu.readACCy()
@@ -100,7 +100,7 @@ class corePrimaryAircraft():
         # Print GPS Data
         lat, long = self.gps.getPosition()
         print('$ GPS DATA:')
-        print('$  -> Latitude = %.8f, Longitude = %.8f \n$ ' % (lat, long))
+        print('$  -> Latitude = %.8f N, Longitude = %.8f E\n$ ' % (lat, long))
         print('===============================================\n')
 
     def transmitToGCS(self):
