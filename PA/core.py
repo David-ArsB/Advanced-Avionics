@@ -73,8 +73,8 @@ class corePrimaryAircraft():
         print('===============================================\n')
         # Print Altimeter Data
         temperature, pressure, altitude = self.altimeter.get_temperature_and_pressure_and_altitude()
-        print('ALTIMETER DATA:')
-        print(' -> Temperature = %.1f\n -> Pressure = %.2f\n -> Altitude =%.2f\n' % (
+        print('$ ALTIMETER DATA:')
+        print('$  -> Temperature = %.1f\n -> Pressure = %.2f\n -> Altitude =%.2f\n' % (
             temperature / 100.0, pressure / 100.0, altitude / 100.0))
         # Print Compass Data
         magX = self.compass.readMAGxCorr()
@@ -84,9 +84,9 @@ class corePrimaryAircraft():
         heading = atan2(magY, magX) * 180 / pi
         if heading < 0:
             heading += 360
-        print('COMPASS DATA:')
-        print(' -> magX = %.2f, magY = %.2f, magZ =%.2f ' % (magX, magY, magZ))
-        print(' -> Heading = %.2f\n' % (heading))
+        print('$ COMPASS DATA:')
+        print('$  -> magX = %.2f, magY = %.2f, magZ =%.2f ' % (magX, magY, magZ))
+        print('$  -> Heading = %.2f\n' % (heading))
         # Print IMU Data
         AccX = self.imu.readACCx()
         AccY = self.imu.readACCy()
@@ -94,13 +94,13 @@ class corePrimaryAircraft():
         GyrX = self.imu.readGYRx()
         GyrY = self.imu.readGYRy()
         GyrZ = self.imu.readGYRz()
-        print('IMU DATA:')
-        print(' -> AccX = %.2f g\n -> AccY = %.2f g\n -> AccZ = %.2f g\n' % (AccX, AccY, AccZ))
-        print(' -> GyrX = %.2f dps\n -> GyrY = %.2f dps\n -> GyrZ = %.2f dps\n' % (GyrX, GyrY, GyrZ))
+        print('$ IMU DATA:')
+        print('$  -> AccX = %.2f g\n -> AccY = %.2f g\n -> AccZ = %.2f g\n' % (AccX, AccY, AccZ))
+        print('$  -> GyrX = %.2f dps\n -> GyrY = %.2f dps\n -> GyrZ = %.2f dps\n' % (GyrX, GyrY, GyrZ))
         # Print GPS Data
         lat, long = self.gps.getPosition()
-        print('GPS DATA:')
-        print(' -> Latitude = %.8f, Longitude = %.8f \n' % (lat, long))
+        print('$ GPS DATA:')
+        print('$  -> Latitude = %.8f, Longitude = %.8f \n' % (lat, long))
         print('===============================================\n')
 
     def transmitToGCS(self):
