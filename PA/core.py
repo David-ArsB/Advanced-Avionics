@@ -77,11 +77,11 @@ class corePrimaryAircraft():
         print(' -> Temperature = %.1f\n -> Pressure = %.2f\n -> Altitude =%.2f\n' % (
             temperature / 100.0, pressure / 100.0, altitude / 100.0))
         # Print Compass Data
-        magX = self.compass.readMAGx()
-        magY = self.compass.readMAGy()
-        magZ = self.compass.readMAGz()
-        print((magX**2+magY**2+magZ**2)**(1/2))
-        heading = atan2(-magY, magX) * 180 / pi
+        magX = self.compass.readMAGxCorr()
+        magY = self.compass.readMAGxCorr()
+        magZ = self.compass.readMAGxCorr()
+        #print((magX**2+magY**2+magZ**2)**(1/2))
+        heading = atan2(magY, magX) * 180 / pi
         if heading < 0:
             heading += 360
         print('COMPASS DATA:')

@@ -90,6 +90,31 @@ class LIS3MDL(object):
 
         return mag_combined / (2.0 ** 15) * self.MAG_RANGES[self.MAG_RANGE_IDX]
 
+    def readMAGxCorr(self):
+        MAGxRaw = self.readMAGx()
+        return MAGxRaw - (MAGX_MIN + MAGX_MAX) / 2
+
+    def readMAGyCorr(self):
+        MAGyRaw = self.readMAGy()
+        return MAGyRaw - (MAGY_MIN + MAGY_MAX) / 2
+
+    def readMAGzCorr(self):
+        MAGzRaw = self.readMAGz()
+        return MAGzRaw - (MAGZ_MIN + MAGZ_MAX) / 2
+
+    def readMAGxCorrDec(self):
+        MAGxRaw = self.readMAGx()
+        return MAGxRaw - (MAGX_MIN + MAGX_MAX) / 2
+
+    def readMAGyCorrDec(self):
+        MAGyRaw = self.readMAGy()
+        return MAGyRaw - (MAGY_MIN + MAGY_MAX) / 2
+
+
+    def readMAGzCorrDec(self):
+        MAGzRaw = self.readMAGz()
+        return MAGzRaw - (MAGZ_MIN + MAGZ_MAX) / 2
+
 
 
 if __name__ == '__main__':
