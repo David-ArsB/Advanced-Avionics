@@ -67,5 +67,16 @@ class corePrimaryAircraft():
         print('Setting up GPS thread ...')
         self.gps.start()
 
+    def printDataSummary(self):
+        # Print Altimeter Data
+        # Print Compass Data
+        # Print IMU Data
+        # Print GPS Data
+        lat, long = self.gps.getPosition()
+        print('Latitude = %.8f, Longitude = %.8f \n' % (lat, long))
+
 if __name__ == '__main__':
     core = corePrimaryAircraft()
+
+    while True:
+        core.printDataSummary()

@@ -78,14 +78,14 @@ class BMP388(object):
         # Load calibration values.
 
         if self._read_byte(BMP388_REG_ADD_WIA) == BMP388_REG_VAL_WIA:
-            print("Pressure sensor is BMP388!\r\n")
+            #print("Pressure sensor is BMP388!\r\n")
             u8RegData = self._read_byte(BMP388_REG_ADD_STATUS)
             if u8RegData & BMP388_REG_VAL_CMD_RDY:
                 self._write_byte(BMP388_REG_ADD_CMD,
                                  BMP388_REG_VAL_SOFT_RESET)
                 time.sleep(0.01)
         else:
-            print("Pressure sensor NULL!\r\n")
+            #print("Pressure sensor NULL!\r\n")
         self._write_byte(BMP388_REG_ADD_PWR_CTRL,
                          BMP388_REG_VAL_PRESS_EN
                          | BMP388_REG_VAL_TEMP_EN
