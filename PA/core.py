@@ -37,7 +37,7 @@ class corePrimaryAircraft():
     def _initAltimeter(self):
         print('Setting up altimeter (BMP388) ...')
         temperature, pressure, altitude = self.altimeter.get_temperature_and_pressure_and_altitude()
-        
+
         self.altimeter.setGroundPressure(pressure / 100.0)
         print(' -> Ground Pressure Level = %.2f Pa' % (pressure / 100.0))
 
@@ -102,9 +102,35 @@ class corePrimaryAircraft():
         print(' -> Latitude = %.8f, Longitude = %.8f \n' % (lat, long))
         print('===============================================\n')
 
+    def transmitToGCS(self):
+        # Fetch Altimeter Data
+        temperature, pressure, altitude = self.altimeter.get_temperature_and_pressure_and_altitude()/100
+        # Fetch Compass Data
+        magX = self.compass.readMAGx()
+        magY = self.compass.readMAGy()
+        magZ = self.compass.readMAGz()
+        heading = atan2(magY, magX) * 180 / pi
+        if heading < 0:
+            heading += 360
+        # Fetch IMU Data
+        AccX = self.imu.readACCx()
+        AccY = self.imu.readACCy()
+        AccZ = self.imu.readACCz()
+        GyrX = self.imu.readGYRx()
+        GyrY = self.imu.readGYRy()
+        GyrZ = self.imu.readGYRz()
+        # Fetch GPS Data
+        lat, long = self.gps.getPosition()
+
 if __name__ == '__main__':
     core = corePrimaryAircraft()
 
-    while True:
-        core.printDataSummary()
-        time.sleep(1)
+    try:
+        while True:
+            core.printDataSummary()
+            time.sleep(1)
+
+    except (KeyboardInterrupt, SystemExit):  # when you press ctrl+c
+        print("\nKilling Thread...")
+        core.gps.running = False
+        core.gps.join()  # wait for the thread to finish what it's doing
