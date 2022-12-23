@@ -49,9 +49,13 @@ class LIS3MDL(object):
         self._address = address
         self._bus = bus
 
+        self.MAG_RANGES = [4, 8, 12, 16]
+        self.MAG_RANGE_CONFIG_BYTE = [0b00000000, 0b00100000, 0b01000000, 0b01100000]
+        self.MAG_RANGE_IDX = 1
+
         # initialise the magnetometer
-        self._writeByte(LIS3MDL_CTRL_REG1,0b11011100)  # Temp sesnor enabled, High performance, ODR 80 Hz, FAST ODR disabled and Selft test disabled.
-        self._writeByte(LIS3MDL_CTRL_REG2, 0b00100000)  # +/- 8 gauss
+        self._writeByte(LIS3MDL_CTRL_REG1, 0b11011100)  # Temp sesnor enabled, High performance, ODR 80 Hz, FAST ODR disabled and Selft test disabled.
+        self._writeByte(LIS3MDL_CTRL_REG2, self.MAG_RANGE_CONFIG_BYTE[self.MAG_RANGE_IDX])  # +/- 8 gauss
         self._writeByte(LIS3MDL_CTRL_REG3, 0b00000000)  # Continuous-conversion mode
 
     def _writeByte(self, register, value):
@@ -62,21 +66,27 @@ class LIS3MDL(object):
         mag_h = self._bus.read_byte_data(LIS3MDL_ADDRESS, LIS3MDL_OUT_X_H)
 
         mag_combined = (mag_l | mag_h << 8)
-        return mag_combined if mag_combined < 32768 else mag_combined - 65536
+        mag_combined = mag_combined if mag_combined < 32768 else mag_combined - 65536
+
+        return mag_combined / (2.0 ** 15) * self.MAG_RANGES[self.MAG_RANGE_IDX]
 
     def readMAGy(self):
         mag_l = self._bus.read_byte_data(LIS3MDL_ADDRESS, LIS3MDL_OUT_Y_L)
         mag_h = self._bus.read_byte_data(LIS3MDL_ADDRESS, LIS3MDL_OUT_Y_H)
 
         mag_combined = (mag_l | mag_h << 8)
-        return mag_combined if mag_combined < 32768 else mag_combined - 65536
+        mag_combined = mag_combined if mag_combined < 32768 else mag_combined - 65536
+
+        return mag_combined / (2.0 ** 15) * self.MAG_RANGES[self.MAG_RANGE_IDX]
 
     def readMAGz(self):
         mag_l = self._bus.read_byte_data(LIS3MDL_ADDRESS, LIS3MDL_OUT_Z_L)
         mag_h = self._bus.read_byte_data(LIS3MDL_ADDRESS, LIS3MDL_OUT_Z_H)
 
         mag_combined = (mag_l | mag_h << 8)
-        return mag_combined if mag_combined < 32768 else mag_combined - 65536
+        mag_combined = mag_combined if mag_combined < 32768 else mag_combined - 65536
+
+        return mag_combined / (2.0 ** 15) * self.MAG_RANGES[self.MAG_RANGE_IDX]
 
 
 
