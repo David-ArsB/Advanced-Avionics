@@ -152,7 +152,12 @@ if __name__ == '__main__':
     try:
         while True:
             core.printDataSummary()
-            core.transmitToGCS()
+            sendMessage = list("Hi..Arduino UNO")  # the message to be sent
+
+            while len(sendMessage) < 32:
+                sendMessage.append(0)
+            core.radio.write(sendMessage)  # just write the message to radio
+            #core.transmitToGCS()
             time.sleep(1)
 
     except (KeyboardInterrupt, SystemExit):  # when you press ctrl+c
