@@ -152,6 +152,7 @@ if __name__ == '__main__':
     try:
         while True:
             #core.printDataSummary()
+            core.radio.printDetails()
             sendMessage = list("Hi..Arduino UNO")  # the message to be sent
 
             while len(sendMessage) < 32:
