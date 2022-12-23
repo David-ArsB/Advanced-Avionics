@@ -24,13 +24,13 @@ class corePrimaryAircraft():
         self.imu = LSM6DSL(smbus.SMBus(0x01))
         self.compass = LIS3MDL(smbus.SMBus(0x01))
         self.radio = NRF24(GPIO, spidev.SpiDev())
-        #self.gps = GpsPoller()
+        self.gps = GpsPoller()
 
         self._initRadio()
         self._initAltimeter()
         self._initCompass()
         self._initIMU()
-        #self._initGPS()
+        self._initGPS()
         print('Initialisation Complete! \n')
 
 
@@ -52,7 +52,7 @@ class corePrimaryAircraft():
         print('Setting up radio (nRF24L01+) ...')
         self.radio = NRF24(GPIO, spidev.SpiDev())  # use the gpio pins
         self.radio.begin(0, 25)  # start the radio and set the ce,csn pin ce= GPIO08, csn= GPIO25
-        
+
         self.radio.setPayloadSize(self.RADIO_PAYLOAD_SIZE)  # set the payload size as 32 bytes
         self.radio.setChannel(0x76)  # set the channel as 76 hex
         self.radio.setDataRate(self.RADIO_DATA_RATES[2])  # set radio data rate to 2MBPS
@@ -63,7 +63,7 @@ class corePrimaryAircraft():
         self.radio.enableAckPayload()
 
         self.radio.openWritingPipe(self.RADIO_WRITING_PIPE)  # open the defined pipe for writing
-        #radio.openReadingPipe(0, self.RADIO_READING_PIPE)  # open the defined pipe for reading
+        radio.openReadingPipe(0, self.RADIO_READING_PIPE)  # open the defined pipe for reading
 
     def _initGPS(self):
         print('Setting up GPS thread ...')
@@ -151,14 +151,10 @@ if __name__ == '__main__':
 
     try:
         while True:
-            #core.printDataSummary()
-            core.radio.printDetails()
-            sendMessage = list("Hi..Arduino UNO")  # the message to be sent
+            core.printDataSummary()
+            #core.radio.printDetails()
 
-            while len(sendMessage) < 32:
-                sendMessage.append(0)
-            core.radio.write(sendMessage)  # just write the message to radio
-            #core.transmitToGCS()
+            core.transmitToGCS()
             time.sleep(1)
 
     except (KeyboardInterrupt, SystemExit):  # when you press ctrl+c
