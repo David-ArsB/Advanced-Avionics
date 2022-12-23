@@ -7,6 +7,7 @@ from LSM6DSL import LSM6DSL # Import Accelerometer and Gyro Module
 from LIS3MDL import LIS3MDL # Import Compass module
 from lib_nrf24 import NRF24 # Import Radio module
 from GPSPoller import GpsPoller
+from math import pi, atan2
 
 
 class corePrimaryAircraft():
@@ -69,8 +70,28 @@ class corePrimaryAircraft():
 
     def printDataSummary(self):
         # Print Altimeter Data
+        temperature, pressure, altitude = self.altimeter.get_temperature_and_pressure_and_altitude()
+
+        print(' Temperature = %.1f Pressure = %.2f  Altitude =%.2f ' % (
+            temperature / 100.0, pressure / 100.0, altitude / 100.0))
         # Print Compass Data
+        magX = self.compass.readMAGx()
+        magY = self.compass.readMAGy()
+        magZ = self.compass.readMAGz()
+        heading = atan2(magY, magX) * 180 / pi
+        if heading < 0:
+            heading += 360
+        print(' magX = %.2f magY = %.2f  magZ =%.2f ' % (magX, magY, magZ))
+        print(' Heading = %.2f\n' % (heading))
         # Print IMU Data
+        AccX = self.imu.readACCx()
+        AccY = self.imu.readACCy()
+        AccZ = self.imu.readACCz()
+        GyrX = self.imu.readGYRx()
+        GyrY = self.imu.readGYRy()
+        GyrZ = self.imu.readGYRz()
+        print('AccX = %.2f g\nAccY = %.2f g\nAccZ = %.2f g\n' % (AccX, AccY, AccZ))
+        print('GyrX = %.2f dps\nGyrY = %.2f dps\nGyrZ = %.2f dps\n' % (GyrX, GyrY, GyrZ))
         # Print GPS Data
         lat, long = self.gps.getPosition()
         print('Latitude = %.8f, Longitude = %.8f \n' % (lat, long))
