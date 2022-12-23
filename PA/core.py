@@ -37,7 +37,7 @@ class corePrimaryAircraft():
     def _initAltimeter(self):
         print('Setting up altimeter (BMP388) ...')
         temperature, pressure, altitude = self.altimeter.get_temperature_and_pressure_and_altitude()
-        self.altimeter.setGroundPressure(pressure)
+        self.altimeter.setGroundPressure(101325.0)
         print(' -> Ground Pressure Level = %.2f Pa' % (pressure / 100.0))
 
     def _initIMU(self):
@@ -69,7 +69,7 @@ class corePrimaryAircraft():
         self.gps.start()
 
     def printDataSummary(self):
-        print('===============================================')
+        print('===============================================\n')
         # Print Altimeter Data
         temperature, pressure, altitude = self.altimeter.get_temperature_and_pressure_and_altitude()
         print('ALTIMETER DATA:')
