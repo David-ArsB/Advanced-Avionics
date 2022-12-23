@@ -59,7 +59,7 @@ if __name__ == '__main__':
       avg_lat = (avg_lat * N + lat)/(N+1)
       avg_long = (avg_long * N + long)/(N+1)
       print('average coords   ' , avg_lat,',',avg_long)
-      print ('time utc        ' , gpsp.gpsd.utc,' + ', gpsd.fix.time)
+      print ('time utc        ' , gpsp.gpsd.utc,' + ', gpsp.gpsd.fix.time)
       print ('altitude (m)    ' , gpsp.gpsd.fix.altitude)
       print ('eps             ' , gpsp.gpsd.fix.eps)
       print ('epx             ' , gpsp.gpsd.fix.epx)
