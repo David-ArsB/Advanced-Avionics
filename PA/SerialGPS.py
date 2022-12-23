@@ -10,22 +10,19 @@ from numpy import std, sqrt, pi, linspace, cos, sin, append;
 from coordDist import distCoords;
 import csv
 
-gpsd = None #seting the global variable
 
 os.system('clear') #clear the terminal (optional)
 
 class GpsPoller(threading.Thread):
   def __init__(self):
     threading.Thread.__init__(self)
-    global gpsd #bring it in scope
-    gpsd = gps(mode=WATCH_ENABLE) #starting the stream of info
+    self.gpsd = gps(mode=WATCH_ENABLE) #starting the stream of info
     self.current_value = None
     self.running = True #setting the thread running to true
 
   def run(self):
-    global gpsd
     while gpsp.running:
-      gpsd.next() #this will continue to loop and grab EACH set of gpsd info to clear the buffer
+      self.gpsd.next() #this will continue to loop and grab EACH set of gpsd info to clear the buffer
 
 if __name__ == '__main__':
   gpsp = GpsPoller() # create the thread
@@ -52,8 +49,8 @@ if __name__ == '__main__':
         y = []
 
       os.system('clear')
-      lat = gpsd.fix.latitude
-      long = gpsd.fix.longitude
+      lat = gpsp.gpsd.fix.latitude
+      long = gpsp.gpsd.fix.longitude
       print()
       print (' GPS reading')
       print ('----------------------------------------')
@@ -62,18 +59,18 @@ if __name__ == '__main__':
       avg_lat = (avg_lat * N + lat)/(N+1)
       avg_long = (avg_long * N + long)/(N+1)
       print('average coords   ' , avg_lat,',',avg_long)
-      print ('time utc        ' , gpsd.utc,' + ', gpsd.fix.time)
-      print ('altitude (m)    ' , gpsd.fix.altitude)
-      print ('eps             ' , gpsd.fix.eps)
-      print ('epx             ' , gpsd.fix.epx)
-      print ('epv             ' , gpsd.fix.epv)
-      print ('ept             ' , gpsd.fix.ept)
-      print ('speed (m/s)     ' , gpsd.fix.speed)
-      print ('climb           ' , gpsd.fix.climb)
-      print ('track           ' , gpsd.fix.track)
-      print ('mode            ' , gpsd.fix.mode)
+      print ('time utc        ' , gpsp.gpsd.utc,' + ', gpsd.fix.time)
+      print ('altitude (m)    ' , gpsp.gpsd.fix.altitude)
+      print ('eps             ' , gpsp.gpsd.fix.eps)
+      print ('epx             ' , gpsp.gpsd.fix.epx)
+      print ('epv             ' , gpsp.gpsd.fix.epv)
+      print ('ept             ' , gpsp.gpsd.fix.ept)
+      print ('speed (m/s)     ' , gpsp.gpsd.fix.speed)
+      print ('climb           ' , gpsp.gpsd.fix.climb)
+      print ('track           ' , gpsp.gpsd.fix.track)
+      print ('mode            ' , gpsp.gpsd.fix.mode)
       print()
-      print('sats             ', gpsd.satellites)
+      print('sats             ', gpsp.gpsd.satellites)
       y.append(lat)
       x.append(long)
 

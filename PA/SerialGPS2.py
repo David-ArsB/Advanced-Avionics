@@ -35,7 +35,7 @@ def decode(coord):
 
 
 print("Receiving GPS data")
-ser = serial.Serial(port, baudrate=9600, timeout=5)
+ser = serial.Serial(port, baudrate=9600, timeout=0.55)
 while True:
     data = ser.readline()
     print(data.decode('ascii', errors = 'replace').strip())

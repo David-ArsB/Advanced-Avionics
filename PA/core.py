@@ -6,7 +6,7 @@ from BMP388 import BMP388 # Import Pressure sensor
 from LSM6DSL import LSM6DSL # Import Accelerometer and Gyro Module
 from LIS3MDL import LIS3MDL # Import Compass module
 from lib_nrf24 import NRF24 # Import Radio module
-from SerialGPS import GpsPoller
+from GPSPoller import GpsPoller
 
 
 class corePrimaryAircraft():
@@ -23,11 +23,13 @@ class corePrimaryAircraft():
         self.imu = LSM6DSL(smbus.SMBus(0x01))
         self.compass = LIS3MDL(smbus.SMBus(0x01))
         self.radio = NRF24(GPIO, spidev.SpiDev())
+        self.gps = GpsPoller()
 
         self._initRadio()
         self._initAltimeter()
         self._initCompass()
         self._initIMU()
+        self._initGPS()
         print('Initialisation Complete! \n')
 
 
@@ -62,7 +64,8 @@ class corePrimaryAircraft():
         radio.openReadingPipe(0, self.RADIO_READING_PIPE)  # open the defined pipe for reading
 
     def _initGPS(self):
-        pass
+        print('Setting up GPS thread ...')
+        self.gps.start()
 
 if __name__ == '__main__':
     core = corePrimaryAircraft()
