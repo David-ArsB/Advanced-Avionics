@@ -30,7 +30,7 @@ class corePrimaryAircraft():
         self._initAltimeter()
         self._initCompass()
         self._initIMU()
-        self._initGPS()
+        #self._initGPS()
         print('Initialisation Complete! \n')
 
 
