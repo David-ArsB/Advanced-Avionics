@@ -78,8 +78,8 @@ class corePrimaryAircraft():
             temperature / 100.0, pressure / 100.0, altitude / 100.0))
         # Print Compass Data
         magX = self.compass.readMAGxCorr()
-        magY = self.compass.readMAGxCorr()
-        magZ = self.compass.readMAGxCorr()
+        magY = self.compass.readMAGyCorr()
+        magZ = self.compass.readMAGzCorr()
         #print((magX**2+magY**2+magZ**2)**(1/2))
         heading = atan2(magY, magX) * 180 / pi
         if heading < 0:
