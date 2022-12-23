@@ -135,11 +135,11 @@ class corePrimaryAircraft():
         # Print GPS Data
         lat, long = self.gps.getPosition()
 
-        numBlocks = 2
+        numBlocks = 6
         header = list('#b'+ str(int(numBlocks)) + ',tph' + ',lat' + ',long')
-        block1 = list(str(temperature/100))
-        block2 = list(str(pressure / 100))
-        block3 = list(str(altitude / 100))
+        block1 = list("%.1f" % round(temperature/100,1))
+        block2 = list("%.1f" % round(pressure/100,1))
+        block3 = list("%.1f" % round(altitude/100,1))
         block4 = list(str(lat) + ',' + str(long))
         block5 = list('EOF')
         blocks = [header, block1, block2, block3, block4, block5]

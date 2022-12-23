@@ -46,8 +46,8 @@ void loop(void) {
        // print message on serial monitor
 
     //radio.stopListening() ;   // stop listening radio
-    if (receivedMessage == "EOF"){
-      Serial.println(' ') ;    // print message on serial monitor 
+    if (strstr(receivedMessage, "EOF") != NULL) {
+    Serial.println(' ') ;    // print message on serial monitor 
     }
 
     
