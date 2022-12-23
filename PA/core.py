@@ -149,15 +149,19 @@ class corePrimaryAircraft():
 if __name__ == '__main__':
     core = corePrimaryAircraft()
 
-    try:
-        while True:
+
+    while True:
+        try:
             core.printDataSummary()
             #core.radio.printDetails()
 
             core.transmitToGCS()
             time.sleep(1)
 
-    except (KeyboardInterrupt, SystemExit):  # when you press ctrl+c
-        print("\nKilling Thread...")
-        core.gps.running = False
-        core.gps.join()  # wait for the thread to finish what it's doing
+        except (KeyboardInterrupt, SystemExit):  # when you press ctrl+c
+            print("\nKilling Thread...")
+            core.gps.running = False
+            core.gps.join()  # wait for the thread to finish what it's doing
+            break
+
+    sys.exit()
