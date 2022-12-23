@@ -104,24 +104,47 @@ class corePrimaryAircraft():
         print('===============================================\n')
 
     def transmitToGCS(self):
-        # Fetch Altimeter Data
+        '''
+        Transmits sensor data to ground station.
+
+        The nRF24L01+ module can only send a maximum of 32 bytes at a time (i.e one block).
+        Sensor information must be split in blocks of 32 bytes.
+        Header block sends information concerning message structure and contents.
+
+        :return: None
+        '''
+        print('Transmitting to ground station...')
+
+        # Print Altimeter Data
         temperature, pressure, altitude = self.altimeter.get_temperature_and_pressure_and_altitude()/100
-        # Fetch Compass Data
-        magX = self.compass.readMAGx()
-        magY = self.compass.readMAGy()
-        magZ = self.compass.readMAGz()
+        # Print Compass Data
+        magX = self.compass.readMAGxCorr()
+        magY = self.compass.readMAGyCorr()
+        magZ = self.compass.readMAGzCorr()
+        # print((magX**2+magY**2+magZ**2)**(1/2))
         heading = atan2(magY, magX) * 180 / pi
         if heading < 0:
             heading += 360
-        # Fetch IMU Data
+        # Print IMU Data
         AccX = self.imu.readACCx()
         AccY = self.imu.readACCy()
         AccZ = self.imu.readACCz()
         GyrX = self.imu.readGYRx()
         GyrY = self.imu.readGYRy()
         GyrZ = self.imu.readGYRz()
-        # Fetch GPS Data
+        # Print GPS Data
         lat, long = self.gps.getPosition()
+
+        numBlocks = 2
+        header = list(str('#b',int(numBlocks), ',tph', ',lat', ',long'))
+        block1 = list(str(temperature, ',', pressure, ',', altitude))
+        block2 = list(str(lat, ',', long))
+        blocks = [header, block1, block2]
+        for block in blocks:
+            while len(block) < self.RADIO_PAYLOAD_SIZE:
+                block.append(0)
+
+            self.radio.write(block)  # write the message to radio
 
 if __name__ == '__main__':
     core = corePrimaryAircraft()
@@ -129,6 +152,7 @@ if __name__ == '__main__':
     try:
         while True:
             core.printDataSummary()
+            core.transmitToGCS()
             time.sleep(1)
 
     except (KeyboardInterrupt, SystemExit):  # when you press ctrl+c
