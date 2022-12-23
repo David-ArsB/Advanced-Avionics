@@ -1,4 +1,4 @@
-import sys, os, smbus
+import sys, os, smbus, time
 import RPi.GPIO as GPIO  # import gpio
 GPIO.setmode(GPIO.BCM)  # set the gpio mode
 import spidev # import SPI
@@ -80,3 +80,4 @@ if __name__ == '__main__':
 
     while True:
         core.printDataSummary()
+        time.sleep(1)
