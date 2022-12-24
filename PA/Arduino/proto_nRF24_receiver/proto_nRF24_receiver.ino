@@ -9,7 +9,7 @@ void setup(void) {
   while (!Serial)
     ;
 
-  Serial.begin(9600);  // start serial monitor baud rate
+  Serial.begin(115200);  // start serial monitor baud rate
 
   Serial.println("Starting.. Setting Up.. Radio on..");  // debug message
 

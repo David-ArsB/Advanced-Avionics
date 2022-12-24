@@ -137,10 +137,10 @@ class corePrimaryAircraft():
 
         numBlocks = 6
         header = list('#b'+ str(int(numBlocks)) + ',tph' + ',lat' + ',long')
-        block1 = list("temperature: %.1f" % round(temperature/100,1))
-        block2 = list("pressure: %.1f" % round(pressure/100,1))
-        block3 = list("altitude: %.1f" % round(altitude/100,1))
-        block4 = list(str(lat) + ',' + str(long))
+        block1 = list("temperature: %.1f" % round(temperature/100, 1))
+        block2 = list("pressure: %.1f" % round(pressure/100, 1))
+        block3 = list("altitude: %.1f" % round(altitude/100, 1))
+        block4 = list("pos:" + str(lat) + ',' + str(long))
         block5 = list('EOF') # Indicates end of message
         blocks = [header, block1, block2, block3, block4, block5]
         for block in blocks:
@@ -155,6 +155,7 @@ if __name__ == '__main__':
 
     while True:
         try:
+            os.system('clear')
             core.printDataSummary()
             #core.radio.printDetails()
 
