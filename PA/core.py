@@ -98,9 +98,9 @@ class corePrimaryAircraft():
         print('$  -> AccX = %.2f g\n$  -> AccY = %.2f g\n$  -> AccZ = %.2f g\n$ ' % (AccX, AccY, AccZ))
         print('$  -> GyrX = %.2f dps\n$  -> GyrY = %.2f dps\n$  -> GyrZ = %.2f dps\n$ ' % (GyrX, GyrY, GyrZ))
         # Print GPS Data
-        lat, long = self.gps.getPosition()
+        lat, long, altGPS = self.gps.getPosition()
         print('$ GPS DATA:')
-        print('$  -> Latitude = %.8f N, Longitude = %.8f E\n$ ' % (lat, long))
+        print('$  -> Latitude = %.8f N, Longitude = %.8f E, Altitude = %.1f\n$ ' % (lat, long, altGPS))
         print('===============================================\n')
 
     def transmitToGCS(self):
@@ -133,17 +133,17 @@ class corePrimaryAircraft():
         GyrY = self.imu.readGYRy()
         GyrZ = self.imu.readGYRz()
         # Print GPS Data
-        lat, long = self.gps.getPosition()
+        lat, long, altGPS = self.gps.getPosition()
 
         numBlocks = 8
         header = list('$b'+ str(int(numBlocks)) + ',tph' + ',lat' + ',long')
         block1 = list("temperature: %.1f" % round(temperature/100, 1))
         block2 = list("pressure: %.1f" % round(pressure/100, 1))
         block3 = list("altitude: %.1f" % round(altitude/100, 1))
-        block4 = list("pos:" + str(lat) + ',' + str(long))
-        block5 = list("Acc: %.1f,%.1f,%.1f" % (round(AccX, 1),round(AccY, 1),round(AccZ, 1)))
-        block6 = list("Gyr: %.1f,%.1f,%.1f" % (round(GyrX, 1), round(GyrY, 1), round(GyrZ, 1)))
-        block7 = list("Mag: %.1f,%.1f,%.1f" % (round(magX, 1), round(magY, 1), round(magZ, 1)))
+        block4 = list("pos:" + str(lat) + ',' + str(long) + ',' + str(altGPS))
+        block5 = list("Acc: %.1f,%.1f,%.1f" % (round(AccX, 2), round(AccY, 2), round(AccZ, 2)))
+        block6 = list("Gyr: %.1f,%.1f,%.1f" % (round(GyrX, 2), round(GyrY, 2), round(GyrZ, 2)))
+        block7 = list("Mag: %.1f,%.1f,%.1f" % (round(magX, 2), round(magY, 2), round(magZ, 2)))
         block8 = list('EOF') # Indicates end of message
         blocks = [header, block1, block2, block3, block4, block5, block6, block7, block8]
         for block in blocks:

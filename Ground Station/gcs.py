@@ -33,15 +33,19 @@ class SerialReaderObj(QObject):
             print(message)
             if message != 'EOF' and len(message) > 0:
                 message = message.split(':')
-                if message[0] != 'pos':
-                    data[message[0].strip()] = float(message[1].strip())
-                elif message[0] == 'Acc' or message[0] == 'Gyr':
+                if message[0].find('$b') != -1:
+                    pass
+                elif message[0] == 'pos':
+                    data['latitude'] = float(message[1].split(',')[0])
+                    data['longitude'] = float(message[1].split(',')[1])
+                    data['altGPS'] = float(message[1].split(',')[2])
+                elif message[0] == 'Acc' or message[0] == 'Gyr' or message[0] == 'Mag':
                     data[message[0] + 'X'] = float(message[1].split(',')[0].strip())
                     data[message[0] + 'Y'] = float(message[1].split(',')[1].strip())
                     data[message[0] + 'Z'] = float(message[1].split(',')[2].strip())
                 else:
-                    data['latitude'] = float(message[1].split(',')[0])
-                    data['longitude'] = float(message[1].split(',')[1])
+                    data[message[0].strip()] = float(message[1].strip())
+
 
             elif len(message) > 0:
                 self.serialBroadcast.emit(data)
@@ -194,6 +198,14 @@ class UI_MW(QMainWindow, Ui_MainWindow):
         self.latitude_SB.setValue(data['latitude'])
         self.longitude_SB.setValue(data['longitude'])
         self.altitudeGPS_SB.setValue(0)
+
+        self.ax_SB.setValue(data['AccX'])
+        self.ay_SB.setValue(data['AccY'])
+        self.az_SB.setValue(data['AccZ'])
+
+        self.gyroX_SB.setValue(data['GyrX'])
+        self.gyroY_SB.setValue(data['GyrY'])
+        self.gyroZ_SB.setValue(data['GyrZ'])
 
     def setSignals(self):
         self.connectSerialButton.clicked.connect(lambda: self.connectToSerial())
