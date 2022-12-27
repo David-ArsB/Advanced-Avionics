@@ -2,10 +2,11 @@ import sys, os, time
 import glob, serial
 import json
 import numpy as np
+from math import atan2, pi
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtWidgets import (QApplication, QDialog, QMainWindow, QInputDialog, QWidget, QLabel,QMessageBox)
-from PyQt6.QtGui import QPen, QColor, QFont, QIntValidator, QDoubleValidator
+from PyQt6.QtGui import QPen, QColor, QFont, QIntValidator, QDoubleValidator, QClipboard
 from PyQt6.QtCore import Qt, QSettings, QDir, QThread, QObject, pyqtSignal as Signal, pyqtSlot as Slot
 
 import matplotlib.pyplot as plt
@@ -38,7 +39,6 @@ class SerialReaderObj(QObject):
                 elif message[0] == 'pos':
                     data['latitude'] = float(message[1].split(',')[0])
                     data['longitude'] = float(message[1].split(',')[1])
-                    data['altGPS'] = float(message[1].split(',')[2])
                 elif message[0] == 'Acc' or message[0] == 'Gyr' or message[0] == 'Mag':
                     data[message[0] + 'X'] = float(message[1].split(',')[0].strip())
                     data[message[0] + 'Y'] = float(message[1].split(',')[1].strip())
@@ -197,7 +197,7 @@ class UI_MW(QMainWindow, Ui_MainWindow):
 
         self.latitude_SB.setValue(data['latitude'])
         self.longitude_SB.setValue(data['longitude'])
-        self.altitudeGPS_SB.setValue(0)
+        self.altitudeGPS_SB.setValue(data['altGPS'])
 
         self.ax_SB.setValue(data['AccX'])
         self.ay_SB.setValue(data['AccY'])
@@ -207,8 +207,23 @@ class UI_MW(QMainWindow, Ui_MainWindow):
         self.gyroY_SB.setValue(data['GyrY'])
         self.gyroZ_SB.setValue(data['GyrZ'])
 
+        magX = data['MagX']
+        magY = data['MagY']
+        heading = atan2(magY, magX) * 180 / pi
+        if heading < 0:
+            heading += 360
+
+        self.heading_SB.setValue(heading)
+
+    def copyGPSToClipboard(self):
+        cb = QApplication.clipboard()
+        cb.clear(mode=QClipboard.Mode.Clipboard)
+        text = str(self.latitude_SB.value()) + ',' + str(self.longitude_SB.value())
+        cb.setText(text, mode=QClipboard.Mode.Clipboard)
+
     def setSignals(self):
         self.connectSerialButton.clicked.connect(lambda: self.connectToSerial())
+        self.copycoordinates_TB.clicked.connect(lambda: self.copyGPSToClipboard())
 
 
 

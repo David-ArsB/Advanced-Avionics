@@ -144,7 +144,7 @@ class corePrimaryAircraft():
         block5 = list("altGPS:" + str(altGPS))
         block6 = list("Acc: %.1f,%.1f,%.1f" % (round(AccX, 2), round(AccY, 2), round(AccZ, 2)))
         block7 = list("Gyr: %.1f,%.1f,%.1f" % (round(GyrX, 2), round(GyrY, 2), round(GyrZ, 2)))
-        block8 = list("Mag: %.1f,%.1f,%.1f" % (round(magX, 2), round(magY, 2), round(magZ, 2)))
+        block8 = list("Mag: %.3f,%.3f,%.3f" % (round(magX, 3), round(magY, 3), round(magZ, 3)))
         block9 = list('EOF') # Indicates end of message
         blocks = [header, block1, block2, block3, block4, block5, block6, block7, block8, block9]
         for block in blocks:
