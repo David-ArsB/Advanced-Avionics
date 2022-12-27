@@ -141,9 +141,9 @@ class corePrimaryAircraft():
         block2 = list("pressure: %.1f" % round(pressure/100, 1))
         block3 = list("altitude: %.1f" % round(altitude/100, 1))
         block4 = list("pos:" + str(lat) + ',' + str(long))
-        block5 = list("Acc: %.1f,%.1f,%.1f" % round(AccX, 1),round(AccY, 1),round(AccZ, 1))
-        block6 = list("Gyr: %.1f,%.1f,%.1f" % round(GyrX, 1), round(GyrY, 1), round(GyrZ, 1))
-        block7 = list("Mag: %.1f,%.1f,%.1f" % round(magX, 1), round(magY, 1), round(magZ, 1))
+        block5 = list("Acc: %.1f,%.1f,%.1f" % (round(AccX, 1),round(AccY, 1),round(AccZ, 1)))
+        block6 = list("Gyr: %.1f,%.1f,%.1f" % (round(GyrX, 1), round(GyrY, 1), round(GyrZ, 1)))
+        block7 = list("Mag: %.1f,%.1f,%.1f" % (round(magX, 1), round(magY, 1), round(magZ, 1)))
         block8 = list('EOF') # Indicates end of message
         blocks = [header, block1, block2, block3, block4, block5, block6, block7, block8]
         for block in blocks:
