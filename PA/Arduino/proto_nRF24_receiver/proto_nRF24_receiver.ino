@@ -6,12 +6,11 @@ RF24 radio(9, 10);  // ce, csn pins
 
 void setup(void) {
 
-  while (!Serial)
-    ;
+  while (!Serial);
 
   Serial.begin(115200);  // start serial monitor baud rate
 
-  Serial.println("Starting.. Setting Up.. Radio on..");  // debug message
+  //Serial.println("Starting.. Setting Up.. Radio on..");  // debug message
 
   radio.begin();  // start radio at ce csn pin 9 and 10
 
@@ -37,6 +36,11 @@ void loop(void) {
   char receivedMessage[32] = { 0 };  // set incmng message for 32 bytes
   if (radio.available()) {           // check if message is coming
     radio.read(receivedMessage, sizeof(receivedMessage));
+
+    if (strstr(receivedMessage, "#b") == NULL) {
+      Serial.println(receivedMessage);
+    }
+
     while (strstr(receivedMessage, "EOF") == NULL) {
       if (radio.available()) {
 
