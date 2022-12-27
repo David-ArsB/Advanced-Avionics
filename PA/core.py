@@ -135,17 +135,18 @@ class corePrimaryAircraft():
         # Print GPS Data
         lat, long, altGPS = self.gps.getPosition()
 
-        numBlocks = 8
+        numBlocks = 9
         header = list('$b'+ str(int(numBlocks)) + ',tph' + ',lat' + ',long')
         block1 = list("temperature: %.1f" % round(temperature/100, 1))
         block2 = list("pressure: %.1f" % round(pressure/100, 1))
         block3 = list("altitude: %.1f" % round(altitude/100, 1))
-        block4 = list("pos:" + str(lat) + ',' + str(long) + ',' + str(altGPS))
-        block5 = list("Acc: %.1f,%.1f,%.1f" % (round(AccX, 2), round(AccY, 2), round(AccZ, 2)))
-        block6 = list("Gyr: %.1f,%.1f,%.1f" % (round(GyrX, 2), round(GyrY, 2), round(GyrZ, 2)))
-        block7 = list("Mag: %.1f,%.1f,%.1f" % (round(magX, 2), round(magY, 2), round(magZ, 2)))
-        block8 = list('EOF') # Indicates end of message
-        blocks = [header, block1, block2, block3, block4, block5, block6, block7, block8]
+        block4 = list("pos:" + str(lat) + ',' + str(long))
+        block5 = list("altGPS:" + str(altGPS))
+        block6 = list("Acc: %.1f,%.1f,%.1f" % (round(AccX, 2), round(AccY, 2), round(AccZ, 2)))
+        block7 = list("Gyr: %.1f,%.1f,%.1f" % (round(GyrX, 2), round(GyrY, 2), round(GyrZ, 2)))
+        block8 = list("Mag: %.1f,%.1f,%.1f" % (round(magX, 2), round(magY, 2), round(magZ, 2)))
+        block9 = list('EOF') # Indicates end of message
+        blocks = [header, block1, block2, block3, block4, block5, block6, block7, block8, block9]
         for block in blocks:
             while len(block) < self.RADIO_PAYLOAD_SIZE:
                 block.append(0)
