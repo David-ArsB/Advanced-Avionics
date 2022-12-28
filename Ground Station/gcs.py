@@ -1,19 +1,84 @@
-import sys, os, time
+import sys, time
 import glob, serial
-import json
+import folium, io
+from Modules.GPSFuncs import distCoordsComponentsSigned
 import numpy as np
 from math import atan2, pi
-
-from PyQt6 import QtCore, QtGui, QtWidgets
-from PyQt6.QtWidgets import (QApplication, QDialog, QMainWindow, QInputDialog, QWidget, QLabel,QMessageBox)
-from PyQt6.QtGui import QPen, QColor, QFont, QIntValidator, QDoubleValidator, QClipboard
-from PyQt6.QtCore import Qt, QSettings, QDir, QThread, QObject, pyqtSignal as Signal, pyqtSlot as Slot
+from PyQt6.QtWidgets import (QApplication, QMainWindow, QTableWidgetItem, QMessageBox)
+from PyQt6.QtGui import QClipboard
+from PyQt6.QtCore import QSettings, QDir, QThread, QObject, pyqtSignal as Signal, pyqtSlot as Slot
 
 import matplotlib.pyplot as plt
+from matplotlib.ticker import (FormatStrFormatter, LinearLocator)
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 
 from gui.gui_gcs import Ui_MainWindow
+
+
+
+class GPSEvaluatorWorker(QObject):
+    finished = Signal()
+    progress = Signal(int)
+    data = Signal(dict)
+
+    def __init__(self, main):
+        super().__init__(None)
+        self.main = main
+
+
+
+    def run(self):
+        """Long-running task."""
+        n = 0
+        oldDataTag = None
+
+        fig = self.main.PLOT_FIGURES['GPS_Acc']['fig']
+        ax = fig.gca()
+        ax.cla()
+        ax.grid()
+        ax.plot([], [], 'ro', markersize=3)
+        ax.axis('equal')
+        ax.plot([0], [0], 'x', color='gold', markersize=10)
+        self.coords = {}
+        self.coords['lat'] = []
+        self.coords['long'] = []
+
+        self.main.GPSEvalCEP_SP.setValue(0)
+        self.main.GPSEvalR95_SP.setValue(0)
+        self.main.GPSEval_ProgressBar.setValue(0)
+
+        while n < 100:
+            try:
+                data = self.main.serialReaderObj.data
+                dataTag = data['tag']
+
+                if dataTag == oldDataTag:
+                    time.sleep(0.25)
+                    continue
+                else:
+                    try:
+                        lat = data['latitude']
+                        long = data['longitude']
+                        self.coords['lat'].append(lat)
+                        self.coords['long'].append(long)
+                        oldDataTag = dataTag
+                    except:
+                        continue
+
+                n += 1
+                self.data.emit(data)
+                if n != 100:
+                    self.main.GPSEval_ProgressBar.setValue(n)
+                else:
+                    self.main.GPSEval_ProgressBar.setValue(self.main.GPSEval_ProgressBar.Maximum)
+
+                print(n)
+
+            except Exception as e:
+                print('[GPS Eval] Exception has occured: ' + str(e))
+
+            self.finished.emit()
 
 class SerialReaderObj(QObject):
     serialBroadcast = Signal(dict)
@@ -25,36 +90,49 @@ class SerialReaderObj(QObject):
         self.run = True
         self.data = {}
 
+    def readSerialOutline(self):
+        message = self.serialPort.readline().decode().strip()
+        if message[0] == 'pos':
+            return float(message[1].split(',')[0]), float(message[1].split(',')[1])
+
+        return None
 
     @Slot()
     def readSerial(self):
         data = {}
+        data['tag'] = 1
+        messageOld = ''
         while self.run:
             message = self.serialPort.readline().decode().strip()
-            print(message)
-            if message != 'EOF' and len(message) > 0:
-                message = message.split(':')
-                if message[0].find('$b') != -1:
-                    pass
-                elif message[0] == 'pos':
-                    data['latitude'] = float(message[1].split(',')[0])
-                    data['longitude'] = float(message[1].split(',')[1])
-                elif message[0] == 'Acc' or message[0] == 'Gyr' or message[0] == 'Mag':
-                    data[message[0] + 'X'] = float(message[1].split(',')[0].strip())
-                    data[message[0] + 'Y'] = float(message[1].split(',')[1].strip())
-                    data[message[0] + 'Z'] = float(message[1].split(',')[2].strip())
-                else:
-                    data[message[0].strip()] = float(message[1].strip())
+            if message != messageOld:
+                #print(message)
+                if message != 'EOF' and len(message) > 0:
+                    message = message.split(':')
+                    if message[0].find('$b') != -1:
+                        pass
+                    elif message[0] == 'pos':
+                        data['latitude'] = float(message[1].split(',')[0])
+                        data['longitude'] = float(message[1].split(',')[1])
+                    elif message[0] == 'Acc' or message[0] == 'Gyr' or message[0] == 'Mag':
+                        data[message[0] + 'X'] = float(message[1].split(',')[0].strip())
+                        data[message[0] + 'Y'] = float(message[1].split(',')[1].strip())
+                        data[message[0] + 'Z'] = float(message[1].split(',')[2].strip())
+                    else:
+                        data[message[0].strip()] = float(message[1].strip())
 
 
-            elif len(message) > 0:
-                self.serialBroadcast.emit(data)
-                data = {}
-
-            time.sleep(0.05)
+                elif len(message) > 0:
+                    tag = data['tag']
+                    self.serialBroadcast.emit(data)
+                    self.data = data
+                    data = {}
+                    data['tag'] = tag+1
+                messageOld = message
+                time.sleep(0.05)
 
 class UI_MW(QMainWindow, Ui_MainWindow):
     serialStartRequested = Signal()
+    gpsEvalRequested = Signal()
 
     def __init__(self, app_name='GUIPreliminaryTool', parent=None):
         super().__init__(parent)
@@ -74,13 +152,49 @@ class UI_MW(QMainWindow, Ui_MainWindow):
         # Initialize plotting area
         self.PLOT_FIGURES = {}
         self.dispose = 0
-        self.setNewFigure('plotA',self.gridLayout_plotA,True)
+        self.setNewFigure('plotA', self.gridLayout_plotA, True)
+        self.setNewFigure('GPS_Acc', self.gridLayout_plotB, True)
 
         self.serialPort_CB.clear()
         self.serialPort_CB.addItems(self.serial_ports())
-        self.serialPort_CB.setCurrentIndex(0)
+        self.serialPort_CB.setCurrentIndex(1)
         self.setSignals()
 
+        c = (45.517449, -73.784236)
+        m = folium.Map(
+            title='GPS Coordinates',
+            zoom_start=13,
+            location=c
+        )
+        data = io.BytesIO()
+        m.save(data,close_file=False)
+        self.webEngineView.setHtml(data.getvalue().decode())
+        self.map = m
+
+        lon1 = -73.78810
+        lon2 = -73.77935
+        lat1 = 45.51600
+        lat2 = 45.52080
+        fig = self.PLOT_FIGURES['plotA']['fig']
+        ax = fig.gca()
+        ax.set_xlim(round(lon1,5), round(lon2,5))
+        ax.set_ylim(round(lat1,5), round(lat2,5))
+        ax.xaxis.set_major_locator(LinearLocator(numticks = 7))
+        ax.xaxis.set_major_formatter(FormatStrFormatter('% 1.5f'))
+        ax.yaxis.set_major_locator(LinearLocator(numticks = 7))
+        ax.yaxis.set_major_formatter(FormatStrFormatter('% 1.5f'))
+        #ax.set_xticks(np.arange(lon1, lon2, (lon2-lon1)/4))
+        #ax.set_yticks(np.arange(lat1, lat2, (lat2-lat1)/4))
+        ax.plot([],[],'o')
+        ax.imshow(plt.imread('map.png'), extent=(lon1, lon2, lat1, lat2), aspect=(1756/2252)**-1)  # Load the image to matplotlib plot.
+        ax.grid()
+        self.PLOT_FIGURES['plotA']['canvas'].draw()
+
+        fig = self.PLOT_FIGURES['GPS_Acc']['fig']
+        ax = fig.gca()
+        ax.plot([], [], 'ro')
+        ax.grid()
+        self.PLOT_FIGURES['GPS_Acc']['canvas'].draw()
 
 
     def init_def_values(self):
@@ -116,7 +230,7 @@ class UI_MW(QMainWindow, Ui_MainWindow):
                 s = serial.Serial(port)
                 s.close()
                 result.append(port)
-            except (OSError, serial.SerialException):
+            except (OSError, serial.SerialException) as e:
                 pass
         return result
 
@@ -142,10 +256,10 @@ class UI_MW(QMainWindow, Ui_MainWindow):
         if toolbar:
             tb = NavigationToolbar(canvas, self)
             layout.addWidget(tb)
-            self.PLOT_FIGURES["tb"] = tb
+            self.PLOT_FIGURES[name]["tb"] = tb
 
         layout.addWidget(canvas)
-        self.PLOT_FIGURES["canvas"] = canvas
+        self.PLOT_FIGURES[name]["canvas"] = canvas
         # refresh canvas
         canvas.draw()
 
@@ -191,29 +305,61 @@ class UI_MW(QMainWindow, Ui_MainWindow):
             return False
 
     def updateGuiData(self, data):
-        self.altitude_SB.setValue(data['altitude'])
-        self.pressure_SB.setValue(data['pressure'])
-        self.temperature_SB.setValue(data['temperature'])
+        try:
+            self.altitude_SB.setValue(data['altitude'])
+            self.pressure_SB.setValue(data['pressure'])
+            self.temperature_SB.setValue(data['temperature'])
 
-        self.latitude_SB.setValue(data['latitude'])
-        self.longitude_SB.setValue(data['longitude'])
-        self.altitudeGPS_SB.setValue(data['altGPS'])
+            self.latitude_SB.setValue(data['latitude'])
+            self.longitude_SB.setValue(data['longitude'])
+            self.altitudeGPS_SB.setValue(data['altGPS'])
 
-        self.ax_SB.setValue(data['AccX'])
-        self.ay_SB.setValue(data['AccY'])
-        self.az_SB.setValue(data['AccZ'])
+            self.ax_SB.setValue(data['AccX'])
+            self.ay_SB.setValue(data['AccY'])
+            self.az_SB.setValue(data['AccZ'])
 
-        self.gyroX_SB.setValue(data['GyrX'])
-        self.gyroY_SB.setValue(data['GyrY'])
-        self.gyroZ_SB.setValue(data['GyrZ'])
+            self.gyroX_SB.setValue(data['GyrX'])
+            self.gyroY_SB.setValue(data['GyrY'])
+            self.gyroZ_SB.setValue(data['GyrZ'])
 
-        magX = data['MagX']
-        magY = data['MagY']
-        heading = atan2(magY, magX) * 180 / pi
-        if heading < 0:
-            heading += 360
+            magX = data['MagX']
+            magY = data['MagY']
+            heading = atan2(magY, magX) * 180 / pi
+            if heading < 0:
+                heading += 360
 
-        self.heading_SB.setValue(heading)
+            self.heading_SB.setValue(heading)
+
+            if self.enableLogging_CB.checked():
+                currentRow = self.dataTelemLog_TW.rowCount() + 1
+                # Column 0: Time
+                newitem = QTableWidgetItem(time.strftime("%H:%M:%S", time.localtime()))
+                self.dataTelemLog_TW.setItem(currentRow, 0, newitem)
+                # Column 1: Altitude
+                newitem = QTableWidgetItem(data['altitude'])
+                self.dataTelemLog_TW.setItem(currentRow, 1, newitem)
+                # Column 2: GPS Latitude
+                newitem = QTableWidgetItem(data['latitude'])
+                self.dataTelemLog_TW.setItem(currentRow, 2, newitem)
+                # Column 3: GPS Longitude
+                newitem = QTableWidgetItem(data['longitude'])
+                self.dataTelemLog_TW.setItem(currentRow, 3, newitem)
+                # Column 4: Heading
+                newitem = QTableWidgetItem(data['heading'])
+                self.dataTelemLog_TW.setItem(currentRow, 4, newitem)
+
+                #currentColumn = self.dataTelemLog_TW.columnCount() + 1
+
+            fig = self.PLOT_FIGURES['plotA']['fig']
+            ax = fig.gca()
+            xdata = ax.lines[0].get_xdata()
+            ydata = ax.lines[0].get_ydata()
+
+            ax.lines[0].set_xdata(np.append(xdata, data['longitude']))
+            ax.lines[0].set_ydata(np.append(ydata, data['latitude']))
+            self.PLOT_FIGURES['plotA']['canvas'].draw()
+        except:
+            pass
 
     def copyGPSToClipboard(self):
         cb = QApplication.clipboard()
@@ -221,9 +367,93 @@ class UI_MW(QMainWindow, Ui_MainWindow):
         text = str(self.latitude_SB.value()) + ',' + str(self.longitude_SB.value())
         cb.setText(text, mode=QClipboard.Mode.Clipboard)
 
+
+    def startGPSAccEval(self ):
+        try:
+            self.GPSEvaluatorThread = QThread()
+            # Step 3: Create a worker object
+            self.GPSEvaluatorWorker = GPSEvaluatorWorker(self)
+            # Step 4: Move worker to the thread
+            self.GPSEvaluatorWorker.moveToThread(self.GPSEvaluatorThread)
+            # Step 5: Connect signals and slots
+            self.GPSEvaluatorThread.started.connect(self.GPSEvaluatorWorker.run)
+            self.GPSEvaluatorWorker.finished.connect(self.GPSEvaluatorThread.quit)
+            self.GPSEvaluatorWorker.finished.connect(self.GPSEvaluatorWorker.deleteLater)
+            self.GPSEvaluatorThread.finished.connect(self.GPSEvaluatorThread.deleteLater)
+            self.GPSEvaluatorWorker.data.connect(self.doGPSAccEval)
+            #self.GPSEvaluatorWorker.progress.connect(self.progressBar)
+            # Step 6: Start the thread
+            self.GPSEvaluatorThread.start()
+
+            # Final resets
+            self.beginGPSAccuracy_PB.setEnabled(False)
+            self.GPSEvaluatorThread.finished.connect(
+                lambda: self.beginGPSAccuracy_PB.setEnabled(True)
+            )
+            #self.gpsEvalRequested.emit()
+        except Exception as e:
+            print('[GPS Eval] Exception has occured: ' + str(e))
+    def doGPSAccEval(self, data):
+        try:
+            xdata = self.GPSEvaluatorWorker.coords['long']
+            ydata = self.GPSEvaluatorWorker.coords['lat']
+
+            if len(xdata) > 2:
+                lat = data['latitude']
+                long = data['longitude']
+
+                fig = self.PLOT_FIGURES['GPS_Acc']['fig']
+                ax = fig.gca()
+
+                long_mean = np.mean(xdata)
+                lat_mean = np.mean(ydata)
+
+                long_dists = np.array([])
+                lat_dists = np.array([])
+                for i in range(len(xdata)):
+                    dists = distCoordsComponentsSigned([lat_mean, long_mean], [ydata[i], xdata[i]], data['altGPS'])
+                    long_dists = np.append(long_dists, dists[0])
+                    lat_dists = np.append(lat_dists, dists[1])
+
+
+                dists_std = np.sqrt(np.std(lat_dists)**2 + np.std(long_dists)**2)
+                #F = 50
+                #CEP = dists_std*np.sqrt(-2*np.log(1-F/100))/np.sqrt(2)
+                CEP = 0.59*(np.std(lat_dists)+ np.std(long_dists))
+                CEP_Circle = plt.Circle((0, 0), CEP, color='g', fill=False)
+
+                r95 = 2*dists_std
+                r95 = 2.08 * CEP
+                r95_Circle = plt.Circle((0, 0), r95, color='b', fill=False)
+
+                ax.lines[0].set_xdata(long_dists)
+                ax.lines[0].set_ydata(lat_dists)
+                [p.remove() for p in reversed(ax.patches)]
+                ax.add_patch(CEP_Circle)
+                ax.add_patch(r95_Circle)
+
+                self.GPSEvalCEP_SP.setValue(CEP)
+                self.GPSEvalR95_SP.setValue(r95)
+
+                if len(xdata)>1 and len(ydata)>1:
+                    ax.set_xlim( -r95 - 0.25, r95 + 0.25)
+                    ax.set_ylim( -r95 - 0.25, r95 + 0.25)
+
+                ax.xaxis.set_major_locator(LinearLocator(numticks=7))
+                ax.xaxis.set_major_formatter(FormatStrFormatter('% 1.5f'))
+                ax.yaxis.set_major_locator(LinearLocator(numticks=7))
+                ax.yaxis.set_major_formatter(FormatStrFormatter('% 1.5f'))
+                self.PLOT_FIGURES['GPS_Acc']['canvas'].draw()
+
+        except Exception as e:
+            print('[GPS Eval] Exception has occured: ' + str(e))
+
+
+
     def setSignals(self):
         self.connectSerialButton.clicked.connect(lambda: self.connectToSerial())
         self.copycoordinates_TB.clicked.connect(lambda: self.copyGPSToClipboard())
+        self.beginGPSAccuracy_PB.clicked.connect(lambda: self.startGPSAccEval())
 
 
 
