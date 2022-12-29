@@ -4,9 +4,8 @@
 CODE TO INTERFACE WITH THE BAROMETER/ALTIMETER ONBOARD THE BERRY-GPS-IMU-v4
 
 """
-import time
+
 import smbus
-import math
 
 # define BMP388 Device I2C address
 
@@ -220,7 +219,7 @@ if __name__ == '__main__':
     import time
 
     print("BMP388 Test Program ...\n")
-    bmp388 = BMP388(smbus.SMBus(0x01))
+    bmp388 = BMP388(smbus.SMBus(0x00))
     bmp388.setGroundPressure( 102216.35)
     N = 1
     avg_temp = 0
