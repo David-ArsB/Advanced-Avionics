@@ -32,6 +32,7 @@ class Ui_MainWindow(object):
         self.enableLogging_CB.setObjectName("enableLogging_CB")
         self.gridLayout_22.addWidget(self.enableLogging_CB, 2, 0, 1, 1)
         self.dataTelemLog_TW = QtWidgets.QTableWidget(self.groupBox_9)
+        self.dataTelemLog_TW.setAlternatingRowColors(True)
         self.dataTelemLog_TW.setColumnCount(11)
         self.dataTelemLog_TW.setObjectName("dataTelemLog_TW")
         self.dataTelemLog_TW.setRowCount(0)
@@ -130,6 +131,7 @@ class Ui_MainWindow(object):
         font.setPointSize(14)
         self.GPSEvalCEP_SP.setFont(font)
         self.GPSEvalCEP_SP.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.GPSEvalCEP_SP.setReadOnly(True)
         self.GPSEvalCEP_SP.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.NoButtons)
         self.GPSEvalCEP_SP.setObjectName("GPSEvalCEP_SP")
         self.gridLayout_21.addWidget(self.GPSEvalCEP_SP, 0, 1, 1, 1)
@@ -145,6 +147,7 @@ class Ui_MainWindow(object):
         font.setPointSize(14)
         self.GPSEvalR95_SP.setFont(font)
         self.GPSEvalR95_SP.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.GPSEvalR95_SP.setReadOnly(True)
         self.GPSEvalR95_SP.setButtonSymbols(QtWidgets.QAbstractSpinBox.ButtonSymbols.NoButtons)
         self.GPSEvalR95_SP.setObjectName("GPSEvalR95_SP")
         self.gridLayout_21.addWidget(self.GPSEvalR95_SP, 1, 1, 1, 1)
@@ -577,7 +580,7 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuHelp.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.mainTabWidget.setCurrentIndex(0)
+        self.mainTabWidget.setCurrentIndex(1)
         self.stackedWidget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 

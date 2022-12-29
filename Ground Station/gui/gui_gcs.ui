@@ -46,6 +46,9 @@
            </item>
            <item row="1" column="0">
             <widget class="QTableWidget" name="dataTelemLog_TW">
+             <property name="alternatingRowColors">
+              <bool>true</bool>
+             </property>
              <property name="columnCount">
               <number>11</number>
              </property>
@@ -234,6 +237,9 @@
                       <property name="alignment">
                        <set>Qt::AlignCenter</set>
                       </property>
+                      <property name="readOnly">
+                       <bool>true</bool>
+                      </property>
                       <property name="buttonSymbols">
                        <enum>QAbstractSpinBox::NoButtons</enum>
                       </property>
@@ -264,6 +270,9 @@
                       </property>
                       <property name="alignment">
                        <set>Qt::AlignCenter</set>
+                      </property>
+                      <property name="readOnly">
+                       <bool>true</bool>
                       </property>
                       <property name="buttonSymbols">
                        <enum>QAbstractSpinBox::NoButtons</enum>
@@ -347,11 +356,17 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QDockWidget" name="dockWidget_4">
+   <property name="minimumSize">
+    <size>
+     <width>100</width>
+     <height>599</height>
+    </size>
+   </property>
    <attribute name="dockWidgetArea">
     <number>1</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_4">
-    <layout class="QGridLayout" name="gridLayout_4" rowstretch="0,0,0,0,0,0" columnstretch="0">
+    <layout class="QGridLayout" name="gridLayout_4" rowstretch="0,0,0,0,0" columnstretch="0">
      <item row="0" column="0">
       <widget class="QGroupBox" name="groupBox_2">
        <property name="maximumSize">

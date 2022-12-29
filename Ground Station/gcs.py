@@ -6,7 +6,7 @@ import numpy as np
 from math import atan2, pi
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QTableWidgetItem, QMessageBox)
 from PyQt6.QtGui import QClipboard
-from PyQt6.QtCore import QSettings, QDir, QThread, QObject, pyqtSignal as Signal, pyqtSlot as Slot
+from PyQt6.QtCore import Qt, QSettings, QDir, QThread, QObject, pyqtSignal as Signal, pyqtSlot as Slot
 
 import matplotlib.pyplot as plt
 from matplotlib.ticker import (FormatStrFormatter, LinearLocator)
@@ -148,6 +148,11 @@ class UI_MW(QMainWindow, Ui_MainWindow):
 
         # Other random initialisations
         self.stackedWidget.setCurrentIndex(0)
+        self.dataTelemLog_TW.setHorizontalHeaderLabels(['Time', 'Altitude', 'Latitude', 'Longitude', 'Heading'])
+        self.dataTelemLog_TW.resizeColumnsToContents()
+
+
+
 
         # Initialize plotting area
         self.PLOT_FIGURES = {}
@@ -329,24 +334,33 @@ class UI_MW(QMainWindow, Ui_MainWindow):
                 heading += 360
 
             self.heading_SB.setValue(heading)
+            if self.enableLogging_CB.isChecked():
+                currentRow = self.dataTelemLog_TW.rowCount()
 
-            if self.enableLogging_CB.checked():
-                currentRow = self.dataTelemLog_TW.rowCount() + 1
+                self.dataTelemLog_TW.setRowCount(currentRow + 1)
                 # Column 0: Time
                 newitem = QTableWidgetItem(time.strftime("%H:%M:%S", time.localtime()))
+                newitem.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
                 self.dataTelemLog_TW.setItem(currentRow, 0, newitem)
                 # Column 1: Altitude
-                newitem = QTableWidgetItem(data['altitude'])
+                newitem = QTableWidgetItem(str(data['altitude']))
+                newitem.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
                 self.dataTelemLog_TW.setItem(currentRow, 1, newitem)
                 # Column 2: GPS Latitude
-                newitem = QTableWidgetItem(data['latitude'])
+                newitem = QTableWidgetItem(str(data['latitude']))
+                newitem.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
                 self.dataTelemLog_TW.setItem(currentRow, 2, newitem)
                 # Column 3: GPS Longitude
-                newitem = QTableWidgetItem(data['longitude'])
+                newitem = QTableWidgetItem(str(data['longitude']))
+                newitem.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
                 self.dataTelemLog_TW.setItem(currentRow, 3, newitem)
                 # Column 4: Heading
-                newitem = QTableWidgetItem(data['heading'])
+                newitem = QTableWidgetItem(str(round(heading,1)))
+                newitem.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
                 self.dataTelemLog_TW.setItem(currentRow, 4, newitem)
+                self.dataTelemLog_TW.resizeColumnsToContents()
+
+                self.dataTelemLog_TW.show()
 
                 #currentColumn = self.dataTelemLog_TW.columnCount() + 1
 
@@ -358,7 +372,8 @@ class UI_MW(QMainWindow, Ui_MainWindow):
             ax.lines[0].set_xdata(np.append(xdata, data['longitude']))
             ax.lines[0].set_ydata(np.append(ydata, data['latitude']))
             self.PLOT_FIGURES['plotA']['canvas'].draw()
-        except:
+        except Exception as e:
+            print('[GUI UPDATE & LOGGING] An exception has occured: '+str(e))
             pass
 
     def copyGPSToClipboard(self):
