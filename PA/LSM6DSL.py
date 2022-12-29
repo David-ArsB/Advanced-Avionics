@@ -2,6 +2,13 @@
 CODE TO INTERFACE WITH THE IMU (ACCEL., GYRO) ONBOARD THE BERRY-GPS-IMU-v4
 
 """
+from misc import detect_model
+
+if detect_model() == 'Hardkernel ODROID-C4\x00':
+    i2c_bus = 0x00
+else:
+    i2c_bus = 0x01
+
 import smbus
 
 LSM6DSL_ADDRESS          =  0x6A
@@ -125,7 +132,7 @@ if __name__ == '__main__':
 
     import time
     print("LSM6DSL Test Program ...\n")
-    LSM6DSL = LSM6DSL(smbus.SMBus(0x01))
+    LSM6DSL = LSM6DSL(smbus.SMBus(i2c_bus))
     while True:
         time.sleep(1)
         AccX = LSM6DSL.readACCx()

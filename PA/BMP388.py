@@ -4,6 +4,12 @@
 CODE TO INTERFACE WITH THE BAROMETER/ALTIMETER ONBOARD THE BERRY-GPS-IMU-v4
 
 """
+from misc import detect_model
+
+if detect_model() == 'Hardkernel ODROID-C4\x00':
+    i2c_bus = 0x00
+elif detect_model() == 'Raspberry Pi 3 Model B Rev 1.2\x00':
+    i2c_bus = 0x01
 
 import smbus
 
@@ -219,8 +225,8 @@ if __name__ == '__main__':
     import time
 
     print("BMP388 Test Program ...\n")
-    bmp388 = BMP388(smbus.SMBus(0x00))
-    bmp388.setGroundPressure( 102216.35)
+    bmp388 = BMP388(smbus.SMBus(i2c_bus))
+    bmp388.setGroundPressure(102216.35)
     N = 1
     avg_temp = 0
     avg_pressure = 0

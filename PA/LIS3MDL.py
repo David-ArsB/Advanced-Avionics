@@ -2,6 +2,13 @@
 CODE TO INTERFACE WITH THE COMPASS ONBOARD THE BERRY-GPS-IMU-v4
 
 """
+from misc import detect_model
+
+if detect_model() == 'Hardkernel ODROID-C4\x00':
+    i2c_bus = 0x00
+else:
+    i2c_bus = 0x01
+
 import smbus
 from math import atan2,pi
 
@@ -122,7 +129,7 @@ if __name__ == '__main__':
     import time
     ## TILT COMPENSATION REQUIRED AND CALIBRATION
     print("LIS3MDL Test Program ...\n")
-    LIS3MDL = LIS3MDL(smbus.SMBus(0x01))
+    LIS3MDL = LIS3MDL(smbus.SMBus(i2c_bus))
     magMax = [0, 0, 0]
     magMin = [0, 0, 0]
     while True:
