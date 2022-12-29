@@ -1,5 +1,5 @@
 import sys, os, smbus, time
-import RPi.GPIO as GPIO  # import gpio
+import Odroid.GPIO as GPIO  # import gpio
 GPIO.setmode(GPIO.BCM)  # set the gpio mode
 import spidev # import SPI
 from BMP388 import BMP388 # Import Pressure sensor
