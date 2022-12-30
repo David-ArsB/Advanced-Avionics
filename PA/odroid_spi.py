@@ -15,12 +15,7 @@ GPIO.BCM == GPIO.SOC
 GPIO.BOARD
 GPIO.WIRINGPI
 '''
-GPIO.setmode(GPIO.BOARD)
+GPIO.setmode(GPIO.BCM)
 
-GPIO.setup(13, GPIO.OUT)
+GPIO.setup(116, GPIO.OUT)
 
-while True:
-    GPIO.output(13, GPIO.HIGH)
-    time.sleep(1)
-    GPIO.output(13, GPIO.LOW)
-    time.sleep(1)
