@@ -1,9 +1,9 @@
 import sys
-from pathlib import Path
-cwd = Path.cwd()
-mod_path = Path(__file__).parent.parent
-print(mod_path)
-sys.path.insert(0, str(mod_path)+r'/Ground Station/lib_nrf24-master/lib_nrf24-master')
+# from pathlib import Path
+# cwd = Path.cwd()
+# mod_path = Path(__file__).parent.parent
+# print(mod_path)
+# sys.path.insert(0, str(mod_path)+r'/Ground Station/lib_nrf24-master/lib_nrf24-master')
 
 import time  # import time library
 import spidev
