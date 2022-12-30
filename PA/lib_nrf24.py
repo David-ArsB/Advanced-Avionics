@@ -492,13 +492,18 @@ class NRF24:
 
         # Allons!
         if self.ce_pin:
-            if self.GPIO.RPI_REVISION > 0:
+            try:
+                if self.GPIO.RPI_REVISION > 0:
+                    self.ce(self.GPIO.HIGH)
+                    time.sleep(10 / 1000000.0)
+                    self.ce(self.GPIO.LOW)
+                else:
+                    # virtGPIO is slower. A 10 uSec pulse is better done with pulseOut():
+                    self.GPIO.pulseOut(self.ce_pin, self.GPIO.HIGH, 10)
+            except:
                 self.ce(self.GPIO.HIGH)
                 time.sleep(10 / 1000000.0)
                 self.ce(self.GPIO.LOW)
-            else:
-                # virtGPIO is slower. A 10 uSec pulse is better done with pulseOut():
-                self.GPIO.pulseOut(self.ce_pin, self.GPIO.HIGH, 10)
 
 
 
