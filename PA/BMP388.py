@@ -11,7 +11,7 @@ if detect_model() == 'Hardkernel ODROID-C4\x00':
 elif detect_model() == 'Raspberry Pi 3 Model B Rev 1.2\x00':
     i2c_bus = 0x01
 
-import smbus
+import smbus, time
 
 # define BMP388 Device I2C address
 
