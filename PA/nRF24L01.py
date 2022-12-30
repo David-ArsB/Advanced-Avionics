@@ -5,29 +5,26 @@ mod_path = Path(__file__).parent.parent
 print(mod_path)
 sys.path.insert(0, str(mod_path)+r'/Ground Station/lib_nrf24-master/lib_nrf24-master')
 
+import time  # import time library
+import spidev
 from misc import detect_model
+from lib_nrf24 import NRF24  # import NRF24 library
 
 if detect_model() == 'Hardkernel ODROID-C4\x00':
     import Odroid.GPIO as GPIO
+    GPIO.setmode(GPIO.WIRINGPI) # set the gpio mode
+    spiPin = 6
 elif detect_model() == 'Raspberry Pi 3 Model B Rev 1.2\x00':
     import RPi.GPIO as GPIO
-
-import time  # import time library
-
-import spidev
-
-from lib_nrf24 import NRF24  # import NRF24 library
-
-print('Test 1')
-GPIO.setmode(GPIO.BCM)  # set the gpio mode
+    GPIO.setmode(GPIO.BCM)  # set the gpio mode
+    spiPin = 25
 
 # set the pipe address. this address shoeld be entered on the receiver alo
 
 pipes = [[0xE0, 0xE0, 0xE0, 0xE0, 0xE0], [0xF0, 0xF0, 0xF0, 0xF0, 0xF0]]
 
 radio = NRF24(GPIO, spidev.SpiDev())  # use the gpio pins
-print('Test 2')
-radio.begin(0, 25)  # start the radio and set the ce,csn pin ce= GPIO08, csn= GPIO25
+radio.begin(0, spiPin)  # start the radio and set the ce,csn pin ce= GPIO08, csn= GPIO25
 
 radio.setPayloadSize(32)  # set the payload size as 32 bytes
 
