@@ -184,6 +184,7 @@ class NRF24:
         # It should be possible to instantiate multiple objects, with different GPIO / spidev
         # EG on Raspberry, one could be RPI GPIO & spidev module, other could be virtual-GPIO
         # On rpi, only bus 0 is supported here, not bus 1 of the model B plus
+        print('Test 3')
         self.GPIO = gpio   # the GPIO module
         self.spidev = spidev # the spidev object/instance
         self.channel = 76
