@@ -70,4 +70,4 @@ while True:
 
     radio.stopListening()  # close radio
 
-    time.sleep(3)  # give delay of 3 seconds
+    time.sleep(1)  # give delay of 3 seconds
