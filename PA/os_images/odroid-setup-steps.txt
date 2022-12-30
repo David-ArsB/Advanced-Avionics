@@ -1,0 +1,28 @@
+sudo apt install xrdp
+sudo apt install software-properties-common
+sudo add-apt-repository ppa:hardkernel/ppa
+sudo apt update
+sudo apt install odroid-wiringpi-python
+
+sudo apt install git
+sudo apt-get install build-essential
+sudo apt-get install autoconf
+sudo apt-get install libtool
+apt install python3-pip
+sudo apt install libwiringpi-dev odroid-wiringpi
+
+git clone https://github.com/hardkernel/wiringPi
+cd wiringPi
+sh autogen.sh
+./configure
+make
+sudo make install
+
+
+git clone https://github.com/hhk7734/Odroid.GPIO
+cd Odroid.GPIO/c_src/
+nano gpio.cpp
+# Change #include <wiringPi.h> for #include <wiringpi2/wiringPi.h> & save
+cd ..
+python3 setup.py install
+

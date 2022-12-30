@@ -47,7 +47,7 @@ radio.openWritingPipe(pipes[0])  # open the defined pipe for writing
 radio.printDetails()  # print basic detals of radio
 
 sendMessage = list("Hi..Arduino UNO")  # the message to be sent
-
+print(sendMessage)
 while len(sendMessage) < 32:
     sendMessage.append(0)
 
