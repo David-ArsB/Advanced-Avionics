@@ -5,7 +5,12 @@ mod_path = Path(__file__).parent.parent
 print(mod_path)
 sys.path.insert(0, str(mod_path)+r'/Ground Station/lib_nrf24-master/lib_nrf24-master')
 
-import RPi.GPIO as GPIO  # import gpio
+from misc import detect_model
+
+if detect_model() == 'Hardkernel ODROID-C4\x00':
+    import Odroid.GPIO as GPIO
+elif detect_model() == 'Raspberry Pi 3 Model B Rev 1.2\x00':
+    import RPi.GPIO as GPIO
 
 import time  # import time library
 
