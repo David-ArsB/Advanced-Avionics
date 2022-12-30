@@ -17,5 +17,5 @@ GPIO.WIRINGPI
 '''
 GPIO.setmode(GPIO.WIRINGPI)
 
-GPIO.setup(13, GPIO.OUT)
+GPIO.setup(6, GPIO.OUT)
 
