@@ -7,14 +7,20 @@
 # GPIO.setup(16, GPIO.OUT)
 
 import Odroid.GPIO as GPIO
+# You can also use 'import RPi.GPIO as GPIO'.
 import time
 
-redLedGPIO=16
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(redLedGPIO,GPIO.OUT)
+'''
+GPIO.BCM == GPIO.SOC
+GPIO.BOARD
+GPIO.WIRINGPI
+'''
+GPIO.setmode(GPIO.BOARD)
+
+GPIO.setup(13, GPIO.OUT)
 
 while True:
-        GPIO.output(redLedGPIO,GPIO.HIGH)
-        time.sleep(1)
-        GPIO.output(redLedGPIO,GPIO.LOW)
-        time.sleep(1)
+    GPIO.output(13, GPIO.HIGH)
+    time.sleep(1)
+    GPIO.output(13, GPIO.LOW)
+    time.sleep(1)
