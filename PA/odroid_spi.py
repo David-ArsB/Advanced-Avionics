@@ -17,5 +17,5 @@ GPIO.WIRINGPI
 '''
 GPIO.setmode(GPIO.BCM)
 
-GPIO.setup(106, GPIO.OUT)
+GPIO.setup(13, GPIO.OUT)
 
