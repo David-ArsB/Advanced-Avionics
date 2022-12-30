@@ -1,6 +1,18 @@
 import sys, os, smbus, time
-import Odroid.GPIO as GPIO  # import gpio
-GPIO.setmode(GPIO.BCM)  # set the gpio mode
+from misc import detect_model
+
+if detect_model() == 'Hardkernel ODROID-C4\x00':
+    i2c_bus = 0x00
+    import Odroid.GPIO as GPIO
+    GPIO.setmode(GPIO.WIRINGPI)  # set the gpio mode
+    spiPin = 6
+
+elif detect_model() == 'Raspberry Pi 3 Model B Rev 1.2\x00':
+    i2c_bus = 0x01
+    import RPi.GPIO as GPIO
+    GPIO.setmode(GPIO.BCM)  # set the gpio mode
+    spiPin = 25
+
 import spidev # import SPI
 from BMP388 import BMP388 # Import Pressure sensor
 from LSM6DSL import LSM6DSL # Import Accelerometer and Gyro Module
@@ -20,9 +32,9 @@ class corePrimaryAircraft():
     RADIO_READING_PIPE = [0xF0, 0xF0, 0xF0, 0xF0, 0xF0]
 
     def __init__(self):
-        self.altimeter = BMP388(smbus.SMBus(0x01))
-        self.imu = LSM6DSL(smbus.SMBus(0x01))
-        self.compass = LIS3MDL(smbus.SMBus(0x01))
+        self.altimeter = BMP388(smbus.SMBus(i2c_bus))
+        self.imu = LSM6DSL(smbus.SMBus(i2c_bus))
+        self.compass = LIS3MDL(smbus.SMBus(i2c_bus))
         self.radio = NRF24(GPIO, spidev.SpiDev())
         self.gps = GpsPoller()
 
@@ -51,7 +63,7 @@ class corePrimaryAircraft():
     def _initRadio(self):
         print('Setting up radio (nRF24L01+) ...')
         self.radio = NRF24(GPIO, spidev.SpiDev())  # use the gpio pins
-        self.radio.begin(0, 25)  # start the radio and set the ce,csn pin ce= GPIO08, csn= GPIO25
+        self.radio.begin(0, spiPin)  # start the radio and set the ce,csn pin ce= GPIO08, csn= GPIO25
 
         self.radio.setPayloadSize(self.RADIO_PAYLOAD_SIZE)  # set the payload size as 32 bytes
         self.radio.setChannel(0x76)  # set the channel as 76 hex

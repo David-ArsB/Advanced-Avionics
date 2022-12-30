@@ -63,7 +63,7 @@ while True:
 
         time.sleep(1 / 100)
 
-        if time.time() - start > 2:
+        if time.time() - start > 1:
             print("Timed out.")  # print errror message if radio disconnected or not functioning anymore
 
             break
