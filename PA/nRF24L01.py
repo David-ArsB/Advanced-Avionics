@@ -18,8 +18,9 @@ import spidev
 
 from lib_nrf24 import NRF24  # import NRF24 library
 
+print('Test 1')
 GPIO.setmode(GPIO.BCM)  # set the gpio mode
-
+print('Test 2')
 # set the pipe address. this address shoeld be entered on the receiver alo
 
 pipes = [[0xE0, 0xE0, 0xE0, 0xE0, 0xE0], [0xF0, 0xF0, 0xF0, 0xF0, 0xF0]]
