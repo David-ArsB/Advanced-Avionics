@@ -20,7 +20,7 @@ from lib_nrf24 import NRF24  # import NRF24 library
 
 print('Test 1')
 GPIO.setmode(GPIO.BCM)  # set the gpio mode
-print('Test 2')
+
 # set the pipe address. this address shoeld be entered on the receiver alo
 
 pipes = [[0xE0, 0xE0, 0xE0, 0xE0, 0xE0], [0xF0, 0xF0, 0xF0, 0xF0, 0xF0]]
@@ -36,7 +36,7 @@ radio.setChannel(0x76)  # set the channel as 76 hex
 radio.setDataRate(NRF24.BR_2MBPS)  # set radio data rate
 
 radio.setPALevel(NRF24.PA_MIN)  # set PA level
-
+print('Test 2')
 radio.setAutoAck(True)  # set acknowledgement as true
 
 radio.enableDynamicPayloads()
