@@ -32,11 +32,11 @@ radio.begin(0, 25)  # start the radio and set the ce,csn pin ce= GPIO08, csn= GP
 radio.setPayloadSize(32)  # set the payload size as 32 bytes
 
 radio.setChannel(0x76)  # set the channel as 76 hex
-
+print('Test 2')
 radio.setDataRate(NRF24.BR_2MBPS)  # set radio data rate
 
 radio.setPALevel(NRF24.PA_MIN)  # set PA level
-print('Test 2')
+
 radio.setAutoAck(True)  # set acknowledgement as true
 
 radio.enableDynamicPayloads()
