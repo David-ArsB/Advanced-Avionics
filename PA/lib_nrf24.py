@@ -37,7 +37,7 @@ if __name__ == '__main__':
 def _BV(x):
     return 1 << x
 
-print('Test 3')
+
 class NRF24:
 
     MAX_CHANNEL = 127
