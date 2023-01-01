@@ -196,8 +196,8 @@ if __name__ == '__main__':
             core.printDataSummary()
             #core.radio.printDetails()
 
-            core.receiveFromGCS()
             core.transmitToGCS()
+            core.receiveFromGCS()
             #time.sleep(1)
 
 
