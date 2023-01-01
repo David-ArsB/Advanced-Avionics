@@ -30,6 +30,7 @@ class corePrimaryAircraft():
     # set the pipe addresses. this address should be entered on the receiver also
     RADIO_WRITING_PIPE = [0xE0, 0xE0, 0xE0, 0xE0, 0xE0]
     RADIO_READING_PIPE = [0xF0, 0xF0, 0xF0, 0xF0, 0xF0]
+    RADIO_AKPL_BUF = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8]
 
     def __init__(self):
         self.altimeter = BMP388(smbus.SMBus(i2c_bus))
@@ -165,6 +166,26 @@ class corePrimaryAircraft():
             print(block,' ',len(block))
             self.radio.write(block)  # write the message to radio
 
+    def receiveFromGCS(self):
+        self.radio.startListening()
+        t1 = time.time()
+        while not self.radio.available(self.RADIO_READING_PIPE):
+            if (time.time() - t1) > 0.95:
+                return None
+            time.sleep(1 / 100)
+
+        recv_buffer = []
+        self.radio.read(recv_buffer, self.radio.getDynamicPayloadSize())
+        #print("Received:")
+        #print(recv_buffer)
+        return recv_buffer
+        self.radio.writeAckPayload(1, self.RADIO_AKPL_BUF, len(self.RADIO_AKPL_BUF))
+        #print("Loaded payload reply:")
+        #print(self.RADIO_AKPL_BUF)
+
+
+        self.radio.stopListening()
+
 if __name__ == '__main__':
     core = corePrimaryAircraft()
 
@@ -175,8 +196,10 @@ if __name__ == '__main__':
             core.printDataSummary()
             #core.radio.printDetails()
 
+            core.receiveFromGCS()
             core.transmitToGCS()
-            time.sleep(1)
+            #time.sleep(1)
+
 
         except (KeyboardInterrupt, SystemExit):  # when you press ctrl+c
             print("\nKilling Thread...")

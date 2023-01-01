@@ -41,7 +41,7 @@ while True:
     akpl_buf = [c,1, 2, 3,4,5,6,7,8,9,0,1, 2, 3,4,5,6,7,8]
     pipe = [0]
     while not radio2.available(pipe):
-        time.sleep(10000/1000000.0)
+        time.sleep(1/100)
 
     recv_buffer = []
     radio2.read(recv_buffer, radio2.getDynamicPayloadSize())

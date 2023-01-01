@@ -479,7 +479,7 @@ class NRF24:
         # Handle the ack packet
         if what['rx_ready']:
             self.ack_payload_length = self.getDynamicPayloadSize()
-            self.ack_payload_available = True              ## bl
+            self.ack_payload_available = True              # needed for ack-payload
 
         return result
 
