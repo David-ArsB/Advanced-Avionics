@@ -4,8 +4,7 @@
 # Example program to receive packets from the radio link
 #
 
-import RPi.GPIO as GPIO
-GPIO.setmode(GPIO.BCM)
+
 import time
 import spidev
 
