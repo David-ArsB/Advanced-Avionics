@@ -194,7 +194,7 @@ class corePrimaryAircraft():
     def receiveFromGCS(self):
         print('\nListening to ground station...')
         t1 = time.time()
-        while not self.radio.available(self.RADIO_READING_PIPE):
+        while not self.radio.available(0):
             if (time.time() - t1) > 1:
                 print('Heard nothing from ground station...')
                 return None
