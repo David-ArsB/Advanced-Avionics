@@ -174,13 +174,13 @@ class corePrimaryAircraft():
                 block.append(0)
             print(block,' - ',len(block))
             self.radio.write(block)  # write the message to radio
-            if self.radio.isAckPayloadAvailable():
-                pl_buffer = []
-                self.radio.read(pl_buffer, self.radio.getDynamicPayloadSize())
-                print("Received back:"),
-                print(pl_buffer)
-            else:
-                print("Received: Ack only, no payload")
+            # if self.radio.isAckPayloadAvailable():
+            #     pl_buffer = []
+            #     self.radio.read(pl_buffer, self.radio.getDynamicPayloadSize())
+            #     print("Received back:"),
+            #     print(pl_buffer)
+            # else:
+            #     print("Received: Ack only, no payload")
 
     def receiveFromGCS(self):
         self.radio.startListening()

@@ -4,6 +4,7 @@
 #define   MAX_DATA_LEN    (32)
 #define   TERMINATOR_CHAR ('\n')
 char message2Transmit[32] = { 0 };
+char ack_buf[] = {'a','c','k'};
 
 RF24 radio(9, 10);  // ce, csn pins
 
@@ -60,6 +61,7 @@ void listenToPA(void){
       if (radio.available()) {
 
         radio.read(receivedMessage, sizeof(receivedMessage));  // read the message and save
+        //radio.writeAckPayload(0, ack_buf, sizeof(ack_buf));
 
         Serial.println(receivedMessage);  // print message on serial monitor
         
