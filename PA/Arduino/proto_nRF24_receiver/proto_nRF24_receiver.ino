@@ -31,6 +31,7 @@ void setup(void) {
   radio.openWritingPipe(w_pipe);
 
   radio.enableDynamicPayloads();
+  radio.setAutoAck(true)
   radio.setPayloadSize(32);
   radio.setDataRate(RF24_250KBPS);
   radio.powerUp();

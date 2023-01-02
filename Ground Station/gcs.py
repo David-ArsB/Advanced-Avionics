@@ -106,6 +106,7 @@ class SerialReaderObj(QObject):
         if self.tx_buf != None:
             self.serialPort.write(self.tx_buf.encode())
             self.tx_buf = None
+
     @Slot()
     def readSerial(self):
         data = {}
