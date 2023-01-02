@@ -10,7 +10,13 @@ from lib_nrf24 import NRF24
 import time
 import spidev
 
+def translate_from_radio(msg, size):
+    translated_msg=[]
+    for i in range (0, size, 4):
+        translated_msg.append(int.from_bytes([msg[i+3], msg[i+2], msg[i+1], msg[i]], byteorder='big'))
 
+    #print("Translate FROM Radio: " + str(msg) + " --> " + str(translated_msg))
+    return translated_msg
 
 pipes = [[0xe7, 0xe7, 0xe7, 0xe7, 0xe7], [0xc2, 0xc2, 0xc2, 0xc2, 0xc2]]
 
@@ -48,7 +54,7 @@ while True:
     recv_buffer = []
     radio2.read(recv_buffer, radio2.getDynamicPayloadSize())
     print ("Received:") ,
-    print (recv_buffer)
+    print (translate_from_radio(recv_buffer))
     c = c + 1
     if (c&1) == 0:
         radio2.writeAckPayload(1, akpl_buf, len(akpl_buf))
