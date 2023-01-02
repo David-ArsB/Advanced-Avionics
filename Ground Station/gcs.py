@@ -15,6 +15,10 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 
 from gui.gui_gcs import Ui_MainWindow
 
+import serial.tools.list_ports
+
+
+
 
 
 class GPSEvaluatorWorker(QObject):
@@ -71,7 +75,7 @@ class GPSEvaluatorWorker(QObject):
                 if n != 100:
                     self.main.GPSEval_ProgressBar.setValue(n)
                 else:
-                    self.main.GPSEval_ProgressBar.setValue(self.main.GPSEval_ProgressBar.Maximum)
+                    self.main.GPSEval_ProgressBar.setValue(self.main.GPSEval_ProgressBar.maximum())
 
                 print(n)
 
@@ -219,25 +223,32 @@ class UI_MW(QMainWindow, Ui_MainWindow):
             :returns:
                 A list of the serial ports available on the system
         """
-        if sys.platform.startswith('win'):
-            ports = ['COM%s' % (i + 1) for i in range(256)]
-        elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
-            # this excludes your current terminal "/dev/tty"
-            ports = glob.glob('/dev/tty[A-Za-z]*')
-        elif sys.platform.startswith('darwin'):
-            ports = glob.glob('/dev/tty.*')
-        else:
-            raise EnvironmentError('Unsupported platform')
+        ports = serial.tools.list_ports.comports()
+        res = []
+        for port, desc, hwid in sorted(ports):
+            res.append("{}: {}".format(port, desc))
 
-        result = []
-        for port in ports:
-            try:
-                s = serial.Serial(port)
-                s.close()
-                result.append(port)
-            except (OSError, serial.SerialException) as e:
-                pass
-        return result
+        return res
+
+        # if sys.platform.startswith('win'):
+        #     ports = ['COM%s' % (i + 1) for i in range(9)]
+        # elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
+        #     # this excludes your current terminal "/dev/tty"
+        #     ports = glob.glob('/dev/tty[A-Za-z]*')
+        # elif sys.platform.startswith('darwin'):
+        #     ports = glob.glob('/dev/tty.*')
+        # else:
+        #     raise EnvironmentError('Unsupported platform')
+        #
+        # result = []
+        # for port in ports:
+        #     try:
+        #         s = serial.Serial(port)
+        #         s.close()
+        #         result.append(port)
+        #     except (OSError, serial.SerialException) as e:
+        #         pass
+        # return result
 
     def setNewFigure(self, name, layout, toolbar=False):
         '''
@@ -270,7 +281,7 @@ class UI_MW(QMainWindow, Ui_MainWindow):
 
     def connectToSerial(self):
         try:
-            port = self.serialPort_CB.currentText()
+            port = self.serialPort_CB.currentText().split(':')[0].strip()
             arduino = serial.Serial(port=port, baudrate=115200, timeout=.1)
             self.serialPort = arduino
 
@@ -463,12 +474,14 @@ class UI_MW(QMainWindow, Ui_MainWindow):
         except Exception as e:
             print('[GPS Eval] Exception has occured: ' + str(e))
 
-
-
+    def refreshComPorts(self):
+        self.serialPort_CB.clear()
+        self.serialPort_CB.addItems(self.serial_ports())
     def setSignals(self):
         self.connectSerialButton.clicked.connect(lambda: self.connectToSerial())
         self.copycoordinates_TB.clicked.connect(lambda: self.copyGPSToClipboard())
         self.beginGPSAccuracy_PB.clicked.connect(lambda: self.startGPSAccEval())
+        self.refresh_COM_TB.clicked.connect(lambda: self.refreshComPorts())
 
 
 

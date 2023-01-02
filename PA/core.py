@@ -197,8 +197,8 @@ if __name__ == '__main__':
             #core.radio.printDetails()
 
             core.transmitToGCS()
-            #core.receiveFromGCS()
-            time.sleep(1)
+            core.receiveFromGCS()
+            time.sleep(0.05)
 
 
         except (KeyboardInterrupt, SystemExit):  # when you press ctrl+c
