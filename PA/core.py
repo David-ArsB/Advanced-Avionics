@@ -67,8 +67,8 @@ class corePrimaryAircraft():
         self.radio.begin(0, spiPin)  # start the radio and set the ce,csn pin ce= GPIO08, csn= GPIO25
 
         self.radio.setPayloadSize(self.RADIO_PAYLOAD_SIZE)  # set the payload size as 32 bytes
-        self.radio.setChannel(0x76)  # set the channel as 76 hex
-        self.radio.setDataRate(self.RADIO_DATA_RATES[2])  # set radio data rate to 2MBPS
+        self.radio.setChannel(0x36)  # set the channel as 76 hex
+        self.radio.setDataRate(self.RADIO_DATA_RATES[0])  # set radio data rate to 2MBPS
         self.radio.setPALevel(self.RADIO_PA_LEVELS[1])  # set PA level to LOW
 
         self.radio.setAutoAck(True)  # set acknowledgement as true
