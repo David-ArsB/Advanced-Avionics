@@ -186,13 +186,13 @@ class corePrimaryAircraft():
             #     print("Received: Ack only, no payload")
 
     def receiveFromGCS(self):
-        print('Listening to ground station...\n')
+        print('\nListening to ground station...\n')
         self.radio.startListening()
         t1 = time.time()
         while not self.radio.available(self.RADIO_READING_PIPE):
             if (time.time() - t1) > 1:
+                print('Heard nothing from ground station...')
                 return None
-                print('Stopped listening to ground station...\n')
 
             time.sleep(1 / 100)
 
