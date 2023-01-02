@@ -201,7 +201,7 @@ if __name__ == '__main__':
 
             core.transmitToGCS()
             time.sleep(0.05)
-            core.receiveFromGCS()
+            #core.receiveFromGCS()
             time.sleep(0.10)
 
 
