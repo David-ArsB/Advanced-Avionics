@@ -133,6 +133,7 @@ class corePrimaryAircraft():
         :return: None
         '''
         print('Transmitting to ground station...\n')
+        self.radio.stopListening()
 
         # Print Altimeter Data
         temperature, pressure, altitude = self.altimeter.get_temperature_and_pressure_and_altitude()
@@ -174,7 +175,7 @@ class corePrimaryAircraft():
                 block.append(0)
             print(block,' - ',len(block))
             self.radio.write(block)  # write the message to radio
-            time.sleep(10 / 100)
+
             # if self.radio.isAckPayloadAvailable():
             #     pl_buffer = []
             #     self.radio.read(pl_buffer, self.radio.getDynamicPayloadSize())
@@ -205,6 +206,8 @@ class corePrimaryAircraft():
         print('Received from GCS: ')
         print(recv_buffer)
         return recv_buffer
+
+
 
 if __name__ == '__main__':
     core = corePrimaryAircraft()
