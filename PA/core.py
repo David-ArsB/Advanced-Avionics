@@ -230,7 +230,6 @@ if __name__ == '__main__':
 
             core.transmitToGCS()
             core.receiveFromGCS()
-            time.sleep(0.5)
 
 
         except (KeyboardInterrupt, SystemExit):  # when you press ctrl+c
