@@ -150,6 +150,7 @@ class corePrimaryAircraft():
 
         numBlocks = 9
         header = list('$b'+ str(int(numBlocks)) + ',tph' + ',lat' + ',long')
+        header = list('BOF')
         block1 = list("temperature: %.1f" % round(temperature/100, 1))
         block2 = list("pressure: %.1f" % round(pressure/100, 1))
         block3 = list("altitude: %.1f" % round(altitude/100, 1))
@@ -170,7 +171,7 @@ class corePrimaryAircraft():
         self.radio.startListening()
         t1 = time.time()
         while not self.radio.available(self.RADIO_READING_PIPE):
-            if (time.time() - t1) > 0.90:
+            if (time.time() - t1) > 1:
                 return None
             time.sleep(1 / 100)
 
@@ -186,7 +187,7 @@ class corePrimaryAircraft():
 
         self.radio.stopListening()
         print('Received from GCS: ')
-        print(recv_buffer+'\n')
+        print(recv_buffer)
         return recv_buffer
 
 if __name__ == '__main__':
@@ -196,13 +197,12 @@ if __name__ == '__main__':
     while True:
         try:
             os.system('clear')
-            core.printDataSummary()
+            #core.printDataSummary()
             #core.radio.printDetails()
 
             core.transmitToGCS()
-            time.sleep(0.15)
-            core.receiveFromGCS()
-            time.sleep(0.10)
+            #core.receiveFromGCS()
+            time.sleep(1.0)
 
 
         except (KeyboardInterrupt, SystemExit):  # when you press ctrl+c
