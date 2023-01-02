@@ -76,7 +76,7 @@ class corePrimaryAircraft():
         self.radio.enableAckPayload()
 
         self.radio.openWritingPipe(self.RADIO_WRITING_PIPE)  # open the defined pipe for writing
-        self.radio.openReadingPipe(0, self.RADIO_READING_PIPE)  # open the defined pipe for reading
+        #self.radio.openReadingPipe(0, self.RADIO_READING_PIPE)  # open the defined pipe for reading
 
     def _initGPS(self):
         print('Setting up GPS thread ...')
