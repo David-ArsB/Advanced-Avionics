@@ -170,7 +170,7 @@ class corePrimaryAircraft():
         self.radio.startListening()
         t1 = time.time()
         while not self.radio.available(self.RADIO_READING_PIPE):
-            if (time.time() - t1) > 1:
+            if (time.time() - t1) > 0.90:
                 return None
             time.sleep(1 / 100)
 
@@ -195,14 +195,14 @@ if __name__ == '__main__':
 
     while True:
         try:
-            #os.system('clear')
-            #core.printDataSummary()
+            os.system('clear')
+            core.printDataSummary()
             #core.radio.printDetails()
 
             core.transmitToGCS()
-            time.sleep(0.1)
+            time.sleep(0.15)
             core.receiveFromGCS()
-            time.sleep(0.1)
+            time.sleep(0.10)
 
 
         except (KeyboardInterrupt, SystemExit):  # when you press ctrl+c

@@ -31,6 +31,7 @@ void setup(void) {
   radio.setPayloadSize(32);
   radio.setDataRate(RF24_250KBPS);
   radio.powerUp();
+  radio.startListening();    // start listening 
   
 }
 
@@ -38,7 +39,7 @@ void setup(void) {
 void loop(void) {
 
   listenToPA();
-  //transmitToPA();
+  transmitToPA();
 
   delay(25);
 }
@@ -47,7 +48,7 @@ void loop(void) {
 void listenToPA(){
   char receivedMessage[32] = { 0 };  // set incmng message for 32 bytes
 
-  radio.startListening();    // start listening 
+  
 
   if (radio.available()) {   // check if message is coming
     radio.read(receivedMessage, sizeof(receivedMessage));
@@ -70,7 +71,7 @@ void listenToPA(){
     Serial.println(' ');              // print message on serial monitor
   }
 
-  radio.stopListening();  // stop listening 
+  //radio.stopListening();  // stop listening 
 }
 
 void transmitToPA(){
