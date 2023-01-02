@@ -81,7 +81,7 @@ class corePrimaryAircraft():
         self.radio.enableAckPayload()
 
         self.radio.openWritingPipe(self.RADIO_WRITING_PIPE)  # open the defined pipe for writing
-        #self.radio.openReadingPipe(0, self.RADIO_READING_PIPE)  # open the defined pipe for reading
+        self.radio.openReadingPipe(0, self.RADIO_READING_PIPE)  # open the defined pipe for reading
         self.radio.stopListening()
 
     def _initGPS(self):
@@ -174,6 +174,13 @@ class corePrimaryAircraft():
                 block.append(0)
             print(block,' - ',len(block))
             self.radio.write(block)  # write the message to radio
+            if self.radio.isAckPayloadAvailable():
+                pl_buffer = []
+                self.radio.read(pl_buffer, self.radio.getDynamicPayloadSize())
+                print("Received back:"),
+                print(pl_buffer)
+            else:
+                print("Received: Ack only, no payload")
 
     def receiveFromGCS(self):
         self.radio.startListening()

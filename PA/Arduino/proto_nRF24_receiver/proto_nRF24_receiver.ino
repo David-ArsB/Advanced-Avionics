@@ -25,7 +25,7 @@ void setup(void) {
   const uint64_t w_pipe = 0xF0F0F0F0F0LL;  // pipe address same as receiver i.e. raspberry pi
 
   radio.openReadingPipe(1, r_pipe);  // start reading pipe
-  //radio.openWritingPipe(w_pipe);
+  radio.openWritingPipe(w_pipe);
 
   radio.enableDynamicPayloads();
   radio.setPayloadSize(32);
