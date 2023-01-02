@@ -1,15 +1,31 @@
-sudo apt install xrdp
-sudo apt install software-properties-common
-sudo add-apt-repository ppa:hardkernel/ppa
-sudo apt update
-sudo apt install odroid-wiringpi-python
+########################################
+#### AVION CARGO GUIDE INSTALLATION ####
+#### ---------- ODROID C4 --------- ####
+########################################
 
+# Enable i2c (Manual)
+sudo vi /media/boot/config.ini
+# Insert overlays="spi0 i2c0 uart0 uart1" and reboot
+
+# OR ENABLE INTERFACES WITH odroid-config
+# enable UART, SPI & I2C
+git clone https://github.com/hhk7734/odroid-config.git
+sudo odroid-config
+
+reboot
+
+sudo apt install xrdp
+sudo apt-get install screen
+sudo apt-get install minicom -y
 sudo apt install git
 sudo apt-get install build-essential
 sudo apt-get install autoconf
 sudo apt-get install libtool
-apt install python3-pip
+sudo apt install python3-pip
 sudo apt install libwiringpi-dev odroid-wiringpi
+
+
+# INSTALL HARDKERNEL WIRINGPI
 
 git clone https://github.com/hardkernel/wiringPi
 cd wiringPi
@@ -18,6 +34,14 @@ sh autogen.sh
 make
 sudo make install
 
+sudo apt install software-properties-common
+sudo add-apt-repository ppa:hardkernel/ppa
+sudo apt update
+sudo apt install odroid-wiringpi-python
+
+
+
+# INSTALL ODROID.GPIO
 
 git clone https://github.com/hhk7734/Odroid.GPIO
 cd Odroid.GPIO/c_src/
@@ -26,3 +50,9 @@ nano gpio.cpp
 cd ..
 python3 setup.py install
 
+
+# INSTALL GPSd
+
+sudo apt-get install gpsd-clients gpsd -y
+# Insert DEVICES="dev/ttyS1" in
+sudo nano /etc/default/gpsd 

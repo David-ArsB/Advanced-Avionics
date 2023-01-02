@@ -1,3 +1,8 @@
+"""
+Main Code for the Avion Cargo Primary Aircraft Localisation System.
+
+"""
+
 import sys, os, smbus, time
 from misc import detect_model
 

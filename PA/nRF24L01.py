@@ -27,25 +27,20 @@ radio = NRF24(GPIO, spidev.SpiDev())  # use the gpio pins
 radio.begin(0, spiPin)  # start the radio and set the ce,csn pin ce= GPIO08, csn= GPIO25
 
 radio.setPayloadSize(32)  # set the payload size as 32 bytes
-
 radio.setChannel(0x76)  # set the channel as 76 hex
-
 radio.setDataRate(NRF24.BR_2MBPS)  # set radio data rate
-
 radio.setPALevel(NRF24.PA_MIN)  # set PA level
 
 radio.setAutoAck(True)  # set acknowledgement as true
-
 radio.enableDynamicPayloads()
-
 radio.enableAckPayload()
-
 radio.openWritingPipe(pipes[0])  # open the defined pipe for writing
-
 radio.printDetails()  # print basic detals of radio
 
 sendMessage = list("Hi..Arduino UNO")  # the message to be sent
 print(sendMessage)
+
+
 while len(sendMessage) < 32:
     sendMessage.append(0)
 

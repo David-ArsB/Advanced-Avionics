@@ -6,33 +6,39 @@
 
 import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
-from lib_nrf24 import NRF24
 import time
 import spidev
 
+from misc import detect_model
+from lib_nrf24 import NRF24  # import NRF24 library
+
+if detect_model() == 'Hardkernel ODROID-C4\x00':
+    import Odroid.GPIO as GPIO
+    GPIO.setmode(GPIO.WIRINGPI) # set the gpio mode
+    spiPin = 6
+elif detect_model() == 'Raspberry Pi 3 Model B Rev 1.2\x00':
+    import RPi.GPIO as GPIO
+    GPIO.setmode(GPIO.BCM)  # set the gpio mode
+    spiPin = 25
 
 
 pipes = [[0xE0, 0xE0, 0xE0, 0xE0, 0xE0], [0xc2, 0xc2, 0xc2, 0xc2, 0xc2]]
 
 radio2 = NRF24(GPIO, spidev.SpiDev())
-radio2.begin(0, 25)
+radio2.begin(0, spiPin)
 
 radio2.setRetries(15,15)
 
 radio2.setPayloadSize(32)
-radio2.setChannel(0x76)
-radio2.setDataRate(NRF24.BR_2MBPS)
+radio2.setChannel(0x36)
+radio2.setDataRate(NRF24.BR_250KBPS)
 radio2.setPALevel(NRF24.PA_MIN)
 
 radio2.setAutoAck(True)
 radio2.enableDynamicPayloads()
 radio2.enableAckPayload()
 
-#radio2.openWritingPipe(pipes[1])
 radio2.openReadingPipe(1, pipes[0])
-
-radio2.startListening()
-radio2.stopListening()
 
 radio2.printDetails()
 
