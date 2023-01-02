@@ -213,6 +213,7 @@ class corePrimaryAircraft():
         print('Received from GCS: ')
         print(recv_buffer)
         print('Stopped listening to ground station...')
+        time.sleep(1)
 
         return recv_buffer
 
@@ -229,7 +230,7 @@ if __name__ == '__main__':
 
             core.transmitToGCS()
             core.receiveFromGCS()
-            time.sleep(0.1)
+            time.sleep(0.5)
 
 
         except (KeyboardInterrupt, SystemExit):  # when you press ctrl+c
