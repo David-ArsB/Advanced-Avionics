@@ -210,7 +210,7 @@ if __name__ == '__main__':
             #core.radio.printDetails()
 
             core.transmitToGCS()
-            #core.receiveFromGCS()
+            core.receiveFromGCS()
             time.sleep(1.0)
 
 
