@@ -68,8 +68,8 @@ class corePrimaryAircraft():
 
         self.radio.setPayloadSize(self.RADIO_PAYLOAD_SIZE)  # set the payload size as 32 bytes
         self.radio.setChannel(0x76)  # set the channel as 76 hex
-        self.radio.setDataRate(self.RADIO_DATA_RATES[0])  # set radio data rate to 2MBPS
-        self.radio.setPALevel(self.RADIO_PA_LEVELS[0])  # set PA level to LOW
+        self.radio.setDataRate(self.RADIO_DATA_RATES[2])  # set radio data rate to 2MBPS
+        self.radio.setPALevel(self.RADIO_PA_LEVELS[1])  # set PA level to LOW
 
         self.radio.setAutoAck(True)  # set acknowledgement as true
         self.radio.enableDynamicPayloads()
@@ -150,7 +150,7 @@ class corePrimaryAircraft():
 
         numBlocks = 9
         header = list('$b'+ str(int(numBlocks)) + ',tph' + ',lat' + ',long')
-        header = list('BOF')
+        header = list('BOF') # Indicates beginning of message
         block1 = list("temperature: %.1f" % round(temperature/100, 1))
         block2 = list("pressure: %.1f" % round(pressure/100, 1))
         block3 = list("altitude: %.1f" % round(altitude/100, 1))
@@ -160,11 +160,13 @@ class corePrimaryAircraft():
         block7 = list("Gyr: %.1f,%.1f,%.1f" % (round(GyrX, 2), round(GyrY, 2), round(GyrZ, 2)))
         block8 = list("Mag: %.3f,%.3f,%.3f" % (round(magX, 3), round(magY, 3), round(magZ, 3)))
         block9 = list('EOF') # Indicates end of message
+
         blocks = [header, block1, block2, block3, block4, block5, block6, block7, block8, block9]
+
         for block in blocks:
             while len(block) < self.RADIO_PAYLOAD_SIZE:
                 block.append(0)
-            print(block,' ',len(block))
+            print(block,' - ',len(block))
             self.radio.write(block)  # write the message to radio
 
     def receiveFromGCS(self):

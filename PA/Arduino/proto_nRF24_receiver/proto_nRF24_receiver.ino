@@ -22,16 +22,16 @@ void setup(void) {
   radio.setChannel(0x76);  // set channel at 76
 
   const uint64_t r_pipe = 0xE0E0E0E0E0LL;  // pipe address same as sender i.e. raspberry pi
-  const uint64_t w_pipe = 0xF0F0F0F0F0LL;  // pipe address same as receiver i.e. raspberry pi
+  //const uint64_t w_pipe = 0xF0F0F0F0F0LL;  // pipe address same as receiver i.e. raspberry pi
 
   radio.openReadingPipe(1, r_pipe);  // start reading pipe
   //radio.openWritingPipe(w_pipe);
 
   radio.enableDynamicPayloads();
   radio.setPayloadSize(32);
-  radio.setDataRate(RF24_250KBPS);
+  radio.setDataRate(RF24_2MBPS);
   radio.powerUp();
-  radio.startListening();    // start listening 
+  
   
 }
 
@@ -46,9 +46,9 @@ void loop(void) {
 
 
 void listenToPA(){
-  char receivedMessage[32] = { 0 };  // set incmng message for 32 bytes
 
-  
+  radio.startListening();    // start listening 
+  char receivedMessage[32] = { 0 };  // set incmng message for 32 bytes
 
   if (radio.available()) {   // check if message is coming
     radio.read(receivedMessage, sizeof(receivedMessage));
@@ -71,7 +71,7 @@ void listenToPA(){
     Serial.println(' ');              // print message on serial monitor
   }
 
-  //radio.stopListening();  // stop listening 
+  radio.stopListening();  // stop listening 
 }
 
 void transmitToPA(){
