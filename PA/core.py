@@ -207,7 +207,7 @@ if __name__ == '__main__':
         try:
             os.system('clear')
             #core.printDataSummary()
-            core.radio.printDetails()
+            #core.radio.printDetails()
 
             core.transmitToGCS()
             #core.receiveFromGCS()
