@@ -3,7 +3,7 @@
 
 #define   MAX_DATA_LEN    (32)
 #define   TERMINATOR_CHAR ('\n')
-char message2Transmit[32] = { 0 };
+char message2Transmit[32] = { 'a' };
 char ack_buf[] = {'a','c','k'};
 
 RF24 radio(9, 10);  // ce, csn pins
@@ -41,7 +41,7 @@ void loop(void) {
   
 
   listenToPA();
-  //transmitToPA();
+  transmitToPA();
 
   delay(25);
 }
@@ -76,6 +76,7 @@ void listenToPA(void){
 void transmitToPA(void){
   char inByte;
   bool dataReady;
+  radio.write(message2Transmit, sizeof(message2Transmit));
   while (Serial.available() > 0) {
     // read the incoming byte:
     inByte = Serial.read();
