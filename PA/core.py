@@ -164,7 +164,7 @@ class corePrimaryAircraft():
             while len(block) < self.RADIO_PAYLOAD_SIZE:
                 block.append(0)
             print(block,' ',len(block))
-            time.sleep(1 / 100)
+            time.sleep(5 / 100)
             self.radio.write(block)  # write the message to radio
 
     def receiveFromGCS(self):
