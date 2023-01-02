@@ -195,7 +195,7 @@ class corePrimaryAircraft():
         #print("Received:")
         #print(recv_buffer)
 
-        self.radio.writeAckPayload(1, self.RADIO_AKPL_BUF, len(self.RADIO_AKPL_BUF))
+        #self.radio.writeAckPayload(1, self.RADIO_AKPL_BUF, len(self.RADIO_AKPL_BUF))
         #print("Loaded payload reply:")
         #print(self.RADIO_AKPL_BUF)
 
