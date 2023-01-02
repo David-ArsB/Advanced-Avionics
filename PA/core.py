@@ -150,6 +150,7 @@ class corePrimaryAircraft():
 
         numBlocks = 9
         header = list('$b'+ str(int(numBlocks)) + ',tph' + ',lat' + ',long')
+        header = list('BOF')
         block1 = list("temperature: %.1f" % round(temperature/100, 1))
         block2 = list("pressure: %.1f" % round(pressure/100, 1))
         block3 = list("altitude: %.1f" % round(altitude/100, 1))
@@ -159,7 +160,7 @@ class corePrimaryAircraft():
         block7 = list("Gyr: %.1f,%.1f,%.1f" % (round(GyrX, 2), round(GyrY, 2), round(GyrZ, 2)))
         block8 = list("Mag: %.3f,%.3f,%.3f" % (round(magX, 3), round(magY, 3), round(magZ, 3)))
         block9 = list('EOF') # Indicates end of message
-        blocks = [header, block2, block1, block3, block4, block5, block6, block7, block8, block9]
+        blocks = [header, block1, block2, block3, block4, block5, block6, block7, block8, block9]
         for block in blocks:
             while len(block) < self.RADIO_PAYLOAD_SIZE:
                 block.append(0)
