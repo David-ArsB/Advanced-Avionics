@@ -133,7 +133,7 @@ class corePrimaryAircraft():
         :return: None
         '''
 
-        self.radio.stopListening() # Confirm that the radio is in transmit mode
+
         print('Transmitting to ground station...\n')
 
         # Print Altimeter Data
@@ -175,7 +175,9 @@ class corePrimaryAircraft():
             while len(block) < self.RADIO_PAYLOAD_SIZE:
                 block.append(0)
             print(block,' - ',len(block))
+            self.radio.stopListening()  # Confirm that the radio is in transmit mode
             self.radio.write(block)  # write the message to radio
+            self.radio.startListening()
 
             # if self.radio.isAckPayloadAvailable():
             #     pl_buffer = []
@@ -185,9 +187,10 @@ class corePrimaryAircraft():
             # else:
             #     print("Received: Ack only, no payload")
 
+
+
     def receiveFromGCS(self):
-        print('\nListening to ground station...\n')
-        self.radio.startListening()
+        print('\nListening to ground station...')
         t1 = time.time()
         while not self.radio.available(self.RADIO_READING_PIPE):
             if (time.time() - t1) > 1:
@@ -206,9 +209,10 @@ class corePrimaryAircraft():
         #print(self.RADIO_AKPL_BUF)
 
 
-        self.radio.stopListening()
+
         print('Received from GCS: ')
         print(recv_buffer)
+        print('Stopped listening to ground station...')
 
         return recv_buffer
 
@@ -225,7 +229,7 @@ if __name__ == '__main__':
 
             core.transmitToGCS()
             core.receiveFromGCS()
-            time.sleep(1.0)
+            time.sleep(0.1)
 
 
         except (KeyboardInterrupt, SystemExit):  # when you press ctrl+c

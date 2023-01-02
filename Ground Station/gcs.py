@@ -93,6 +93,7 @@ class SerialReaderObj(QObject):
         self.thread = None
         self.run = True
         self.data = {}
+        self.tx_buf = None
 
     def readSerialOutline(self):
         message = self.serialPort.readline().decode().strip()
@@ -101,6 +102,10 @@ class SerialReaderObj(QObject):
 
         return None
 
+    def writeToSerial(self):
+        if self.tx_buf != None:
+            self.serialPort.write(self.tx_buf.encode())
+            self.tx_buf = None
     @Slot()
     def readSerial(self):
         data = {}
@@ -110,7 +115,7 @@ class SerialReaderObj(QObject):
             message = self.serialPort.readline().decode().strip()
             if message != messageOld:
                 #print(message)
-                if message != 'EOF' and len(message) > 0:
+                if message != 'EOF' and message != 'BOF' and len(message) > 0:
                     message = message.split(':')
                     if message[0].find('$b') != -1:
                         pass
@@ -125,14 +130,16 @@ class SerialReaderObj(QObject):
                         data[message[0].strip()] = float(message[1].strip())
 
 
-                elif len(message) > 0:
+                elif len(message) > 0 and message != 'BOF':
                     tag = data['tag']
                     self.serialBroadcast.emit(data)
                     self.data = data
                     data = {}
                     data['tag'] = tag+1
                 messageOld = message
-                time.sleep(0.1)
+
+            self.writeToSerial()
+            time.sleep(0.1)
 
 
 
@@ -323,6 +330,8 @@ class UI_MW(QMainWindow, Ui_MainWindow):
             return False
 
     def updateGuiData(self, data):
+        if len(data) == 1:
+            return
         try:
             self.altitude_SB.setValue(data['altitude'])
             self.pressure_SB.setValue(data['pressure'])
@@ -477,7 +486,9 @@ class UI_MW(QMainWindow, Ui_MainWindow):
             print('[GPS Eval] Exception has occured: ' + str(e))
 
     def transmitTest(self):
-        self.serialPort.write("This is a test\r".encode())
+
+        self.serialReaderObj.tx_buf = "This is a test\r"
+
     def refreshComPorts(self):
         self.serialPort_CB.clear()
         self.serialPort_CB.addItems(self.serial_ports())

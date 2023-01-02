@@ -3,7 +3,7 @@
 
 #define   MAX_DATA_LEN    (32)
 #define   TERMINATOR_CHAR ('\n')
-char message2Transmit[32] = { 'a' };
+char message2Transmit[32] = { 0 };
 char ack_buf[] = {'a','c','k'};
 
 RF24 radio(9, 10);  // ce, csn pins
@@ -32,7 +32,9 @@ void setup(void) {
   radio.setPayloadSize(32);
   radio.setDataRate(RF24_250KBPS);
   radio.powerUp();
-  radio.startListening();    // start listening 
+
+  radio.startListening();
+  //radio.stopListening();  // stop listening 
   
 }
 
@@ -48,6 +50,8 @@ void loop(void) {
 
 
 void listenToPA(void){
+  //radio.startListening();
+  
   char receivedMessage[32] = { 0 };  // set incmng message for 32 bytes
   
   if (radio.available()) {   // check if message is coming
@@ -74,16 +78,18 @@ void listenToPA(void){
 }
 
 void transmitToPA(void){
+  //radio.stopListening();  // stop listening 
   char inByte;
   bool dataReady;
-  radio.write(message2Transmit, sizeof(message2Transmit));
   while (Serial.available() > 0) {
     // read the incoming byte:
     inByte = Serial.read();
     dataReady = addData((char)inByte);  
     if ( dataReady )
+      radio.stopListening();
       radio.write(&message2Transmit, sizeof(message2Transmit));
-      Serial.println(message2Transmit);
+      radio.startListening();
+      //Serial.println(message2Transmit);
 
   }
 }
