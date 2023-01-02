@@ -1,6 +1,9 @@
 #include <SPI.h>   // spi library for connecting nrf
 #include <RF24.h>  // nrf library
 
+#define   MAX_DATA_LEN    (32)
+#define   TERMINATOR_CHAR ('\n')
+char message2Transmit[32] = { 0 };
 
 RF24 radio(9, 10);  // ce, csn pins
 
@@ -32,8 +35,11 @@ void setup(void) {
 
 void loop(void) {
 
-
+  char inByte = 0;
+  bool dataReady;
+  
   char receivedMessage[32] = { 0 };  // set incmng message for 32 bytes
+
   if (radio.available()) {           // check if message is coming
     radio.read(receivedMessage, sizeof(receivedMessage));
 
@@ -53,5 +59,51 @@ void loop(void) {
     Serial.println(' ');              // print message on serial monitor
   }
 
-  delay(10);
+  while (Serial.available() > 0) {
+    // read the incoming byte:
+    inByte = Serial.read();
+    dataReady = addData((char)inByte);  
+    if ( dataReady )
+      radio.write(&message2Transmit, sizeof(message2Transmit));
+  }
+
+  delay(25);
+}
+
+bool addData(char nextChar)
+{  
+  // This is position in the buffer where we put next char.
+  // Static var will remember its value across function calls.
+  static uint8_t currentIndex = 0;
+
+    // Ignore some characters - new line, space and tabs
+    if (nextChar == '\t'){
+      return false;
+    }
+      
+
+    // If we receive Enter character...
+    if (nextChar == TERMINATOR_CHAR) {
+        // ...terminate the string by NULL character "\0" and return true
+        //message2Transmit[currentIndex] = '\0';
+        currentIndex = 0;
+        return true;
+    }
+
+    // For normal character just store it in the buffer and move
+    // position to next
+    message2Transmit[currentIndex] = nextChar;
+    currentIndex++;
+
+    // Check for too many chars
+    if (currentIndex >= MAX_DATA_LEN) {
+      // The data too long so reset our position and return true
+      // so that the data received so far can be processed - the caller should
+      // see if it is valid command or not...
+      message2Transmit[MAX_DATA_LEN] = TERMINATOR_CHAR;
+      currentIndex = 0;
+      return true;
+    }
+
+    return false;
 }

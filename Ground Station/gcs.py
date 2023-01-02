@@ -132,7 +132,9 @@ class SerialReaderObj(QObject):
                     data = {}
                     data['tag'] = tag+1
                 messageOld = message
-                time.sleep(0.05)
+                time.sleep(0.1)
+
+
 
 class UI_MW(QMainWindow, Ui_MainWindow):
     serialStartRequested = Signal()
@@ -474,6 +476,8 @@ class UI_MW(QMainWindow, Ui_MainWindow):
         except Exception as e:
             print('[GPS Eval] Exception has occured: ' + str(e))
 
+    def transmitTest(self):
+        self.serialPort.write("This is a test\r".encode())
     def refreshComPorts(self):
         self.serialPort_CB.clear()
         self.serialPort_CB.addItems(self.serial_ports())
@@ -482,6 +486,7 @@ class UI_MW(QMainWindow, Ui_MainWindow):
         self.copycoordinates_TB.clicked.connect(lambda: self.copyGPSToClipboard())
         self.beginGPSAccuracy_PB.clicked.connect(lambda: self.startGPSAccEval())
         self.refresh_COM_TB.clicked.connect(lambda: self.refreshComPorts())
+        self.pushButton.clicked.connect(lambda: self.transmitTest())
 
 
 
