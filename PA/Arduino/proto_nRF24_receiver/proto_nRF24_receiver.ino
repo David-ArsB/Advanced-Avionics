@@ -24,7 +24,7 @@ void setup(void) {
 
   radio.enableDynamicPayloads();
   radio.setPayloadSize(32);
-  radio.setDataRate(RF24_2MBPS);
+  radio.setDataRate(RF24_250KBPS);
   radio.powerUp();
   radio.startListening();  // start listening forever
 }
