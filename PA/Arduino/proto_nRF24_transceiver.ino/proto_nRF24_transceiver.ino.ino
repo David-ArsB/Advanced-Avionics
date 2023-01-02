@@ -23,6 +23,7 @@ void setup(void) {
   radio.openWritingPipe(pipe) ;        // start reading pipe 
 
   radio.enableDynamicPayloads() ;
+  radio.setDataRate(RF24_250KBPS);
 
   radio.powerUp() ;          
   radio.stopListening();          //This sets the module as transmitter

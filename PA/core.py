@@ -69,7 +69,7 @@ class corePrimaryAircraft():
         self.radio.setPayloadSize(self.RADIO_PAYLOAD_SIZE)  # set the payload size as 32 bytes
         self.radio.setChannel(0x36)  # set the channel as 76 hex
         self.radio.setDataRate(self.RADIO_DATA_RATES[0])  # set radio data rate to 2MBPS
-        self.radio.setPALevel(self.RADIO_PA_LEVELS[1])  # set PA level to LOW
+        self.radio.setPALevel(self.RADIO_PA_LEVELS[0])  # set PA level to LOW
 
         self.radio.setAutoAck(True)  # set acknowledgement as true
         self.radio.enableDynamicPayloads()
@@ -77,6 +77,7 @@ class corePrimaryAircraft():
 
         self.radio.openWritingPipe(self.RADIO_WRITING_PIPE)  # open the defined pipe for writing
         #self.radio.openReadingPipe(0, self.RADIO_READING_PIPE)  # open the defined pipe for reading
+        self.radio.stopListening()
 
     def _initGPS(self):
         print('Setting up GPS thread ...')
@@ -194,6 +195,7 @@ class corePrimaryAircraft():
 
 if __name__ == '__main__':
     core = corePrimaryAircraft()
+
 
 
     while True:

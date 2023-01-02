@@ -19,7 +19,7 @@ void setup(void) {
 
   radio.setPALevel(RF24_PA_MIN);  // set power level
 
-  radio.setChannel(0x36);  // set channel at 76
+  radio.setChannel(0x36);  // set channel at 36
 
   const uint64_t r_pipe = 0xE0E0E0E0E0LL;  // pipe address same as sender i.e. raspberry pi
   const uint64_t w_pipe = 0xF0F0F0F0F0LL;  // pipe address same as receiver i.e. raspberry pi
@@ -49,14 +49,9 @@ void loop(void) {
 void listenToPA(void){
   char receivedMessage[32] = { 0 };  // set incmng message for 32 bytes
   
-
-  
-
   if (radio.available()) {   // check if message is coming
     radio.read(receivedMessage, sizeof(receivedMessage));
-    Serial.println("Listening");
-    
-    
+    Serial.println("Listening");  
 
     if (strstr(receivedMessage, "#b") == NULL) {
       Serial.println(receivedMessage);
