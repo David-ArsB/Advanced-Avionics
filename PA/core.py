@@ -199,8 +199,6 @@ class corePrimaryAircraft():
                 print('Heard nothing from ground station...')
                 return None
 
-            time.sleep(1 / 100)
-
         recv_buffer = []
         self.radio.read(recv_buffer, self.radio.getDynamicPayloadSize())
         #print("Received:")
