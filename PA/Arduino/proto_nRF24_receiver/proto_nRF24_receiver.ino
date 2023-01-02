@@ -37,12 +37,18 @@ void setup(void) {
 
 void loop(void) {
 
-  char inByte = 0;
-  bool dataReady;
-  
+  listenToPA();
+  transmitToPA();
+
+  delay(25);
+}
+
+
+void listenToPA(){
   char receivedMessage[32] = { 0 };  // set incmng message for 32 bytes
 
   radio.startListening();    // start listening 
+
   if (radio.available()) {   // check if message is coming
     radio.read(receivedMessage, sizeof(receivedMessage));
 
@@ -61,17 +67,22 @@ void loop(void) {
     }
     Serial.println(' ');              // print message on serial monitor
   }
-  radio.stopListening();  // stop listening 
 
+  radio.stopListening();  // stop listening 
+}
+
+void transmitToPA(){
+  char inByte;
+  bool dataReady;
   while (Serial.available() > 0) {
     // read the incoming byte:
     inByte = Serial.read();
     dataReady = addData((char)inByte);  
     if ( dataReady )
       radio.write(&message2Transmit, sizeof(message2Transmit));
-  }
+      Serial.println(message2Transmit);
 
-  delay(25);
+  }
 }
 
 bool addData(char nextChar)
