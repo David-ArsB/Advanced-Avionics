@@ -195,9 +195,10 @@ class corePrimaryAircraft():
         print('\nListening to ground station...')
         t1 = time.time()
         while not self.radio.available([0]):
-            if (time.time() - t1) > 1:
+            if (time.time() - t1) > 2.0:
                 print('Heard nothing from ground station...')
                 return None
+            time.sleep(1 / 100)
 
         recv_buffer = []
         self.radio.read(recv_buffer, self.radio.getDynamicPayloadSize())
@@ -213,7 +214,6 @@ class corePrimaryAircraft():
         print('Received from GCS: ')
         print(recv_buffer)
         print('Stopped listening to ground station...')
-        time.sleep(1)
 
         return recv_buffer
 
