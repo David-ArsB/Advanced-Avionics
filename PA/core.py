@@ -196,14 +196,14 @@ if __name__ == '__main__':
 
     while True:
         try:
-            os.system('clear')
+            #os.system('clear')
             #core.printDataSummary()
             #core.radio.printDetails()
 
             core.transmitToGCS()
             time.sleep(0.01)
-            #core.receiveFromGCS()
-            time.sleep(1.00)
+            core.receiveFromGCS()
+            time.sleep(0.01)
 
 
         except (KeyboardInterrupt, SystemExit):  # when you press ctrl+c
