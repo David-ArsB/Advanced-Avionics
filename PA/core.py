@@ -196,7 +196,7 @@ if __name__ == '__main__':
 
     while True:
         try:
-            #os.system('clear')
+            os.system('clear')
             #core.printDataSummary()
             #core.radio.printDetails()
 
