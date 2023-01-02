@@ -44,7 +44,7 @@ radio2.setAutoAck(True)
 radio2.enableDynamicPayloads()
 radio2.enableAckPayload()
 
-radio2.openReadingPipe(1, pipes[0])
+radio2.openReadingPipe(1, pipes[1])
 
 radio2.printDetails()
 
