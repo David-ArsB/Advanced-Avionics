@@ -2,13 +2,15 @@
 #include <RF24.h>  // nrf library
 
 #define   MAX_DATA_LEN    (32)
-#define   TERMINATOR_CHAR ('\n')
+#define   TERMINATOR_CHAR ('\0')
 char message2Transmit[32] = { 0 };
 char ack_buf[] = {'a','c','k'};
 
 RF24 radio(9, 10);  // ce, csn pins
 
 void setup(void) {
+  pinMode(6, OUTPUT);
+  
 
   while (!Serial);
 
@@ -81,11 +83,19 @@ void transmitToPA(void){
   //radio.stopListening();  // stop listening 
   char inByte;
   bool dataReady;
+  
+  
   while (Serial.available() > 0) {
     // read the incoming byte:
+    digitalWrite(6, HIGH);
+      delay(10);
+      digitalWrite(6, LOW);
     inByte = Serial.read();
     dataReady = addData((char)inByte);  
     if ( dataReady )
+      
+      
+      
       radio.stopListening();
       radio.write(&message2Transmit, sizeof(message2Transmit));
       radio.startListening();
@@ -101,7 +111,7 @@ bool addData(char nextChar)
   static uint8_t currentIndex = 0;
 
     // Ignore some characters - new line, space and tabs
-    if (nextChar == '\t'){
+    if (nextChar == '\t' || nextChar == '\n'){
       return false;
     }
       
@@ -109,7 +119,7 @@ bool addData(char nextChar)
     // If we receive Enter character...
     if (nextChar == TERMINATOR_CHAR) {
         // ...terminate the string by NULL character "\0" and return true
-        //message2Transmit[currentIndex] = '\0';
+        message2Transmit[currentIndex] = '\0';
         currentIndex = 0;
         return true;
     }

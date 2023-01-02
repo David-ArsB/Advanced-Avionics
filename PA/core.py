@@ -170,14 +170,16 @@ class corePrimaryAircraft():
         block9 = list('EOF') # Indicates end of message
 
         blocks = [header, block1, block2, block3, block4, block5, block6, block7, block8, block9]
+        
+        self.radio.stopListening()  # Confirm that the radio is in transmit mode
 
         for block in blocks:
             while len(block) < self.RADIO_PAYLOAD_SIZE:
                 block.append(0)
             print(block,' - ',len(block))
-            self.radio.stopListening()  # Confirm that the radio is in transmit mode
             self.radio.write(block)  # write the message to radio
-            self.radio.startListening()
+
+        self.radio.startListening()
 
             # if self.radio.isAckPayloadAvailable():
             #     pl_buffer = []

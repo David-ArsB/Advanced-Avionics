@@ -487,7 +487,7 @@ class UI_MW(QMainWindow, Ui_MainWindow):
 
     def transmitTest(self):
 
-        self.serialReaderObj.tx_buf = "This is a test\r"
+        self.serialReaderObj.tx_buf = "testtt\0"
 
     def refreshComPorts(self):
         self.serialPort_CB.clear()
