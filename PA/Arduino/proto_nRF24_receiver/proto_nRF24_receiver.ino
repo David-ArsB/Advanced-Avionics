@@ -51,8 +51,8 @@ void listenToPA(){
 
   if (radio.available()) {   // check if message is coming
     radio.read(receivedMessage, sizeof(receivedMessage));
-    
     Serial.println('Listening');
+    
 
     if (strstr(receivedMessage, "#b") == NULL) {
       Serial.println(receivedMessage);
