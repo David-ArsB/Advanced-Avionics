@@ -178,13 +178,16 @@ class corePrimaryAircraft():
         self.radio.read(recv_buffer, self.radio.getDynamicPayloadSize())
         #print("Received:")
         #print(recv_buffer)
-        return recv_buffer
+
         self.radio.writeAckPayload(1, self.RADIO_AKPL_BUF, len(self.RADIO_AKPL_BUF))
         #print("Loaded payload reply:")
         #print(self.RADIO_AKPL_BUF)
 
 
         self.radio.stopListening()
+        print('Received from GCS: ')
+        print(recv_buffer+'\n')
+        return recv_buffer
 
 if __name__ == '__main__':
     core = corePrimaryAircraft()
