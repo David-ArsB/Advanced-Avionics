@@ -22,7 +22,7 @@ void setup(void) {
 
   radio.begin();  // start radio at ce csn pin 9 and 10
 
-  radio.setPALevel(RF24_PA_MIN);  // set power level
+  radio.setPALevel(RF24_PA_MAX);  // set power level
 
   radio.setChannel(0x36);  // set channel at 36
 
@@ -47,9 +47,7 @@ void setup(void) {
 
 
 void loop(void) {
-  for (int i = 0; i < 32 ; i++) {
-    message2Transmit[i] = 0;
-  }
+  
 
   listenToPA();
   transmitToPA();
@@ -92,16 +90,24 @@ void transmitToPA(void){
   
   while (Serial.available() > 0) {
     // read the incoming byte:
-    digitalWrite(6, HIGH);
-    delay(1);
-    digitalWrite(6, LOW);
+    //digitalWrite(6, HIGH);
+    //delay(1);
+    //digitalWrite(6, LOW);
+    //delay(1);
     inByte = Serial.read();
     dataReady = addData((char)inByte);  
-    if (dataReady)
-      
+    if (dataReady){
+      //digitalWrite(6, HIGH);
+      //delay(10);
+      //digitalWrite(6, LOW);
       radio.stopListening();
       bool res = radio.write(&message2Transmit, sizeof(message2Transmit));
       radio.startListening();
+
+    for (int i = 0; i < 32 ; i++) {
+      message2Transmit[i] = 0;
+    }
+    }
 
   }
 
@@ -114,10 +120,8 @@ bool addData(char nextChar)
   static uint8_t currentIndex = 0;
 
     // Ignore some characters - new line, space and tabs
-    if (nextChar == '\t' || nextChar == '\n'){
-      return false;
-    }
-      
+    if ((nextChar == ' ') || (nextChar == '\t'))
+        return false;
 
     // If we receive Enter character...
     if (nextChar == TERMINATOR_CHAR) {
@@ -137,7 +141,7 @@ bool addData(char nextChar)
       // The data too long so reset our position and return true
       // so that the data received so far can be processed - the caller should
       // see if it is valid command or not...
-      message2Transmit[MAX_DATA_LEN] = TERMINATOR_CHAR;
+      message2Transmit[MAX_DATA_LEN] = '\0';
       currentIndex = 0;
       return true;
     }

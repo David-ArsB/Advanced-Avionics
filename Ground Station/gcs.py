@@ -108,18 +108,20 @@ class SerialReaderObj(QObject):
         else:
             tx_buf = '\0'
 
-        print(self.serialPort.write(tx_buf.encode()))
+        self.serialPort.write(tx_buf.encode())
         self.tx_buf = None
 
     @Slot()
     def readSerial(self):
         data = {}
         data['tag'] = 1
+        messages = []
         while self.run:
             message = self.serialPort.readline().decode().strip()
             if message == 'BOF':
                 while message != 'EOF':
                     message = self.serialPort.readline().decode().strip()
+                    messages.append(message)
                     message = message.split(':')
                     if message[0].find('$b') != -1:
                         pass
@@ -526,7 +528,7 @@ class UI_MW(QMainWindow, Ui_MainWindow):
 
     def transmitTest(self):
 
-        self.serialReaderObj.tx_buf = 'test\0'
+        self.serialReaderObj.tx_buf = 'testtesttest\0'
 
     def refreshComPorts(self):
         self.serialPort_CB.clear()
