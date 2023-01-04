@@ -33,7 +33,7 @@ void setup(void) {
   radio.openWritingPipe(w_pipe);
 
   radio.enableDynamicPayloads();
-  radio.setRetries(15, 15);
+  //radio.setRetries(15, 15);
   radio.setAutoAck(true);
   radio.setPayloadSize(32);
   radio.setDataRate(RF24_250KBPS);
@@ -47,12 +47,10 @@ void setup(void) {
 
 
 void loop(void) {
-  
 
   listenToPA();
   transmitToPA();
 
-  delay(10);
 }
 
 
@@ -87,6 +85,7 @@ void listenToPA(void){
 void transmitToPA(void){
   char inByte;
   bool dataReady;
+  bool res = false;
   
   while (Serial.available() > 0) {
     inByte = Serial.read();
@@ -96,7 +95,7 @@ void transmitToPA(void){
       //delay(10);
       //digitalWrite(6, LOW);
       radio.stopListening();
-      bool res = radio.write(&message2Transmit, sizeof(message2Transmit));
+      radio.write(&message2Transmit, sizeof(message2Transmit));
       radio.startListening();
 
       for (int i = 0; i < 32 ; i++) {

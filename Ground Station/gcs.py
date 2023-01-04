@@ -118,70 +118,29 @@ class SerialReaderObj(QObject):
         messages = []
         while self.run:
             message = self.serialPort.readline().decode().strip()
-            if message == 'BOF':
+            message = message.split(':')
+
+            if message[0].find('$b') != -1 or message[0] == 'BOF':
+                pass
+            elif message[0] == 'pos' :
+                data['latitude'] = float(message[1].split(',')[0])
+                data['longitude'] = float(message[1].split(',')[1])
+            elif message[0] == 'Acc' or message[0] == 'Gyr' or message[0] == 'Mag':
+                data[message[0] + 'X'] = float(message[1].split(',')[0].strip())
+                data[message[0] + 'Y'] = float(message[1].split(',')[1].strip())
+                data[message[0] + 'Z'] = float(message[1].split(',')[2].strip())
+            elif message[0] == 'EOF':
+                tag = data['tag']
+                self.serialBroadcast.emit(data)
+                self.data = data
+                data = {}
+                data['tag'] = tag + 1
                 self.writeToSerial()
-                while message != 'EOF':
-                    message = self.serialPort.readline().decode().strip()
-                    messages.append(message)
-                    message = message.split(':')
-                    if message[0].find('$b') != -1:
-                        pass
-                    elif message[0] == 'pos':
-                        data['latitude'] = float(message[1].split(',')[0])
-                        data['longitude'] = float(message[1].split(',')[1])
-                    elif message[0] == 'Acc' or message[0] == 'Gyr' or message[0] == 'Mag':
-                        data[message[0] + 'X'] = float(message[1].split(',')[0].strip())
-                        data[message[0] + 'Y'] = float(message[1].split(',')[1].strip())
-                        data[message[0] + 'Z'] = float(message[1].split(',')[2].strip())
-                    elif message[0] == 'EOF':
-                        tag = data['tag']
-                        self.serialBroadcast.emit(data)
-                        self.data = data
-                        data = {}
-                        data['tag'] = tag + 1
-                        break
-                    else:
-                        try:
-                            data[message[0].strip()] = float(message[1].strip())
-                        except:
-                            pass
-
-                    time.sleep(0.05)
-
-
-            # if message != messageOld:
-            #
-            #     #print(message)
-            #     if message != 'EOF' and message != 'BOF' and len(message) > 0:
-            #         message = message.split(':')
-            #         if message[0].find('$b') != -1:
-            #             pass
-            #         elif message[0] == 'pos':
-            #             data['latitude'] = float(message[1].split(',')[0])
-            #             data['longitude'] = float(message[1].split(',')[1])
-            #         elif message[0] == 'Acc' or message[0] == 'Gyr' or message[0] == 'Mag':
-            #             data[message[0] + 'X'] = float(message[1].split(',')[0].strip())
-            #             data[message[0] + 'Y'] = float(message[1].split(',')[1].strip())
-            #             data[message[0] + 'Z'] = float(message[1].split(',')[2].strip())
-            #         else:
-            #             try:
-            #                 data[message[0].strip()] = float(message[1].strip())
-            #             except:
-            #                 pass
-            #                 #print('Missed Frame: (%s: %s)' % (message[0], message[1]))
-
-
-
-                # elif len(message) > 0 and message != 'BOF':
-                #     tag = data['tag']
-                #     self.serialBroadcast.emit(data)
-                #     self.data = data
-                #     data = {}
-                #     data['tag'] = tag+1
-                #
-                # messageOld = message
-
-
+            else:
+                try:
+                    data[message[0].strip()] = float(message[1].strip())
+                except:
+                    pass
 
 
 
