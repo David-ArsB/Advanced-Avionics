@@ -13,7 +13,10 @@ class GpsPoller(threading.Thread):
 
   def run(self):
     while self.running:
+        #try:
       self.gpsd.next() #this will continue to loop and grab EACH set of gpsd info to clear the buffer
+        #except:
+          #pass
 
   def getPosition(self):
       return [self.gpsd.fix.latitude, self.gpsd.fix.longitude, self.gpsd.fix.altitude]
