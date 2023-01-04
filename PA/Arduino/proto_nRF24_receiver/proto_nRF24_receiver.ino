@@ -3,8 +3,10 @@
 
 #define   MAX_DATA_LEN    (32)
 #define   TERMINATOR_CHAR ('\0')
-char message2Transmit[32] = { 0 };
+
 char ack_buf[] = {'a','c','k'};
+char emptybuff[32] = { 0 };
+char message2Transmit[32] = { 0 };
 
 RF24 radio(9, 10);  // ce, csn pins
 
@@ -85,7 +87,6 @@ void listenToPA(void){
 void transmitToPA(void){
   char inByte;
   bool dataReady;
-  
   
   while (Serial.available() > 0) {
     // read the incoming byte:
