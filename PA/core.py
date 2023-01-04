@@ -73,6 +73,7 @@ class corePrimaryAircraft():
 
         self.radio.setPayloadSize(self.RADIO_PAYLOAD_SIZE)  # set the payload size as 32 bytes
         self.radio.setChannel(0x36)  # set the channel as 76 hex
+        self.radio.setRetries(5, 10)
         self.radio.setDataRate(self.RADIO_DATA_RATES[0])  # set radio data rate to 2MBPS
         self.radio.setPALevel(self.RADIO_PA_LEVELS[0])  # set PA level to LOW
 
@@ -195,7 +196,7 @@ class corePrimaryAircraft():
         print('\nListening to ground station...')
         t1 = time.time()
         while not self.radio.available([1]):
-            if (time.time() - t1) > 1.0:
+            if (time.time() - t1) > 5.0:
                 print('Heard nothing from ground station...')
                 return None
             time.sleep(1 / 100)

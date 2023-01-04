@@ -139,7 +139,8 @@ class SerialReaderObj(QObject):
                     data['tag'] = tag+1
                 messageOld = message
 
-            self.writeToSerial()
+                self.writeToSerial()
+                
             time.sleep(0.1)
 
 
