@@ -140,7 +140,7 @@ class SerialReaderObj(QObject):
                 messageOld = message
 
                 self.writeToSerial()
-                
+
             time.sleep(0.1)
 
 
