@@ -40,7 +40,8 @@ ser = serial.Serial(port,
                     baudrate=9600,
                     timeout=0.55)
 while True:
-    data = ser.readline()
+    data = ser.readline().decode('ascii', errors = 'replace').strip()
+    print(data)
     nmeaobj = pynmea2.parse(data)
     ['%s: %s' % (nmeaobj.fields[i][0], nmeaobj.data[i])
      for i in range(len(nmeaobj.fields))]
