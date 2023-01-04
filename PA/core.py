@@ -177,9 +177,10 @@ class corePrimaryAircraft():
             while len(block) < self.RADIO_PAYLOAD_SIZE:
                 block.append(0)
             #print(block,' - ',len(block))
-            self.radio.startListening()
+
             self.radio.write(block)  # write the message to radio
-            self.radio.startListening()
+
+        self.radio.startListening()
 
             # if self.radio.isAckPayloadAvailable():
             #     pl_buffer = []
@@ -195,7 +196,7 @@ class corePrimaryAircraft():
         print('\nListening to ground station...')
         t1 = time.time()
         while not self.radio.available([1]):
-            if (time.time() - t1) > 3.0:
+            if (time.time() - t1) > 1.0:
                 print('Heard nothing from ground station...')
                 return None
             time.sleep(1 / 100)

@@ -119,6 +119,7 @@ class SerialReaderObj(QObject):
         while self.run:
             message = self.serialPort.readline().decode().strip()
             if message == 'BOF':
+                self.writeToSerial()
                 while message != 'EOF':
                     message = self.serialPort.readline().decode().strip()
                     messages.append(message)
@@ -146,7 +147,7 @@ class SerialReaderObj(QObject):
                             pass
 
                     time.sleep(0.05)
-                self.writeToSerial()
+
 
             # if message != messageOld:
             #
