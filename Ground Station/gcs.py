@@ -145,7 +145,9 @@ class SerialReaderObj(QObject):
                         except:
                             pass
 
+                    time.sleep(0.05)
                 self.writeToSerial()
+
             # if message != messageOld:
             #
             #     #print(message)
