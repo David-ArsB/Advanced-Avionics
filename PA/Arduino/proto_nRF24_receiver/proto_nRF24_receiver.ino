@@ -88,7 +88,7 @@ void transmitToPA(void){
   bool res = false;
   
   while (Serial.available() > 0) {
-    inByte = Serial.read();
+    inByte = (char)Serial.read();
     dataReady = addData((char)inByte);  
     if (dataReady){
       //digitalWrite(6, HIGH);
@@ -98,6 +98,10 @@ void transmitToPA(void){
       radio.write(&message2Transmit, sizeof(message2Transmit));
       radio.startListening();
 
+      if (message2Transmit[0] != '\0'){
+        Serial.println(message2Transmit);
+      }
+    
       for (int i = 0; i < 32 ; i++) {
         message2Transmit[i] = 0;
       }

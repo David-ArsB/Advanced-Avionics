@@ -115,7 +115,7 @@ class SerialReaderObj(QObject):
     def readSerial(self):
         data = {}
         data['tag'] = 1
-        messages = []
+
         while self.run:
             message = self.serialPort.readline().decode().strip()
             message = message.split(':')
@@ -140,7 +140,7 @@ class SerialReaderObj(QObject):
                 try:
                     data[message[0].strip()] = float(message[1].strip())
                 except:
-                    pass
+                    print(message[0])
 
 
 

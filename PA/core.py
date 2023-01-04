@@ -203,6 +203,9 @@ class corePrimaryAircraft():
 
         recv_buffer = []
         self.radio.read(recv_buffer, self.radio.getDynamicPayloadSize())
+        for i, val in enumerate(recv_buffer):
+            if (val >= 32 and val <= 126):
+                recv_buffer[i] = chr(val)
         #print("Received:")
         #print(recv_buffer)
 
