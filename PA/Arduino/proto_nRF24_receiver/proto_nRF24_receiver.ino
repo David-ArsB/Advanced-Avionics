@@ -5,7 +5,7 @@
 #define   TERMINATOR_CHAR ('\0')
 
 char ack_buf[] = {'a','c','k'};
-char emptybuff[32] = { 0 };
+
 char message2Transmit[32] = { 0 };
 
 RF24 radio(9, 10);  // ce, csn pins
@@ -47,7 +47,9 @@ void setup(void) {
 
 
 void loop(void) {
-  
+  for (int i = 0; i < 32 ; i++) {
+    message2Transmit[i] = 0;
+  }
 
   listenToPA();
   transmitToPA();
@@ -102,6 +104,7 @@ void transmitToPA(void){
       radio.startListening();
 
   }
+
 }
 
 bool addData(char nextChar)

@@ -108,19 +108,18 @@ class SerialReaderObj(QObject):
         else:
             tx_buf = '\0'
 
-        self.serialPort.write(tx_buf.encode())
+        print(self.serialPort.write(tx_buf.encode()))
         self.tx_buf = None
 
     @Slot()
     def readSerial(self):
         data = {}
         data['tag'] = 1
-        messageOld = ''
         while self.run:
             message = self.serialPort.readline().decode().strip()
-            if message != messageOld:
-                #print(message)
-                if message != 'EOF' and message != 'BOF' and len(message) > 0:
+            if message == 'BOF':
+                while message != 'EOF':
+                    message = self.serialPort.readline().decode().strip()
                     message = message.split(':')
                     if message[0].find('$b') != -1:
                         pass
@@ -131,26 +130,55 @@ class SerialReaderObj(QObject):
                         data[message[0] + 'X'] = float(message[1].split(',')[0].strip())
                         data[message[0] + 'Y'] = float(message[1].split(',')[1].strip())
                         data[message[0] + 'Z'] = float(message[1].split(',')[2].strip())
+                    elif message[0] == 'EOF':
+                        tag = data['tag']
+                        self.serialBroadcast.emit(data)
+                        self.data = data
+                        data = {}
+                        data['tag'] = tag + 1
+                        break
                     else:
                         try:
                             data[message[0].strip()] = float(message[1].strip())
                         except:
                             pass
-                            #print('Missed Frame: (%s: %s)' % (message[0], message[1]))
-
-
-
-                elif len(message) > 0 and message != 'BOF':
-                    tag = data['tag']
-                    self.serialBroadcast.emit(data)
-                    self.data = data
-                    data = {}
-                    data['tag'] = tag+1
-                messageOld = message
 
                 self.writeToSerial()
+            # if message != messageOld:
+            #
+            #     #print(message)
+            #     if message != 'EOF' and message != 'BOF' and len(message) > 0:
+            #         message = message.split(':')
+            #         if message[0].find('$b') != -1:
+            #             pass
+            #         elif message[0] == 'pos':
+            #             data['latitude'] = float(message[1].split(',')[0])
+            #             data['longitude'] = float(message[1].split(',')[1])
+            #         elif message[0] == 'Acc' or message[0] == 'Gyr' or message[0] == 'Mag':
+            #             data[message[0] + 'X'] = float(message[1].split(',')[0].strip())
+            #             data[message[0] + 'Y'] = float(message[1].split(',')[1].strip())
+            #             data[message[0] + 'Z'] = float(message[1].split(',')[2].strip())
+            #         else:
+            #             try:
+            #                 data[message[0].strip()] = float(message[1].strip())
+            #             except:
+            #                 pass
+            #                 #print('Missed Frame: (%s: %s)' % (message[0], message[1]))
 
-            time.sleep(0.1)
+
+
+                # elif len(message) > 0 and message != 'BOF':
+                #     tag = data['tag']
+                #     self.serialBroadcast.emit(data)
+                #     self.data = data
+                #     data = {}
+                #     data['tag'] = tag+1
+                #
+                # messageOld = message
+
+
+
+
 
 
 
@@ -498,7 +526,7 @@ class UI_MW(QMainWindow, Ui_MainWindow):
 
     def transmitTest(self):
 
-        self.serialReaderObj.tx_buf = "testtt\0"
+        self.serialReaderObj.tx_buf = 'test\0'
 
     def refreshComPorts(self):
         self.serialPort_CB.clear()
