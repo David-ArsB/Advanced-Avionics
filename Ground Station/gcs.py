@@ -106,7 +106,7 @@ class SerialReaderObj(QObject):
         if self.tx_buf != None:
             tx_buf = self.tx_buf
         else:
-            tx_buf = ['\0']
+            tx_buf = '\0'
 
         self.serialPort.write(tx_buf.encode())
         self.tx_buf = None
@@ -135,7 +135,8 @@ class SerialReaderObj(QObject):
                         try:
                             data[message[0].strip()] = float(message[1].strip())
                         except:
-                            print('Missed Frame: (%s: %s)' % (message[0], message[1]))
+                            pass
+                            #print('Missed Frame: (%s: %s)' % (message[0], message[1]))
 
 
 
@@ -149,7 +150,7 @@ class SerialReaderObj(QObject):
 
                 self.writeToSerial()
 
-            time.sleep(1)
+            time.sleep(0.1)
 
 
 
