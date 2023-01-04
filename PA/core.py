@@ -196,7 +196,7 @@ class corePrimaryAircraft():
         print('\nListening to ground station...')
         t1 = time.time()
         while not self.radio.available([1]):
-            if (time.time() - t1) > 1.0:
+            if (time.time() - t1) > 3.0:
                 print('Heard nothing from ground station...')
                 return None
             time.sleep(1 / 100)

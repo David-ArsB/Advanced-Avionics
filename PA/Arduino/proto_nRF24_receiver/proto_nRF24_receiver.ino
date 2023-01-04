@@ -33,7 +33,7 @@ void setup(void) {
   radio.openWritingPipe(w_pipe);
 
   radio.enableDynamicPayloads();
-  radio.setRetries(5, 15);
+  radio.setRetries(15, 15);
   radio.setAutoAck(true);
   radio.setPayloadSize(32);
   radio.setDataRate(RF24_250KBPS);
