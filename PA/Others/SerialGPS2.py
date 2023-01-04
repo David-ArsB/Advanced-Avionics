@@ -41,10 +41,11 @@ ser = serial.Serial(port,
                     timeout=0.55)
 while True:
     data = ser.readline().decode('ascii', errors = 'replace').strip()
-    print(data)
+    #print(data)
     try:
         nmeaobj = pynmea2.parse(data)
-        ['%s: %s' % (nmeaobj.fields[i][0], nmeaobj.data[i])
-        for i in range(len(nmeaobj.fields))]
+        d = ['%s: %s' % (nmeaobj.fields[i][0], nmeaobj.data[i])
+            for i in range(len(nmeaobj.fields))]
+        print(d)
     except:
         pass
