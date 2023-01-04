@@ -1,12 +1,12 @@
 
 import serial
-
+import pynmea2
 port = "/dev/ttyS1"
 
 
 def parseGPS(data):
     #    print "raw:", data #prints raw data
-    if data[0:6] == "$GPRMC":
+    if data[0:6] == "$GNGGA":
         sdata = data.split(",")
         if sdata[2] == 'V':
             print("no satellite data available")
@@ -36,8 +36,11 @@ def decode(coord):
 
 print("Receiving GPS data")
 
-ser = serial.Serial(port, baudrate= 9600, timeout=0.55)
+ser = serial.Serial(port,
+                    baudrate=9600,
+                    timeout=0.55)
 while True:
     data = ser.readline()
-    print(data.decode('ascii', errors = 'replace').strip())
-    parseGPS(data)
+    nmeaobj = pynmea2.parse(data)
+    ['%s: %s' % (nmeaobj.fields[i][0], nmeaobj.data[i])
+     for i in range(len(nmeaobj.fields))]

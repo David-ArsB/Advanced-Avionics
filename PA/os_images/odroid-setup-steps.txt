@@ -56,3 +56,6 @@ python3 setup.py install
 sudo apt-get install gpsd-clients gpsd -y
 # Insert DEVICES="dev/ttyS1" in
 sudo nano /etc/default/gpsd 
+
+# PUT GPS IN NMEA MODE (BERRY GPS MOUNTED) 
+sudo gpsctl -n
