@@ -85,6 +85,7 @@ class GPSEvaluatorWorker(QObject):
             self.finished.emit()
 
 class SerialReaderObj(QObject):
+    finished = Signal()
     serialBroadcast = Signal(dict)
 
     def __init__(self, port):
@@ -140,11 +141,10 @@ class SerialReaderObj(QObject):
                 try:
                     data[message[0].strip()] = float(message[1].strip())
                 except:
-                    print(message[0])
+                    pass
+                    #print(message[0])
 
-
-
-
+        self.finished.emit()
 
 class UI_MW(QMainWindow, Ui_MainWindow):
     serialStartRequested = Signal()
@@ -166,9 +166,6 @@ class UI_MW(QMainWindow, Ui_MainWindow):
         self.stackedWidget.setCurrentIndex(0)
         self.dataTelemLog_TW.setHorizontalHeaderLabels(['Time', 'Altitude', 'Latitude', 'Longitude', 'Heading'])
         self.dataTelemLog_TW.resizeColumnsToContents()
-
-
-
 
         # Initialize plotting area
         self.PLOT_FIGURES = {}
@@ -293,36 +290,61 @@ class UI_MW(QMainWindow, Ui_MainWindow):
 
     def connectToSerial(self):
         try:
-            port = self.serialPort_CB.currentText().split(':')[0].strip()
-            arduino = serial.Serial(port=port, baudrate=115200, timeout=.1)
-            self.serialPort = arduino
+            newPort = self.serialPort_CB.currentText().split(':')[0].strip()
+            if self.serialPort == None or self.serialPort.port != newPort:
+                if self.serialPort != None:
+                    self.serialPort.close()
 
-            # Start a thread that runs in the backgrounds continuously to update the gui
-            if self.serialReaderObj != None:
-                # Stop the previous thread and reset
-                self.serialReaderThread.exit()
-                self.serialReaderThread.wait()
+                port = newPort
+                arduino = serial.Serial(port=port, baudrate=115200, timeout=.1)
+                self.serialPort = arduino
+
+                # Start a thread that runs in the backgrounds continuously to update the gui
+                if self.serialReaderObj != None:
+                    # Stop the previous thread and reset
+                    self.serialReaderThread.exit()
+                    self.serialReaderThread.wait()
+                    self.serialReaderObj = None
+                    self.serialReaderThread = None
+                    pass
+
+                self.serialReaderObj = SerialReaderObj(arduino)
+                self.serialReaderThread = QThread()
+
+                self.serialReaderObj.serialBroadcast.connect(self.updateGuiData)
+                self.serialReaderObj.moveToThread(self.serialReaderThread)
+
+                self.serialReaderObj.finished.connect(self.serialReaderThread.quit)
+                self.serialReaderObj.finished.connect(self.serialReaderObj.deleteLater)
+                self.serialReaderThread.finished.connect(self.serialReaderThread.deleteLater)
+                self.serialStartRequested.connect(self.serialReaderObj.readSerial)
+                self.serialReaderThread.start()
+                self.serialStartRequested.emit()
+                self.connectSerialButton.setText('Disconnect')
+
+                message = "Connection successful."
+                msgBox = QMessageBox()
+                msgBox.setIcon(QMessageBox.Icon.Information)
+                msgBox.setText(message)
+                msgBox.setWindowTitle('Success')
+                msgBox.exec()
+                return True
+            elif self.serialPort.is_open:
+
+                self.serialReaderObj.run = False
                 self.serialReaderObj = None
-                self.serialReaderThread = None
-                pass
+                self.serialPort.close()
+                self.serialPort = None
+                self.connectSerialButton.setText('Connect')
 
-            self.serialReaderObj = SerialReaderObj(arduino)
-            self.serialReaderThread = QThread()
+                message = "Disconnection successful."
+                msgBox = QMessageBox()
+                msgBox.setIcon(QMessageBox.Icon.Information)
+                msgBox.setText(message)
+                msgBox.setWindowTitle('Success')
+                msgBox.exec()
+                return True
 
-            self.serialReaderObj.serialBroadcast.connect(self.updateGuiData)
-
-            self.serialStartRequested.connect(self.serialReaderObj.readSerial)
-            self.serialReaderObj.moveToThread(self.serialReaderThread)
-            self.serialReaderThread.start()
-            self.serialStartRequested.emit()
-
-            message = "Connection successful."
-            msgBox = QMessageBox()
-            msgBox.setIcon(QMessageBox.Icon.Information)
-            msgBox.setText(message)
-            msgBox.setWindowTitle('Success')
-            msgBox.exec()
-            return True
         except Exception as e:
             message = "Connection Failed:\n"+str(e)
             msgBox = QMessageBox()
@@ -335,30 +357,61 @@ class UI_MW(QMainWindow, Ui_MainWindow):
     def updateGuiData(self, data):
         if len(data) == 1:
             return
+        error = []
         try:
-            self.altitude_SB.setValue(data['altitude'])
-            self.pressure_SB.setValue(data['pressure'])
-            self.temperature_SB.setValue(data['temperature'])
+            if 'altitude' in data:
+                self.altitude_SB.setValue(data['altitude'])
+            else:
+                error.append('altitude')
 
-            self.latitude_SB.setValue(data['latitude'])
-            self.longitude_SB.setValue(data['longitude'])
-            self.altitudeGPS_SB.setValue(data['altGPS'])
+            if 'pressure' in data:
+                self.pressure_SB.setValue(data['pressure'])
+            else:
+                error.append('pressure')
 
-            self.ax_SB.setValue(data['AccX'])
-            self.ay_SB.setValue(data['AccY'])
-            self.az_SB.setValue(data['AccZ'])
+            if 'temperature' in data:
+                self.temperature_SB.setValue(data['temperature'])
+            else:
+                error.append('temperature')
 
-            self.gyroX_SB.setValue(data['GyrX'])
-            self.gyroY_SB.setValue(data['GyrY'])
-            self.gyroZ_SB.setValue(data['GyrZ'])
+            if 'latitude' in data and 'longitude' in data:
+                self.latitude_SB.setValue(data['latitude'])
+                self.longitude_SB.setValue(data['longitude'])
+            else:
+                error.append('GPS_pos')
 
-            magX = data['MagX']
-            magY = data['MagY']
-            heading = atan2(magY, magX) * 180 / pi
-            if heading < 0:
-                heading += 360
+            if 'altGPS' in data:
+                self.altitudeGPS_SB.setValue(data['altGPS'])
+            else:
+                error.append('altGPS')
 
-            self.heading_SB.setValue(heading)
+            if 'AccX' in data and 'AccY' in data and 'AccZ' in data:
+                self.ax_SB.setValue(data['AccX'])
+                self.ay_SB.setValue(data['AccY'])
+                self.az_SB.setValue(data['AccZ'])
+            else:
+                error.append('Acc')
+
+            if 'GyrX' in data and 'GyrY' in data and 'GyrZ' in data:
+                self.gyroX_SB.setValue(data['GyrX'])
+                self.gyroY_SB.setValue(data['GyrY'])
+                self.gyroZ_SB.setValue(data['GyrZ'])
+            else:
+                error.append('Gyr')
+
+            if data['MagX'] and data['MagY']:
+                magX = data['MagX']
+                magY = data['MagY']
+                heading = atan2(magY, magX) * 180 / pi
+
+                if heading < 0:
+                    heading += 360
+
+                self.heading_SB.setValue(heading)
+
+            else:
+                error.append('Mag')
+
             if self.enableLogging_CB.isChecked():
                 currentRow = self.dataTelemLog_TW.rowCount()
 
@@ -389,14 +442,15 @@ class UI_MW(QMainWindow, Ui_MainWindow):
 
                 #currentColumn = self.dataTelemLog_TW.columnCount() + 1
 
-            fig = self.PLOT_FIGURES['plotA']['fig']
-            ax = fig.gca()
-            xdata = ax.lines[0].get_xdata()
-            ydata = ax.lines[0].get_ydata()
+                fig = self.PLOT_FIGURES['plotA']['fig']
+                ax = fig.gca()
+                xdata = ax.lines[0].get_xdata()
+                ydata = ax.lines[0].get_ydata()
 
-            ax.lines[0].set_xdata(np.append(xdata, data['longitude']))
-            ax.lines[0].set_ydata(np.append(ydata, data['latitude']))
-            self.PLOT_FIGURES['plotA']['canvas'].draw()
+                ax.lines[0].set_xdata(np.append(xdata, data['longitude']))
+                ax.lines[0].set_ydata(np.append(ydata, data['latitude']))
+                self.PLOT_FIGURES['plotA']['canvas'].draw()
+
         except Exception as e:
             print('[GUI UPDATE & LOGGING] An exception has occured: '+str(e))
             pass
@@ -490,19 +544,30 @@ class UI_MW(QMainWindow, Ui_MainWindow):
 
     def transmitTest(self):
 
-        self.serialReaderObj.tx_buf = 'testtesttest\0'
+        self.serialReaderObj.tx_buf = 'RELEASE\0'
 
     def refreshComPorts(self):
         self.serialPort_CB.clear()
         self.serialPort_CB.addItems(self.serial_ports())
+
+    def loggingChecked(self):
+        if not self.enableLogging_CB.isChecked():
+            self.dataTelemLog_TW.setRowCount(0)
+
+            fig = self.PLOT_FIGURES['plotA']['fig']
+            ax = fig.gca()
+            ax.lines[0].set_xdata(np.array([]))
+            ax.lines[0].set_ydata(np.array([]))
+            self.PLOT_FIGURES['plotA']['canvas'].draw()
+
+
     def setSignals(self):
         self.connectSerialButton.clicked.connect(lambda: self.connectToSerial())
         self.copycoordinates_TB.clicked.connect(lambda: self.copyGPSToClipboard())
         self.beginGPSAccuracy_PB.clicked.connect(lambda: self.startGPSAccEval())
         self.refresh_COM_TB.clicked.connect(lambda: self.refreshComPorts())
         self.pushButton.clicked.connect(lambda: self.transmitTest())
-
-
+        self.enableLogging_CB.stateChanged.connect(lambda: self.loggingChecked())
 
 
 if __name__ == "__main__":

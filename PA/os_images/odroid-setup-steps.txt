@@ -3,56 +3,105 @@
 #### ---------- ODROID C4 --------- ####
 ########################################
 
-# Enable i2c (Manual)
+# Connect to wifi
+sudo nmcli dev wifi connect SSID password "pass"
+
+sudo rm /var/lib/apt/lists/*
+sudo apt-get update
+sudo apt full-upgrade
+
+sudo dpkg --configure -a
+
+sudo apt install xrdp
+sudo apt install git
+sudo apt install libgcc-11-dev
+
+sudo apt-get install libtool
+sudo apt-get install build-essential
+sudo apt-get install autoconf
+
+#####################
+# ENABLE INTERFACES #
+#####################
+
+#$#$ Enable i2c (Manual)
+
 sudo vi /media/boot/config.ini
 # Insert overlays="spi0 i2c0 uart0 uart1" and reboot
 
-# OR ENABLE INTERFACES WITH odroid-config
-# enable UART, SPI & I2C
+
+== OR ==
+
+
+#$#$ ENABLE INTERFACES WITH odroid-config (enable UART, SPI & I2C)
+
 git clone https://github.com/hhk7734/odroid-config.git
+cd odroid-config
+sudo make install
+cd ..
+sudo rm -rf odroid-config
 sudo odroid-config
 
 reboot
 
-sudo apt install xrdp
-sudo apt-get install screen
-sudo apt-get install minicom -y
-sudo apt install git
-sudo apt-get install build-essential
-sudo apt-get install autoconf
-sudo apt-get install libtool
-sudo apt install python3-pip
-sudo apt install libwiringpi-dev odroid-wiringpi
 
+###############################
+# INSTALL HARDKERNEL WIRINGPI #
+###############################
 
-# INSTALL HARDKERNEL WIRINGPI
-
-git clone https://github.com/hardkernel/wiringPi
-cd wiringPi
-sh autogen.sh
-./configure
-make
-sudo make install
+#$#$ Ubuntu PPA
 
 sudo apt install software-properties-common
+sudo apt install python3-pip
+sudo apt install libwiringpi-dev odroid-wiringpi
 sudo add-apt-repository ppa:hardkernel/ppa
 sudo apt update
 sudo apt install odroid-wiringpi-python
 
 
+== OR ==
 
-# INSTALL ODROID.GPIO
+
+#$#$ Manually (Git)
+
+git clone https://github.com/hardkernel/wiringPi
+cd wiringPi
+sh autogen.sh
+./configure 
+make
+sudo make install
+
+
+
+#######################
+# INSTALL ODROID.GPIO #
+#######################
 
 git clone https://github.com/hhk7734/Odroid.GPIO
+python3 setup.py install
+
+# if that fails
+
 cd Odroid.GPIO/c_src/
 nano gpio.cpp
 # Change #include <wiringPi.h> for #include <wiringpi2/wiringPi.h> & save
 cd ..
 python3 setup.py install
 
+########################
+# INSTALL PIP3 MODULES #
+########################
 
-# INSTALL GPSd
+pip3 install smbus
+pip3 install spidev
+pip3 install gps
 
+################
+# INSTALL GPSd #
+################
+
+sudo apt-get install screen
+sudo apt-get install minicom -y
 sudo apt-get install gpsd-clients gpsd -y
 # Insert DEVICES="dev/ttyS1" in
 sudo nano /etc/default/gpsd 

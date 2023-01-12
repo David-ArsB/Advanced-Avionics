@@ -359,7 +359,7 @@
    <property name="minimumSize">
     <size>
      <width>399</width>
-     <height>635</height>
+     <height>641</height>
     </size>
    </property>
    <attribute name="dockWidgetArea">
@@ -583,7 +583,7 @@
             </property>
             <property name="icon">
              <iconset>
-              <normaloff>copy_icon.png</normaloff>copy_icon.png</iconset>
+              <normaloff>../../../../../../../.designer/backup/copy_icon.png</normaloff>../../../../../../../.designer/backup/copy_icon.png</iconset>
             </property>
             <property name="toolButtonStyle">
              <enum>Qt::ToolButtonIconOnly</enum>
@@ -1243,10 +1243,32 @@
        </layout>
       </widget>
      </item>
-     <item row="6" column="0">
+     <item row="6" column="0" alignment="Qt::AlignHCenter">
       <widget class="QPushButton" name="pushButton">
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>200</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(255, 0, 0);</string>
+       </property>
        <property name="text">
-        <string>Transmit to Primary Aircraft</string>
+        <string>RELEASE PADA</string>
        </property>
       </widget>
      </item>

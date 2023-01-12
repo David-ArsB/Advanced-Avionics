@@ -40,6 +40,7 @@ def distCoords(cd1, cd2, altitude):
 
     # calculate the result
     dist = c * earthRadii * 1000
+    return dist
 
 
 def orientation(cd1, cd2, altitude):
@@ -74,3 +75,5 @@ def orientation(cd1, cd2, altitude):
     print(message)
 
     # N dlat ; E dlon -> ex: (N 10deg ; E 20deg)
+
+print(distCoords([45.61968, -73.53193],[45.619696425175356, -73.53195048238999] ,0))
