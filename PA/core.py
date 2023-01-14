@@ -304,6 +304,8 @@ class corePrimaryAircraft():
         '''
         Process the received buffer in order to execute a command.
         '''
+        if recv_blocks is None:
+            return self.STATUS
 
         for recv_buffer in recv_blocks:
             try:
