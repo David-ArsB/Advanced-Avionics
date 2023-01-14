@@ -67,6 +67,7 @@ class corePrimaryAircraft():
         print('Initialisation Complete! \n')
 
         self.STATUS = 'STANDBY'
+        self.altMovAverage = []
 
 
     def _initAltimeter(self):
@@ -166,6 +167,15 @@ class corePrimaryAircraft():
     def fetchData(self):
         # Fetch Altimeter Data
         temperature, pressure, altitude = self.altimeter.get_temperature_and_pressure_and_altitude()
+        if len(self.altMovAverage) < 5:
+            self.altMovAverage.append(altitude)
+        else:
+            for i in range(1, len(self.altMovAverage)):
+                self.altMovAverage[i] = self.altMovAverage[i-1]
+            self.altMovAverage[0] = altitude
+
+        altitude = sum(self.altMovAverage)/len(self.altMovAverage)
+
         # Fetch Compass Data
         magX = self.compass.readMAGxCorr()
         magY = self.compass.readMAGyCorr()
@@ -434,8 +444,6 @@ class corePrimaryAircraft():
             time.sleep(0.010)
 
         av = sum(vals)/len(vals)/ 100.0
-
-        print(av)
 
         self.altimeter.setGroundPressure(av)
 
