@@ -310,6 +310,7 @@ class corePrimaryAircraft():
         for recv_buffer in recv_blocks:
             try:
                 recv_comm = ''.join(str(e) for e in recv_buffer)
+                print(recv_comm)
                 if recv_comm.find("$RESET") != -1:
                     pass
 
