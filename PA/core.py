@@ -422,6 +422,7 @@ if __name__ == '__main__':
     # PA Avionics core (main) definition class. Handles sensors, localisation and targeting (computer vision).
     core = corePrimaryAircraft()
     time.sleep(1.0)
+    core.radio.startListening()
     # Wait for '$ARM' command from GCS
     stat = core.waitForMissionBegin()
     
