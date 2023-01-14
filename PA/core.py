@@ -167,7 +167,7 @@ class corePrimaryAircraft():
     def fetchData(self):
         # Fetch Altimeter Data
         temperature, pressure, altitude = self.altimeter.get_temperature_and_pressure_and_altitude()
-        if len(self.altMovAverage) < 5:
+        if len(self.altMovAverage) < 10:
             self.altMovAverage.append(altitude)
         else:
             for i in range(1, len(self.altMovAverage)):
