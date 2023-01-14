@@ -170,7 +170,7 @@ class corePrimaryAircraft():
         if len(self.altMovAverage) < 5:
             self.altMovAverage.append(altitude)
         else:
-            for i in range(1, len(self.altMovAverage)):
+            for i in range(len(self.altMovAverage), 1):
                 self.altMovAverage[i] = self.altMovAverage[i-1]
             self.altMovAverage[0] = altitude
 
