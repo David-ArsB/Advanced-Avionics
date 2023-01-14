@@ -294,7 +294,7 @@ class corePrimaryAircraft():
                 time.sleep(1 / 100)
 
         print('Received from GCS: ')
-        print(recv_buffer)
+        print(recv_blocks)
         print('Stopped listening to ground station...')
 
 
