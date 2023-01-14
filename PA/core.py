@@ -76,10 +76,8 @@ class corePrimaryAircraft():
         Ground pressure is used to calibrate the altimeter.
         """
         print('Setting up altimeter (BMP388) ...')
-        temperature, pressure, altitude = self.altimeter.get_temperature_and_pressure_and_altitude()
+        self.calibrate_altimeter()
 
-        self.altimeter.setGroundPressure(pressure / 100.0)
-        print(' -> Ground Pressure Level = %.2f Pa' % (pressure / 100.0))
 
     def _initIMU(self):
         print('Setting up IMU (LSM6DSL) ...')
@@ -447,6 +445,9 @@ class corePrimaryAircraft():
         av = sum(vals)/len(vals)/ 100.0
 
         self.altimeter.setGroundPressure(av)
+        print(vals)
+        print(' -> Ground Pressure Level = %.2f Pa' % (av))
+        time.sleep(3)
 
 
 
