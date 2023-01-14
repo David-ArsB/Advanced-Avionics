@@ -314,6 +314,7 @@ class corePrimaryAircraft():
                     pass
 
                 elif recv_comm.find("$ARM") != -1:
+                    print('YEEET')
                     # If PA is in STANDBY Mode, put it in READY mode, which begins the mission
 
                     if self.STATUS != "ARMED":
