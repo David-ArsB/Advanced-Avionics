@@ -291,7 +291,7 @@ class corePrimaryAircraft():
                         recv_buffer[i] = chr(val)
 
                 recv_blocks.append(recv_buffer)
-                time.sleep(1 / 100)
+                time.sleep(5 / 100)
 
         print('Received from GCS: ')
         print(recv_blocks)
