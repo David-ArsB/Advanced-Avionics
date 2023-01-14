@@ -426,6 +426,7 @@ if __name__ == '__main__':
     stat = core.waitForMissionBegin()
     
     # Core loop, break on keyboard interrupt (Ctr + C)
+    print('MISSION BEGIN')
     while True:
         try:
             # Clear terminal on each iteration
