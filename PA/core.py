@@ -294,7 +294,7 @@ class corePrimaryAircraft():
                 time.sleep(5 / 100)
 
         print('Received from GCS: ')
-        print(recv_blocks)
+        print(buf for buf in recv_blocks)
         print('Stopped listening to ground station...')
 
 
@@ -310,12 +310,10 @@ class corePrimaryAircraft():
         for recv_buffer in recv_blocks:
             try:
                 recv_comm = ''.join(str(e) for e in recv_buffer)
-                print(recv_comm)
                 if recv_comm.find("$RESET") != -1:
                     pass
 
                 elif recv_comm.find("$ARM") != -1:
-                    print('YEEET')
                     # If PA is in STANDBY Mode, put it in READY mode, which begins the mission
 
                     if self.STATUS != "ARMED":

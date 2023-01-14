@@ -122,7 +122,8 @@ class SerialReaderObj(QObject):
             message = self.serialPort.readline().decode().strip()
             message = message.split(':')
             if message[0].find('@STANDBY') != -1:
-                self.writeToSerial()
+                #self.writeToSerial()
+                continue
 
             if message[0].find('$b') != -1 or message[0] == 'BOF':
                 pass
