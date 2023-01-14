@@ -298,7 +298,7 @@ class corePrimaryAircraft():
         print('Stopped listening to ground station...')
 
 
-        return recv_buffer
+        return recv_blocks
 
     def processRecv(self, recv_blocks):
         '''
@@ -413,6 +413,7 @@ class corePrimaryAircraft():
             self.transmitToGCS(blocks)  # write the message to radio
 
             recv_blocks = self.receiveFromGCS()
+            
             stat = self.processRecv(recv_blocks)
 
         return True

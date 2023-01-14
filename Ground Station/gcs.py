@@ -109,7 +109,6 @@ class SerialReaderObj(QObject):
         else:
             tx_buf = '\0'
 
-        print('write')
         self.serialPort.write(tx_buf.encode())
         self.tx_buf = None
 
