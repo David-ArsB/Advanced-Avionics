@@ -418,6 +418,10 @@ class corePrimaryAircraft():
 
             stat = self.processRecv(recv_blocks)
 
+            # Wait a second before the next transmission
+            time.sleep(1.0)
+
+
         return True
 
     def calibrate_altimeter(self):
