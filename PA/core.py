@@ -396,6 +396,8 @@ class corePrimaryAircraft():
         stat = self.STATUS
 
         while stat != 'ARMED':
+            # Clear terminal on each iteration
+            os.system('clear')
 
             time.sleep(0.25)
 
@@ -413,7 +415,7 @@ class corePrimaryAircraft():
             self.transmitToGCS(blocks)  # write the message to radio
 
             recv_blocks = self.receiveFromGCS()
-            
+
             stat = self.processRecv(recv_blocks)
 
         return True
