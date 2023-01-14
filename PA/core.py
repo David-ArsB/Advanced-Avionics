@@ -175,6 +175,7 @@ class corePrimaryAircraft():
             self.altMovAverage[0] = altitude
 
         altitude = sum(self.altMovAverage)/len(self.altMovAverage)
+        print(self.altMovAverage)
 
         # Fetch Compass Data
         magX = self.compass.readMAGxCorr()
