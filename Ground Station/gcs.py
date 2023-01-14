@@ -109,6 +109,7 @@ class SerialReaderObj(QObject):
         else:
             tx_buf = '\0'
 
+        print('write')
         self.serialPort.write(tx_buf.encode())
         self.tx_buf = None
 
@@ -120,6 +121,8 @@ class SerialReaderObj(QObject):
         while self.run:
             message = self.serialPort.readline().decode().strip()
             message = message.split(':')
+            if message[0].find('@STANDBY') != -1:
+                self.writeToSerial()
 
             if message[0].find('$b') != -1 or message[0] == 'BOF':
                 pass

@@ -398,6 +398,20 @@ class corePrimaryAircraft():
         while stat != 'ARMED':
 
             time.sleep(0.25)
+
+            # Indicate to GCS that PA computer is ready and waiting for commands
+            header = list('BOF')  # Indicates beginning of message
+            block = list('@STANDBY')
+            eof = list('EOF')  # Indicates end of message
+
+            blocks = [header, block, eof]
+
+            for block in blocks:
+                while len(block) < self.RADIO_PAYLOAD_SIZE:  # Fill remaining bytes with zeros
+                    block.append(0)
+
+            self.transmitToGCS(blocks)  # write the message to radio
+
             recv_blocks = self.receiveFromGCS()
             stat = self.processRecv(recv_blocks)
 
@@ -422,7 +436,6 @@ if __name__ == '__main__':
     # PA Avionics core (main) definition class. Handles sensors, localisation and targeting (computer vision).
     core = corePrimaryAircraft()
     time.sleep(1.0)
-    core.radio.startListening()
     # Wait for '$ARM' command from GCS
     stat = core.waitForMissionBegin()
     
