@@ -66,6 +66,8 @@ class corePrimaryAircraft():
 
         print('Initialisation Complete! \n')
 
+        self.STATUS = 'STANDBY'
+
 
     def _initAltimeter(self):
         """
@@ -120,6 +122,10 @@ class corePrimaryAircraft():
         print('Setting up GPS thread ...')
         self.gps.start()
 
+    def kill(self):
+        self.gps.running = False
+        self.gps.join()  # wait for the thread to finish what it's doing
+        sys.exit()
     def printDataSummary(self):
         """
         Print sensor data summary to terminal.
@@ -191,7 +197,49 @@ class corePrimaryAircraft():
 
         self.data = data
 
-    def transmitToGCS(self):
+        return data
+
+    def setupDataForTransmission(self, data):
+        '''
+        Organize sensor data in blocks ready for transmission.
+
+        :input:
+            - data: dictionary of the available data
+
+        :return:
+            - blocks: list of blocks to be transmitted
+        '''
+        temperature = data['temperature']
+        pressure = data['pressure']
+        altitude = data['alitude']
+        magX, magY, magZ = data['mag']
+        heading = data['heading']
+        AccX, AccY, AccZ = data['acc']
+        GyrX, GyrY, GyrZ = data['gyr']
+        lat, long, altGPS = data['GPS']
+
+        numBlocks = 9
+        header = list('$b' + str(int(numBlocks)) + ',tph' + ',lat' + ',long')
+        header = list('BOF')  # Indicates beginning of message
+        block1 = list("temperature: %.1f" % round(temperature / 100, 1))
+        block2 = list("pressure: %.1f" % round(pressure / 100, 1))
+        block3 = list("altitude: %.1f" % round(altitude / 100, 1))
+        block4 = list("pos:" + str(lat) + ',' + str(long))
+        block5 = list("altGPS:" + str(altGPS))
+        block6 = list("Acc: %.1f,%.1f,%.1f" % (round(AccX, 2), round(AccY, 2), round(AccZ, 2)))
+        block7 = list("Gyr: %.1f,%.1f,%.1f" % (round(GyrX, 2), round(GyrY, 2), round(GyrZ, 2)))
+        block8 = list("Mag: %.3f,%.3f,%.3f" % (round(magX, 3), round(magY, 3), round(magZ, 3)))
+        eof = list('EOF')  # Indicates end of message
+
+        blocks = [header, block1, block2, block3, block4, block5, block6, block7, block8, eof]
+
+        for block in blocks:
+            while len(block) < self.RADIO_PAYLOAD_SIZE: # Fill remaining bytes with zeros
+                block.append(0)
+
+        return blocks
+
+    def transmitToGCS(self, blocks):
         '''
         Transmits sensor data to ground station.
 
@@ -206,51 +254,106 @@ class corePrimaryAircraft():
 
         print('Transmitting to ground station...\n')
 
-        temperature = self.data['temperature']
-        pressure = self.data['pressure']
-        altitude = self.data['alitude']
-        magX, magY, magZ = self.data['mag']
-        heading = self.data['heading']
-        AccX, AccY, AccZ = self.data['acc']
-        GyrX, GyrY, GyrZ = self.data['gyr']
-        lat, long, altGPS = self.data['GPS']
+        # Confirm that the radio is in transmit mode
+        self.radio.stopListening()
 
-        numBlocks = 9
-        header = list('$b'+ str(int(numBlocks)) + ',tph' + ',lat' + ',long')
-        header = list('BOF') # Indicates beginning of message
-        block1 = list("temperature: %.1f" % round(temperature/100, 1))
-        block2 = list("pressure: %.1f" % round(pressure/100, 1))
-        block3 = list("altitude: %.1f" % round(altitude/100, 1))
-        block4 = list("pos:" + str(lat) + ',' + str(long))
-        block5 = list("altGPS:" + str(altGPS))
-        block6 = list("Acc: %.1f,%.1f,%.1f" % (round(AccX, 2), round(AccY, 2), round(AccZ, 2)))
-        block7 = list("Gyr: %.1f,%.1f,%.1f" % (round(GyrX, 2), round(GyrY, 2), round(GyrZ, 2)))
-        block8 = list("Mag: %.3f,%.3f,%.3f" % (round(magX, 3), round(magY, 3), round(magZ, 3)))
-        block9 = list('EOF') # Indicates end of message
-
-        blocks = [header, block1, block2, block3, block4, block5, block6, block7, block8, block9]
-
-        self.radio.stopListening()  # Confirm that the radio is in transmit mode
         # Begin transmitting the message
         for block in blocks:
-            while len(block) < self.RADIO_PAYLOAD_SIZE: # Fill remaining bytes with zeros
-                block.append(0)
-            print(block,' - ',len(block))
             self.radio.write(block)  # write the message to radio
 
-        self.radio.startListening() #Put radio in listening mode
+        # Confirm that the radio is in listening mode
+        self.radio.startListening()
 
-            # if self.radio.isAckPayloadAvailable():
-            #     pl_buffer = []
-            #     self.radio.read(pl_buffer, self.radio.getDynamicPayloadSize())
-            #     print("Received back:"),
-            #     print(pl_buffer)
-            # else:
-            #     print("Received: Ack only, no payload")
+    def receiveFromGCS(self, timeout=1.0):
+        """
+        Listen to any transmission coming fromm the ground station.
+        Wait one second before timeout.
+        """
+        print('\nListening to ground station...')
+        recv_blocks = []
+        recv_buffer = []
+
+        t1 = time.time()
+        while len(recv_blocks) == 0:
+            # Check for timeout...
+            if (time.time() - t1) > timeout:
+                print('Heard nothing from ground station...')
+                return None  # Leave function if nothing received
+
+            while self.radio.available([1]):
+                # If transmission received, receive and process the message
+                self.radio.read(recv_buffer, self.radio.getDynamicPayloadSize())
+
+                # Convert transmission to a readable format
+                for i, val in enumerate(recv_buffer):
+                    # convert integers from transmission to its unicode character
+                    if (val >= 32 and val <= 126):
+                        recv_buffer[i] = chr(val)
+
+                recv_blocks.append(recv_buffer)
+                time.sleep(1 / 100)
+
+        print('Received from GCS: ')
+        print(recv_buffer)
+        print('Stopped listening to ground station...')
 
 
+        return recv_buffer
 
-    def receiveFromGCS(self):
+    def processRecv(self, recv_blocks):
+        '''
+        Process the received buffer in order to execute a command.
+        '''
+
+        for recv_buffer in recv_blocks:
+            try:
+                recv_comm = ''.join(str(e) for e in recv_buffer)
+                if recv_comm.find("$RESET") != -1:
+                    pass
+
+                elif recv_comm.find("$ARM") != -1:
+                    # If PA is in STANDBY Mode, put it in READY mode, which begins the mission
+
+                    if self.STATUS != "ARMED":
+                        self.STATUS = 'ARMED'
+
+                        # Indicate to GCS that message has been received and that the
+                        # PA computer is ready and armed
+                        header = list('BOF')  # Indicates beginning of message
+                        block = list('@ARMED')
+                        eof = list('EOF')  # Indicates end of message
+
+                        blocks = [header, block, eof]
+
+                        for block in blocks:
+                            while len(block) < self.RADIO_PAYLOAD_SIZE:  # Fill remaining bytes with zeros
+                                block.append(0)
+
+                        self.transmitToGCS(blocks)  # write the message to radio
+
+                        # Maybe use isAckPayloadAvailable() to confirm message reception
+                elif recv_comm.find("$KILL") != -1:
+                    self.kill()
+
+                elif recv_comm.find("$STANDBY") != -1:
+                    self.STATUS = 'STANDBY'
+
+                elif recv_comm.find("$RELEASE") != -1:
+                    pass
+
+                elif recv_comm.find("$CAL_ALTIMETER") != -1:
+                    self.calibrate_altimeter()
+
+
+                else:
+                    return False
+            except Exception as e:
+                print(e)
+
+
+        return self.STATUS
+
+    def receiveFromGCSOld(self):
         """
         Listen to any transmission coming fromm the ground station.
         Wait one second before timeout.
@@ -259,9 +362,11 @@ class corePrimaryAircraft():
         t1 = time.time()
         # Wait for a transmission until timeout
         while not self.radio.available([1]):
+            # Check for timeout...
             if (time.time() - t1) > 1.0:
                 print('Heard nothing from ground station...')
-                return None # Leave function if nothing received
+                return None  # Leave function if nothing received
+
             time.sleep(1 / 100)
 
         # If transmission received, receive and process the message
@@ -274,20 +379,50 @@ class corePrimaryAircraft():
             if (val >= 32 and val <= 126):
                 recv_buffer[i] = chr(val)
 
-        #self.radio.writeAckPayload(1, self.RADIO_AKPL_BUF, len(self.RADIO_AKPL_BUF))
-        #print("Loaded payload reply:")
-        #print(self.RADIO_AKPL_BUF)
-
         print('Received from GCS: ')
         print(recv_buffer)
         print('Stopped listening to ground station...')
 
         return recv_buffer
 
+    def waitForMissionBegin(self):
+
+        # Confirm radio is in listening mode
+        self.radio.startListening()
+
+        # Wait for a command from the ground station
+        stat = self.STATUS
+
+        while stat != 'ARMED':
+
+            time.sleep(0.25)
+            recv_blocks = self.receiveFromGCS()
+            stat = self.processRecv(recv_blocks)
+
+        return True
+
+    def calibrate_altimeter(self):
+
+        vals = []
+        for i in range(100):
+            pressure = self.altimeter.get_temperature_and_pressure_and_altitude()[1]
+            vals.append(pressure)
+            time.sleep(0.010)
+
+        av = sum(vals)/len(vals)
+
+        self.altimeter.setGroundPressure(av/ 100.0)
+
+
+
+
 if __name__ == '__main__':
     # PA Avionics core (main) definition class. Handles sensors, localisation and targeting (computer vision).
     core = corePrimaryAircraft()
     time.sleep(1.0)
+    # Wait for '$ARM' command from GCS
+    stat = core.waitForMissionBegin()
+    
     # Core loop, break on keyboard interrupt (Ctr + C)
     while True:
         try:
@@ -298,11 +433,15 @@ if __name__ == '__main__':
             #core.radio.printDetails()
 
             # Fetch sensor data
-            core.fetchData()
+            data = core.fetchData()
+            # Ready Data for transmission
+            blocks = core.setupDataForTransmission(data)
             # Transmit sensor data to GCS
-            core.transmitToGCS()
+            core.transmitToGCS(blocks)
             # Receive any transmissions from the GCS
-            core.receiveFromGCS()
+            recv_blocks = core.receiveFromGCS()
+            # Process the received buffer from the GCS
+            stat = core.processRecv(recv_blocks)
             # Wait a second before the next transmission
             time.sleep(1.0)
 
@@ -310,8 +449,7 @@ if __name__ == '__main__':
 
         except (KeyboardInterrupt, SystemExit):  # when you press ctrl+c
             print("\nKilling Thread...")
-            core.gps.running = False
-            core.gps.join()  # wait for the thread to finish what it's doing
+
             break
 
     sys.exit()

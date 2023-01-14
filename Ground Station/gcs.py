@@ -166,6 +166,7 @@ class UI_MW(QMainWindow, Ui_MainWindow):
         self.stackedWidget.setCurrentIndex(0)
         self.dataTelemLog_TW.setHorizontalHeaderLabels(['Time', 'Altitude', 'Latitude', 'Longitude', 'Heading'])
         self.dataTelemLog_TW.resizeColumnsToContents()
+        self.loggingChecked()
 
         # Initialize plotting area
         self.PLOT_FIGURES = {}
@@ -542,9 +543,8 @@ class UI_MW(QMainWindow, Ui_MainWindow):
         except Exception as e:
             print('[GPS Eval] Exception has occured: ' + str(e))
 
-    def transmitTest(self):
-
-        self.serialReaderObj.tx_buf = 'RELEASE\0'
+    def transmitCommand(self, com):
+        self.serialReaderObj.tx_buf = com + '\0'
 
     def refreshComPorts(self):
         self.serialPort_CB.clear()
@@ -566,8 +566,13 @@ class UI_MW(QMainWindow, Ui_MainWindow):
         self.copycoordinates_TB.clicked.connect(lambda: self.copyGPSToClipboard())
         self.beginGPSAccuracy_PB.clicked.connect(lambda: self.startGPSAccEval())
         self.refresh_COM_TB.clicked.connect(lambda: self.refreshComPorts())
-        self.pushButton.clicked.connect(lambda: self.transmitTest())
         self.enableLogging_CB.stateChanged.connect(lambda: self.loggingChecked())
+
+        # Commands
+        self.releasePADA_PB.clicked.connect(lambda: self.transmitCommand('$RELEASE'))
+        self.armPA_PB.clicked.connect(lambda: self.transmitCommand('$ARM'))
+        self.resetPA_PB.clicked.connect(lambda: self.transmitCommand('$RESET'))
+        self.calibrateAltimeter_PB.clicked.connect(lambda: self.transmitCommand('$CAL_ALTIMETER'))
 
 
 if __name__ == "__main__":
