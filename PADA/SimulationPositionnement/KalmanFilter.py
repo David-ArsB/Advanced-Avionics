@@ -21,6 +21,10 @@ def stateExtrapolationEquation(ECSS, u_n, w_n, F, G):
 
 
 def KalmanFilter(x_00, A, B, u, P, Q, H, m, R):
+    '''
+    
+    '''
+
     x_10 = A @ x_00 + B @ u
     P = A @ P @ A.transpose() + Q
     # Kalman Gain

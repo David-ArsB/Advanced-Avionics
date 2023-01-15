@@ -7,7 +7,7 @@ class vehicle():
         self.actXDot = vi
         self.actXDotDot = ai
 
-        self.GPS_Error = 3.5
+        self.GPS_Error = 2
 
     def getTheta(self):
         return np.arctan2(self.actPos[1] , self.actPos[0])
