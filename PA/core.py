@@ -358,7 +358,7 @@ class corePrimaryAircraft():
 
                 elif recv_comm.find("$SET_ORIGIN") != -1:
                     pass
-                #This is a comment
+
 
 
                 else:
@@ -461,6 +461,7 @@ if __name__ == '__main__':
     time.sleep(1.0)
     # Wait for '$ARM' command from GCS
     stat = core.waitForMissionBegin()
+    timeout = 1.0
     
     # Core loop, break on keyboard interrupt (Ctr + C)
     print('MISSION BEGIN')
@@ -468,7 +469,8 @@ if __name__ == '__main__':
         try:
             # Clear terminal on each iteration
             os.system('clear')
-
+            t1 = time.time()
+            if (time.time() - t1) > timeout:
             #core.printDataSummary()
             #core.radio.printDetails()
 
@@ -483,7 +485,9 @@ if __name__ == '__main__':
             # Process the received buffer from the GCS
             stat = core.processRecv(recv_blocks)
             # Wait a second before the next transmission
-            time.sleep(1.0)
+            dt = time.time() - t1
+            print(dt)
+            time.sleep(timeout-dt)
 
 
 

@@ -109,3 +109,9 @@ sudo nano /etc/default/gpsd
 
 # PUT GPS IN NMEA MODE (BERRY GPS MOUNTED) 
 sudo gpsctl -n
+# Change GPS update rate to 10Hz 
+echo -e "\xB5\x62\x06\x08\x06\x00\x64\x00\x01\x00\x01\x00\x7A\x12" > /dev/ttyS1
+# Change GPS update rate to 5Hz 
+echo -e "\xB5\x62\x06\x08\x06\x00\xC8\x00\x01\x00\x01\x00\xDE\x6A" > /dev/ttyS1
+# Change GPS update rate to 2Hz 
+echo -e -n "\xB5\x62\x06\x08\x06\x00\xF4\x01\x01\x00\x01\x00\x0B\x77" > /dev/ttyS1
