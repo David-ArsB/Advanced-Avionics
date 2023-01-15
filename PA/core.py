@@ -273,7 +273,7 @@ class corePrimaryAircraft():
         # Confirm that the radio is in listening mode
         self.radio.startListening()
 
-    def receiveFromGCS(self, timeout=0.1):
+    def receiveFromGCS(self, timeout=1.0):
         """
         Listen to any transmission coming fromm the ground station.
         Wait one second before timeout.
