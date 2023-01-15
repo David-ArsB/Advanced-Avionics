@@ -21,6 +21,8 @@ import serial.tools.list_ports
 
 
 
+
+
 class GPSEvaluatorWorker(QObject):
     finished = Signal()
     progress = Signal(int)

@@ -356,6 +356,9 @@ class corePrimaryAircraft():
                 elif recv_comm.find("$CAL_ALTIMETER") != -1:
                     self.calibrate_altimeter()
 
+                elif recv_comm.find("$SET_ORIGIN") != -1:
+                    pass
+
 
                 else:
                     return False
@@ -445,9 +448,8 @@ class corePrimaryAircraft():
         av = sum(vals)/len(vals)/ 100.0
 
         self.altimeter.setGroundPressure(av)
-        print(vals)
         print(' -> Ground Pressure Level = %.2f Pa' % (av))
-        time.sleep(3)
+
 
 
 
