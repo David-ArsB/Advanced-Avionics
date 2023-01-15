@@ -358,6 +358,7 @@ class corePrimaryAircraft():
 
                 elif recv_comm.find("$SET_ORIGIN") != -1:
                     pass
+                #This is a comment
 
 
                 else:
