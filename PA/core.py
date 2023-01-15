@@ -469,6 +469,7 @@ if __name__ == '__main__':
         try:
             # Clear terminal on each iteration
             os.system('clear')
+            t1 = time.time()
             #core.printDataSummary()
             #core.radio.printDetails()
 
