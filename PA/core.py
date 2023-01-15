@@ -469,8 +469,6 @@ if __name__ == '__main__':
         try:
             # Clear terminal on each iteration
             os.system('clear')
-            t1 = time.time()
-            if (time.time() - t1) > timeout:
             #core.printDataSummary()
             #core.radio.printDetails()
 
