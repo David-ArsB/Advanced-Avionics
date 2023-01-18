@@ -173,7 +173,7 @@ class corePrimaryAircraft():
             self.altMovAverage[0] = altitude
 
         altitude = sum(self.altMovAverage)/len(self.altMovAverage)
-        print(self.altMovAverage)
+        #print(self.altMovAverage)
 
         # Fetch Compass Data
         magX = self.compass.readMAGxCorr()
@@ -486,7 +486,7 @@ if __name__ == '__main__':
             stat = core.processRecv(recv_blocks)
             # Wait a loop timeout before the next transmission
             dt = time.time() - t1
-            print('Loop dt:' + str(dt))
+            print('Loop dt: ' + str(round(dt, 3)))
             if not (timeout-dt) <= 0:
                 time.sleep(timeout-dt)
 
