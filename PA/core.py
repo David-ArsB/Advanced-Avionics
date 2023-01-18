@@ -486,7 +486,7 @@ if __name__ == '__main__':
             # Wait a loop timeout before the next transmission
             dt = time.time() - t1
             print('Loop dt:' + str(dt))
-            if not dt <= 0:
+            if not (timeout-dt) <= 0:
                 time.sleep(timeout-dt)
 
 
