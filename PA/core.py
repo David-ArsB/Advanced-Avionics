@@ -106,7 +106,7 @@ class corePrimaryAircraft():
         self.radio.setChannel(0x36)  # set the channel as 76 hex
         self.radio.setRetries(5, 10)
         self.radio.setDataRate(self.RADIO_DATA_RATES[0])  # set radio data rate to 2MBPS
-        self.radio.setPALevel(self.RADIO_PA_LEVELS[2])  # set PA level to LOW
+        self.radio.setPALevel(self.RADIO_PA_LEVELS[0])  # set PA level to LOW
 
         self.radio.setAutoAck(True)  # set acknowledgement as true
         self.radio.enableDynamicPayloads()
