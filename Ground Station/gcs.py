@@ -143,6 +143,7 @@ class SerialReaderObj(QObject):
                 self.data = data
                 data = {}
                 data['tag'] = tag + 1
+                print('Writing to Serial...')
                 self.writeToSerial()
             else:
                 try:
