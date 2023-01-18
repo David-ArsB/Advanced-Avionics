@@ -463,7 +463,7 @@ if __name__ == '__main__':
     time.sleep(1.0)
     # Wait for '$ARM' command from GCS
     stat = core.waitForMissionBegin()
-    iter_rate = 2
+    iter_rate = 5
     timeout = 1/iter_rate
     okRecv = 0
     failedRecv = 0
