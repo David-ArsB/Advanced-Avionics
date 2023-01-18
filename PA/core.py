@@ -461,7 +461,8 @@ if __name__ == '__main__':
     time.sleep(1.0)
     # Wait for '$ARM' command from GCS
     stat = core.waitForMissionBegin()
-    timeout = 1.0
+    iter_rate = 5
+    timeout = 1/iter_rate
     
     # Core loop, break on keyboard interrupt (Ctr + C)
     print('MISSION BEGIN')
@@ -480,7 +481,7 @@ if __name__ == '__main__':
             # Transmit sensor data to GCS
             core.transmitToGCS(blocks)
             # Receive any transmissions from the GCS
-            recv_blocks = core.receiveFromGCS()
+            recv_blocks = core.receiveFromGCS(timeout)
             # Process the received buffer from the GCS
             stat = core.processRecv(recv_blocks)
             # Wait a loop timeout before the next transmission
