@@ -462,7 +462,7 @@ if __name__ == '__main__':
     # Wait for '$ARM' command from GCS
     stat = core.waitForMissionBegin()
     iter_rate = 5
-    timeout = 1/iter_rate
+    timeout = 0.5
     
     # Core loop, break on keyboard interrupt (Ctr + C)
     print('MISSION BEGIN')
