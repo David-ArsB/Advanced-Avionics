@@ -273,7 +273,7 @@ class corePrimaryAircraft():
         # Confirm that the radio is in listening mode
         self.radio.startListening()
 
-    def receiveFromGCS(self, timeout=0.1):
+    def receiveFromGCS(self, timeout=0.2):
         """
         Listen to any transmission coming fromm the ground station.
         Wait one second before timeout.
@@ -483,10 +483,11 @@ if __name__ == '__main__':
             recv_blocks = core.receiveFromGCS()
             # Process the received buffer from the GCS
             stat = core.processRecv(recv_blocks)
-            # Wait a second before the next transmission
+            # Wait a loop timeout before the next transmission
             dt = time.time() - t1
-            print(dt)
-            time.sleep(timeout-dt)
+            print('Loop dt:' + str(dt))
+            if not dt <= 0:
+                time.sleep(timeout-dt)
 
 
 
