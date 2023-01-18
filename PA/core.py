@@ -311,7 +311,7 @@ class corePrimaryAircraft():
         print('Stopped listening to ground station...')
         self.okRecv += 1
 
-        print('Success Rate: ' + str((self.okRecv) / (self.okRecv + self.failedRecv)*100) + '%\n')
+        print('Success Rate: ' + str(round((self.okRecv) / (self.okRecv + self.failedRecv))*100) + '%\n')
         return recv_blocks
 
     def processRecv(self, recv_blocks):
@@ -465,7 +465,7 @@ if __name__ == '__main__':
     time.sleep(1.0)
     # Wait for '$ARM' command from GCS
     stat = core.waitForMissionBegin()
-    iter_rate = 5
+    iter_rate = 2
     timeout = 1/iter_rate
     
     # Core loop, break on keyboard interrupt (Ctr + C)
