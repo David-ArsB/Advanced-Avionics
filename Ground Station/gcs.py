@@ -440,7 +440,7 @@ class UI_MW(QMainWindow, Ui_MainWindow):
                 newitem.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
                 self.dataTelemLog_TW.setItem(currentRow, 3, newitem)
                 # Column 4: Heading
-                newitem = QTableWidgetItem(str(round(heading,1)))
+                newitem = QTableWidgetItem(str(round(heading, 1)))
                 newitem.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
                 self.dataTelemLog_TW.setItem(currentRow, 4, newitem)
                 self.dataTelemLog_TW.resizeColumnsToContents()
@@ -460,6 +460,7 @@ class UI_MW(QMainWindow, Ui_MainWindow):
 
         except Exception as e:
             print('[GUI UPDATE & LOGGING] An exception has occured: '+str(e))
+            print('Values not accessible: ' + str(error))
             pass
 
     def copyGPSToClipboard(self):
