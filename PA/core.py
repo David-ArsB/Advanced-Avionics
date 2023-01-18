@@ -68,6 +68,8 @@ class corePrimaryAircraft():
 
         self.STATUS = 'STANDBY'
         self.altMovAverage = []
+        self.failedRecv = 0
+        self.okRecv = 0
 
 
     def _initAltimeter(self):
@@ -287,6 +289,7 @@ class corePrimaryAircraft():
             # Check for timeout...
             if (time.time() - t1) > timeout:
                 print('Heard nothing from ground station...')
+                self.failedRecv += 1
                 return None  # Leave function if nothing received
 
             while self.radio.available([1]):
@@ -306,8 +309,9 @@ class corePrimaryAircraft():
         for buf in recv_blocks:
             print(buf)
         print('Stopped listening to ground station...')
+        self.okRecv += 1
 
-
+        print('Success Rate: ' + str((self.okRecv) / (self.okRecv + self.failedRecv)*100) + '%\n')
         return recv_blocks
 
     def processRecv(self, recv_blocks):
