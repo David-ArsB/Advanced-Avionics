@@ -491,7 +491,7 @@ if __name__ == '__main__':
             else:
                 okRecv += 1
 
-            print('Success Rate: ' + str(round((okRecv) / (okRecv + failedRecv)) * 100) + '%\n')
+            print('Success Rate: ' + str(round((okRecv) / (okRecv + failedRecv,1)* 100) ) + '%\n')
             # Process the received buffer from the GCS
             stat = core.processRecv(recv_blocks)
             # Wait a loop timeout before the next transmission
