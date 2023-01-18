@@ -289,7 +289,7 @@ class corePrimaryAircraft():
             # Check for timeout...
             if (time.time() - t1) > timeout:
                 print('Heard nothing from ground station...')
-                self.failedRecv += 1
+
                 return None  # Leave function if nothing received
 
             while self.radio.available([1]):
@@ -309,9 +309,7 @@ class corePrimaryAircraft():
         for buf in recv_blocks:
             print(buf)
         print('Stopped listening to ground station...')
-        self.okRecv += 1
 
-        print('Success Rate: ' + str(round((self.okRecv) / (self.okRecv + self.failedRecv))*100) + '%\n')
         return recv_blocks
 
     def processRecv(self, recv_blocks):
@@ -467,6 +465,8 @@ if __name__ == '__main__':
     stat = core.waitForMissionBegin()
     iter_rate = 2
     timeout = 1/iter_rate
+    okRecv = 0
+    failedRecv = 0
     
     # Core loop, break on keyboard interrupt (Ctr + C)
     print('MISSION BEGIN')
@@ -486,6 +486,12 @@ if __name__ == '__main__':
             core.transmitToGCS(blocks)
             # Receive any transmissions from the GCS
             recv_blocks = core.receiveFromGCS(timeout)
+            if recv_blocks == None:
+                failedRecv += 1
+            else:
+                okRecv += 1
+
+            print('Success Rate: ' + str(round((okRecv) / (okRecv + failedRecv)) * 100) + '%\n')
             # Process the received buffer from the GCS
             stat = core.processRecv(recv_blocks)
             # Wait a loop timeout before the next transmission
