@@ -462,7 +462,7 @@ if __name__ == '__main__':
     # Wait for '$ARM' command from GCS
     stat = core.waitForMissionBegin()
     iter_rate = 5
-    timeout = 0.5
+    timeout = 1/iter_rate
     
     # Core loop, break on keyboard interrupt (Ctr + C)
     print('MISSION BEGIN')
@@ -486,7 +486,7 @@ if __name__ == '__main__':
             stat = core.processRecv(recv_blocks)
             # Wait a loop timeout before the next transmission
             dt = time.time() - t1
-            print('Loop dt: ' + str(round(dt, 3)))
+            print('Loop dt: ' + str(round(dt, 3)) + ' s')
             if not (timeout-dt) <= 0:
                 time.sleep(timeout-dt)
 
