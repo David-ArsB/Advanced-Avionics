@@ -472,7 +472,7 @@ class corePrimaryAircraft():
             print(e)
 
         print('TEST')
-        time.sleep(1.1)
+        time.sleep(10.1)
 
         av = [sum(lats) / len(lats) / num,
               sum(longs) / len(longs) / num,
