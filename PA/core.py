@@ -201,7 +201,7 @@ class corePrimaryAircraft():
         data = {}
         data['temperature'] = temperature
         data['pressure'] = pressure
-        data['alitude'] = altitude
+        data['altitude'] = altitude
         data['mag'] = [magX, magY, magZ]
         data['heading'] = heading
         data['acc'] = [AccX, AccY, AccZ]
@@ -224,7 +224,7 @@ class corePrimaryAircraft():
         '''
         temperature = data['temperature']
         pressure = data['pressure']
-        altitude = data['alitude']
+        altitude = data['altitude']
         magX, magY, magZ = data['mag']
         heading = data['heading']
         AccX, AccY, AccZ = data['acc']
@@ -250,6 +250,7 @@ class corePrimaryAircraft():
         for block in blocks:
             while len(block) < self.RADIO_PAYLOAD_SIZE: # Fill remaining bytes with zeros
                 block.append(0)
+
 
         return blocks
 
@@ -536,6 +537,7 @@ class corePrimaryAircraft():
             data['STATUS'] = '@ARMED'
             # Ready Data for transmission
             blocks = core.setupDataForTransmission(data)
+            print('GROUND PRESSURE: ' + self.altimeter.groundPressure)
             # Transmit sensor data to GCS
             core.transmitToGCS(blocks)
             # Receive any transmissions from the GCS
@@ -580,7 +582,7 @@ class corePrimaryAircraft():
 
             except (KeyboardInterrupt, SystemExit):  # When you press ctrl+c
                 print("\nKilling Core...")
-                break
+                return False
 
 
 

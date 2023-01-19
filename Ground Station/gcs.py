@@ -21,7 +21,12 @@ import serial.tools.list_ports
 
 # pip install PyQt6-WebEngine required
 
-
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
 
 
 class GPSEvaluatorWorker(QObject):
@@ -157,7 +162,13 @@ class SerialReaderObj(QObject):
                     pass
 
                 else:
-                    data['Unknown'] = line
+                    try:
+                        if is_number(message[1]):
+                            data[message[0]] = float(message[1])
+                        else:
+                            data[message[0]] = message[1]
+                    except:
+                        data['Unknown'] = line
 
 
 
