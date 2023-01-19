@@ -471,7 +471,7 @@ class corePrimaryAircraft():
               sum(longs) / len(longs) / num,
               sum(alts) / len(alts) / num]
 
-
+        time.sleep(10)
         self.ref_origin = av
         print(' -> Origin Coordinates: %.5f°N, %.5f°E' % (av[0], av[1]))
 
