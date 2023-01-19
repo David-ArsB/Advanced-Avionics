@@ -355,9 +355,10 @@ class corePrimaryAircraft():
 
                         # ARMING represents mission begin; set origins
                         # Expect a few seconds delay here
+
+                        self.calibrateAltimeter()
                         print('TEST')
                         time.sleep(10)
-                        self.calibrateAltimeter()
                         self.setOrigin()
 
                         # Maybe use isAckPayloadAvailable() to confirm message reception
