@@ -355,6 +355,8 @@ class corePrimaryAircraft():
 
                         # ARMING represents mission begin; set origins
                         # Expect a few seconds delay here
+                        print('TEST')
+                        time.sleep(10)
                         self.calibrateAltimeter()
                         self.setOrigin()
 
