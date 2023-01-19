@@ -1,5 +1,6 @@
 import sys, time
 import glob, serial
+from copy import deepcopy
 import folium, io
 from Modules.GPSFuncs import distCoordsComponentsSigned
 import numpy as np
@@ -138,10 +139,11 @@ class SerialReaderObj(QObject):
                 data[message[0] + 'Z'] = float(message[1].split(',')[2].strip())
             elif message[0] == 'EOF':
                 tag = data['tag']
-                self.serialBroadcast.emit(data)
+                self.serialBroadcast.emit(deepcopy(data))
                 self.data = data
                 data = {}
                 data['tag'] = tag + 1
+                print('Writing to Serial...')
                 self.writeToSerial()
             else:
                 try:
@@ -161,7 +163,8 @@ class UI_MW(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.settings = QSettings("__settings.ini",QSettings.Format.IniFormat)
         self.workingDirectory = QDir.current().currentPath()
-
+        self.success_rate = 0
+        self.error_rate = 0
         # Initialize some values
         self.init_def_values()
         self.serialReaderObj = None
@@ -406,7 +409,7 @@ class UI_MW(QMainWindow, Ui_MainWindow):
             else:
                 error.append('Gyr')
 
-            if data['MagX'] and data['MagY']:
+            if 'MagX' in data and 'MagY' in data:
                 magX = data['MagX']
                 magY = data['MagY']
                 heading = atan2(magY, magX) * 180 / pi
@@ -415,6 +418,7 @@ class UI_MW(QMainWindow, Ui_MainWindow):
                     heading += 360
 
                 self.heading_SB.setValue(heading)
+                #print(heading)
 
             else:
                 error.append('Mag')
@@ -440,7 +444,7 @@ class UI_MW(QMainWindow, Ui_MainWindow):
                 newitem.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
                 self.dataTelemLog_TW.setItem(currentRow, 3, newitem)
                 # Column 4: Heading
-                newitem = QTableWidgetItem(str(round(heading,1)))
+                newitem = QTableWidgetItem(str(round(heading, 1)))
                 newitem.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
                 self.dataTelemLog_TW.setItem(currentRow, 4, newitem)
                 self.dataTelemLog_TW.resizeColumnsToContents()
@@ -458,8 +462,15 @@ class UI_MW(QMainWindow, Ui_MainWindow):
                 ax.lines[0].set_ydata(np.append(ydata, data['latitude']))
                 self.PLOT_FIGURES['plotA']['canvas'].draw()
 
+            self.success_rate += 1
+
+            print('Success Rate: '+str((self.success_rate)/(self.success_rate+self.error_rate))+'\n')
+
         except Exception as e:
             print('[GUI UPDATE & LOGGING] An exception has occured: '+str(e))
+            print('Values not accessible: ' + str(error))
+            print(data)
+            self.error_rate += 1
             pass
 
     def copyGPSToClipboard(self):

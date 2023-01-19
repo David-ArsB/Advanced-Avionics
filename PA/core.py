@@ -68,6 +68,8 @@ class corePrimaryAircraft():
 
         self.STATUS = 'STANDBY'
         self.altMovAverage = []
+        self.failedRecv = 0
+        self.okRecv = 0
 
 
     def _initAltimeter(self):
@@ -106,7 +108,7 @@ class corePrimaryAircraft():
         self.radio.setChannel(0x36)  # set the channel as 76 hex
         self.radio.setRetries(5, 10)
         self.radio.setDataRate(self.RADIO_DATA_RATES[0])  # set radio data rate to 2MBPS
-        self.radio.setPALevel(self.RADIO_PA_LEVELS[2])  # set PA level to LOW
+        self.radio.setPALevel(self.RADIO_PA_LEVELS[0])  # set PA level to LOW
 
         self.radio.setAutoAck(True)  # set acknowledgement as true
         self.radio.enableDynamicPayloads()
@@ -165,7 +167,7 @@ class corePrimaryAircraft():
     def fetchData(self):
         # Fetch Altimeter Data
         temperature, pressure, altitude = self.altimeter.get_temperature_and_pressure_and_altitude()
-        if len(self.altMovAverage) < 5:
+        if len(self.altMovAverage) < 15:
             self.altMovAverage.append(altitude)
         else:
             for i in range(len(self.altMovAverage), 1):
@@ -173,7 +175,7 @@ class corePrimaryAircraft():
             self.altMovAverage[0] = altitude
 
         altitude = sum(self.altMovAverage)/len(self.altMovAverage)
-        print(self.altMovAverage)
+        #print(self.altMovAverage)
 
         # Fetch Compass Data
         magX = self.compass.readMAGxCorr()
@@ -273,7 +275,7 @@ class corePrimaryAircraft():
         # Confirm that the radio is in listening mode
         self.radio.startListening()
 
-    def receiveFromGCS(self, timeout=0.1):
+    def receiveFromGCS(self, timeout=0.2):
         """
         Listen to any transmission coming fromm the ground station.
         Wait one second before timeout.
@@ -287,6 +289,7 @@ class corePrimaryAircraft():
             # Check for timeout...
             if (time.time() - t1) > timeout:
                 print('Heard nothing from ground station...')
+
                 return None  # Leave function if nothing received
 
             while self.radio.available([1]):
@@ -306,7 +309,6 @@ class corePrimaryAircraft():
         for buf in recv_blocks:
             print(buf)
         print('Stopped listening to ground station...')
-
 
         return recv_blocks
 
@@ -461,7 +463,10 @@ if __name__ == '__main__':
     time.sleep(1.0)
     # Wait for '$ARM' command from GCS
     stat = core.waitForMissionBegin()
-    timeout = 1.0
+    iter_rate = 5
+    timeout = 1/iter_rate
+    okRecv = 0
+    failedRecv = 0
     
     # Core loop, break on keyboard interrupt (Ctr + C)
     print('MISSION BEGIN')
@@ -480,13 +485,20 @@ if __name__ == '__main__':
             # Transmit sensor data to GCS
             core.transmitToGCS(blocks)
             # Receive any transmissions from the GCS
-            recv_blocks = core.receiveFromGCS()
+            recv_blocks = core.receiveFromGCS(timeout)
+            if recv_blocks == None:
+                failedRecv += 1
+            else:
+                okRecv += 1
+
+            print('Success Rate: ' + str(round((okRecv) / (okRecv + failedRecv)* 100,1) ) + '%\n')
             # Process the received buffer from the GCS
             stat = core.processRecv(recv_blocks)
-            # Wait a second before the next transmission
+            # Wait a loop timeout before the next transmission
             dt = time.time() - t1
-            print(dt)
-            time.sleep(timeout-dt)
+            print('Loop dt: ' + str(round(dt, 3)) + ' s')
+            if not (timeout-dt) <= 0:
+                time.sleep(timeout-dt)
 
 
 
