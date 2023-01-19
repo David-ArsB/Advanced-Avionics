@@ -307,7 +307,6 @@ class corePrimaryAircraft():
                         recv_buffer[i] = chr(val)
 
                 recv_blocks.append(recv_buffer)
-                time.sleep(5 / 100)
 
         print('Received from GCS: ')
         for buf in recv_blocks:
@@ -556,9 +555,8 @@ class corePrimaryAircraft():
             stat = core.processRecv(recv_blocks)
             # Wait a loop timeout before the next transmission
             dt = time.time() - t1
-            print('@Loop dt: ' + str(round(dt, 3)) + ' s')
+            print('@Loop dt: ' + str(round(dt, 3)) + ' s\n')
             print('@GROUND PRESSURE: ' + str(self.altimeter.groundPressure))
-            print(self.ref_origin)
             print('@REF_ORIGIN: %.5f°N, %.5f°E' % (self.ref_origin[0], self.ref_origin[1]))
             if not (timeout - dt) <= 0:
                 time.sleep(timeout - dt)

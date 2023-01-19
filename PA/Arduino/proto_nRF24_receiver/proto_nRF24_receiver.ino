@@ -91,6 +91,7 @@ void transmitToPA(void){
     inByte = (char)Serial.read();
     dataReady = addData((char)inByte);  
     if (dataReady){
+      
       //digitalWrite(6, HIGH);
       //delay(10);
       //digitalWrite(6, LOW);
@@ -98,9 +99,9 @@ void transmitToPA(void){
       radio.write(&message2Transmit, sizeof(message2Transmit));
       radio.startListening();
 
-      if (message2Transmit[0] != '\0'){
-        Serial.println(message2Transmit);
-      }
+      //if (message2Transmit[0] != '\0'){
+      //  Serial.println(message2Transmit);
+      //}
     
       for (int i = 0; i < 32 ; i++) {
         message2Transmit[i] = 0;
@@ -139,7 +140,7 @@ bool addData(char nextChar)
       // The data too long so reset our position and return true
       // so that the data received so far can be processed - the caller should
       // see if it is valid command or not...
-      message2Transmit[MAX_DATA_LEN] = '\0';
+      message2Transmit[MAX_DATA_LEN-1] = '\0';
       currentIndex = 0;
       return true;
     }

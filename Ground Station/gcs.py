@@ -157,7 +157,7 @@ class SerialReaderObj(QObject):
                     tag = data['tag']
                     data = {}
                     data['tag'] = tag + 1
-                    print('Writing to Serial...')
+                    print('Writing to Serial...\n')
                     self.writeToSerial()
                     pass
 
