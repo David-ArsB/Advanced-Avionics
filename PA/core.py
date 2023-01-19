@@ -461,22 +461,17 @@ class corePrimaryAircraft():
         lats = []
         longs = []
         alts = []
-        try:
-            for i in range(num):
-                lat, long, altGPS = self.gps.getPosition()
-                lats.append(lat)
-                longs.append(long)
-                alts.append(altGPS)
-                time.sleep(0.3)
-        except Exception as e:
-            print(e)
 
-        print('TEST')
-        time.sleep(10.1)
+        for i in range(num):
+            lat, long, altGPS = self.gps.getPosition()
+            lats.append(lat)
+            longs.append(long)
+            alts.append(altGPS)
+            time.sleep(0.3)
 
-        av = [sum(lats) / len(lats) / num,
-              sum(longs) / len(longs) / num,
-              sum(alts) / len(alts) / num]
+        av = [sum(lats) / len(lats),
+              sum(longs) / len(longs),
+              sum(alts) / len(alts)]
 
 
         self.ref_origin = av
