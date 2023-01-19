@@ -47,6 +47,7 @@ class GPSEvaluatorWorker(QObject):
         ax.plot([], [], 'ro', markersize=3)
         ax.axis('equal')
         ax.plot([0], [0], 'x', color='gold', markersize=10)
+        
         self.coords = {}
         self.coords['lat'] = []
         self.coords['long'] = []
@@ -61,7 +62,7 @@ class GPSEvaluatorWorker(QObject):
                 dataTag = data['tag']
 
                 if dataTag == oldDataTag:
-                    time.sleep(0.25)
+                    time.sleep(0.10)
                     continue
                 else:
                     try:
@@ -80,12 +81,12 @@ class GPSEvaluatorWorker(QObject):
                 else:
                     self.main.GPSEval_ProgressBar.setValue(self.main.GPSEval_ProgressBar.maximum())
 
-                print(n)
+                # print(n)
 
             except Exception as e:
                 print('[GPS Eval] Exception has occured: ' + str(e))
 
-            self.finished.emit()
+        self.finished.emit()
 
 class SerialReaderObj(QObject):
     finished = Signal()
@@ -98,13 +99,6 @@ class SerialReaderObj(QObject):
         self.run = True
         self.data = {}
         self.tx_buf = None
-
-    def readSerialOutline(self):
-        message = self.serialPort.readline().decode().strip()
-        if message[0] == 'pos':
-            return float(message[1].split(',')[0]), float(message[1].split(',')[1])
-
-        return None
 
     def writeToSerial(self):
         if self.tx_buf != None:
@@ -122,35 +116,49 @@ class SerialReaderObj(QObject):
         data['tag'] = 1
 
         while self.run:
-            message = self.serialPort.readline().decode().strip()
-            message = message.split(':')
-            if message[0].find('@STANDBY') != -1:
-                #self.writeToSerial()
-                continue
+            messages = []
+            # Wait for bytes to enter the serial port and register incoming messages
+            while self.serialPort.in_waiting():
+                messages.append(self.serialPort.readline().decode().strip())
+                if messages[-1].find("EOF") != -1:
+                    break
 
-            if message[0].find('$b') != -1 or message[0] == 'BOF':
-                pass
-            elif message[0] == 'pos' :
-                data['latitude'] = float(message[1].split(',')[0])
-                data['longitude'] = float(message[1].split(',')[1])
-            elif message[0] == 'Acc' or message[0] == 'Gyr' or message[0] == 'Mag':
-                data[message[0] + 'X'] = float(message[1].split(',')[0].strip())
-                data[message[0] + 'Y'] = float(message[1].split(',')[1].strip())
-                data[message[0] + 'Z'] = float(message[1].split(',')[2].strip())
-            elif message[0] == 'EOF':
-                tag = data['tag']
-                self.serialBroadcast.emit(deepcopy(data))
-                self.data = data
-                data = {}
-                data['tag'] = tag + 1
-                print('Writing to Serial...')
-                self.writeToSerial()
-            else:
-                try:
-                    data[message[0].strip()] = float(message[1].strip())
-                except:
+            # Process each line into a data dictionary
+            for line in messages:
+                message = line.split(':')
+
+                if message[0] == 'BOF':
                     pass
-                    #print(message[0])
+
+                elif message[0] == 'pos':
+                    data['latitude'] = float(message[1].split(',')[0])
+                    data['longitude'] = float(message[1].split(',')[1])
+
+                elif message[0] == 'Acc' or message[0] == 'Gyr' or message[0] == 'Mag':
+                    data[message[0] + 'X'] = float(message[1].split(',')[0].strip())
+                    data[message[0] + 'Y'] = float(message[1].split(',')[1].strip())
+                    data[message[0] + 'Z'] = float(message[1].split(',')[2].strip())
+
+                elif message[0].find('@STANDBY') != -1:
+                    continue
+
+                elif message[0].find('@ARMED') != -1:
+                    continue
+
+                elif message[0] == 'EOF':
+                    # EOF is confirmed
+                    pass
+
+                else:
+                    data['Unknown'] = line
+
+            self.serialBroadcast.emit(deepcopy(data))
+            self.data = deepcopy(data)
+            tag = data['tag']
+            data = {}
+            data['tag'] = tag + 1
+            print('Writing to Serial...')
+            self.writeToSerial()
 
         self.finished.emit()
 
@@ -561,7 +569,15 @@ class UI_MW(QMainWindow, Ui_MainWindow):
             print('[GPS Eval] Exception has occured: ' + str(e))
 
     def transmitCommand(self, com):
-        self.serialReaderObj.tx_buf = com + '\0'
+        try:
+            self.serialReaderObj.tx_buf = com + '\0'
+        except:
+            message = "No serial port selected, please select a COM port."
+            msgBox = QMessageBox()
+            msgBox.setIcon(QMessageBox.Icon.Warning)
+            msgBox.setText(message)
+            msgBox.setWindowTitle('Error')
+            msgBox.exec()
 
     def refreshComPorts(self):
         self.serialPort_CB.clear()

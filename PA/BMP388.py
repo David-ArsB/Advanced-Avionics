@@ -211,7 +211,7 @@ class BMP388(object):
         altitude = 4430769.4 * (1 - pow(pressure / 100.0 / self.groundPressure,
                                          0.190284))
 
-        return (temperature, pressure, altitude)
+        return (temperature/100, pressure/100, altitude/100)
 
     def setGroundPressure(self, pressure = None):
         if pressure == None:
