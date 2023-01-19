@@ -533,6 +533,7 @@ class corePrimaryAircraft():
 
             # Fetch sensor data
             data = core.fetchData()
+            data['STATUS'] = '@ARMED'
             # Ready Data for transmission
             blocks = core.setupDataForTransmission(data)
             # Transmit sensor data to GCS

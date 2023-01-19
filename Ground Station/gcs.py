@@ -140,10 +140,10 @@ class SerialReaderObj(QObject):
                     data[message[0] + 'Z'] = float(message[1].split(',')[2].strip())
 
                 elif message[0].find('@STANDBY') != -1:
-                    continue
+                    data['STATUS'] = '@STANDBY'
 
                 elif message[0].find('@ARMED') != -1:
-                    continue
+                    data['STATUS'] = '@ARMED'
 
                 elif message[0] == 'EOF':
                     # EOF is confirmed
