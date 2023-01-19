@@ -445,7 +445,7 @@ class corePrimaryAircraft():
             vals.append(pressure)
             time.sleep(0.010)
 
-        av = sum(vals)/len(vals)/ num
+        av = sum(vals)/len(vals)
 
         self.altimeter.setGroundPressure(av)
         print(' -> Ground Pressure Level = %.2f Pa' % (av))
