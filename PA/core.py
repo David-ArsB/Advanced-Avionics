@@ -461,8 +461,6 @@ class corePrimaryAircraft():
         lats = []
         longs = []
         alts = []
-        print('TEST')
-        time.sleep(10)
 
         for i in range(num):
             lat, long, altGPS = self.gps.getPosition()
@@ -470,6 +468,8 @@ class corePrimaryAircraft():
             longs.append(long)
             lat.append(altGPS)
             time.sleep(0.3)
+            print('TEST')
+            time.sleep(1.1)
 
         av = [sum(lats) / len(lats) / num,
               sum(longs) / len(longs) / num,
