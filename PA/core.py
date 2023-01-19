@@ -516,7 +516,7 @@ class corePrimaryAircraft():
             if (timeout - dt) > 0:
                 time.sleep(timeout - dt)
 
-        return True
+        return stat
 
     def missionLoop(self, timeout):
         okRecv = 0

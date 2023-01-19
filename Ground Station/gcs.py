@@ -378,6 +378,12 @@ class UI_MW(QMainWindow, Ui_MainWindow):
             return
         error = []
         try:
+            if 'STATUS' in data:
+                if data['STATUS'] == '@ARMED':
+                    pass
+                elif data['STATUS'] == '@STANDBY':
+                    return None
+
             if 'altitude' in data:
                 self.altitude_SB.setValue(data['altitude'])
             else:
