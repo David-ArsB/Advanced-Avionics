@@ -537,7 +537,7 @@ class corePrimaryAircraft():
             data['STATUS'] = '@ARMED'
             # Ready Data for transmission
             blocks = core.setupDataForTransmission(data)
-            print('GROUND PRESSURE: ' + self.altimeter.groundPressure)
+            print('GROUND PRESSURE: ' + str(self.altimeter.groundPressure))
             # Transmit sensor data to GCS
             core.transmitToGCS(blocks)
             # Receive any transmissions from the GCS
