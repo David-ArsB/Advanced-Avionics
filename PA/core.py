@@ -555,6 +555,7 @@ class corePrimaryAircraft():
             dt = time.time() - t1
             print('@Loop dt: ' + str(round(dt, 3)) + ' s')
             print('@GROUND PRESSURE: ' + str(self.altimeter.groundPressure))
+            print(self.ref_origin)
             print('@REF_ORIGIN: %.5f°N, %.5f°E' % (self.ref_origin[0], self.ref_origin[1]))
             if not (timeout - dt) <= 0:
                 time.sleep(timeout - dt)
