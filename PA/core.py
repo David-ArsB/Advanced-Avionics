@@ -524,7 +524,7 @@ class corePrimaryAircraft():
         stat = self.STATUS
 
         while stat.upper() == 'ARMED':
-            self.missionLoop()
+            #self.missionLoop(timeout)
             # Clear terminal on each iteration
             os.system('clear')
             t1 = time.time()
