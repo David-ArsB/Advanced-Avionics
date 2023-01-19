@@ -537,8 +537,7 @@ class corePrimaryAircraft():
             data['STATUS'] = '@ARMED'
             # Ready Data for transmission
             blocks = core.setupDataForTransmission(data)
-            print('GROUND PRESSURE: ' + str(self.altimeter.groundPressure))
-            print(' -> Origin Coordinates: %.5f°N, %.5f°E' % (self.ref_origin[0], self.ref_origin[1]))
+
             # Transmit sensor data to GCS
             core.transmitToGCS(blocks)
             # Receive any transmissions from the GCS
@@ -554,7 +553,9 @@ class corePrimaryAircraft():
             stat = core.processRecv(recv_blocks)
             # Wait a loop timeout before the next transmission
             dt = time.time() - t1
-            print('Loop dt: ' + str(round(dt, 3)) + ' s')
+            print('@Loop dt: ' + str(round(dt, 3)) + ' s')
+            print('@GROUND PRESSURE: ' + str(self.altimeter.groundPressure))
+            print('@REF_ORIGIN: %.5f°N, %.5f°E' % (self.ref_origin[0], self.ref_origin[1]))
             if not (timeout - dt) <= 0:
                 time.sleep(timeout - dt)
 
