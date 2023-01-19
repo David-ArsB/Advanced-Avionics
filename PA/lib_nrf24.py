@@ -372,9 +372,9 @@ class NRF24:
         # ce_pin is for the rx=listen or tx=trigger pin on RF24 (they call that ce !!!)
         # CE optional (at least in some circumstances, eg fixed PTX PRX roles, no powerdown)
         # CE seems to hold itself as (sufficiently) HIGH, but tie HIGH is safer!
-        print('Test 3')
+
         self.spidev.open(0, csn_pin)
-        print('Test 4')
+        
         self.spidev.max_speed_hz = 4000000
         self.ce_pin = ce_pin
 
