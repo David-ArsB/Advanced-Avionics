@@ -466,7 +466,7 @@ class corePrimaryAircraft():
                 lat, long, altGPS = self.gps.getPosition()
                 lats.append(lat)
                 longs.append(long)
-                lat.append(altGPS)
+                alts.append(altGPS)
                 time.sleep(0.3)
         except Exception as e:
             print(e)
