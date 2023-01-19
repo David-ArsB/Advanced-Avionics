@@ -118,7 +118,7 @@ class SerialReaderObj(QObject):
         while self.run:
             messages = []
             # Wait for bytes to enter the serial port and register incoming messages
-            while self.serialPort.in_waiting():
+            while self.serialPort.in_waiting:
                 messages.append(self.serialPort.readline().decode().strip())
                 if messages[-1].find("EOF") != -1:
                     break
@@ -147,18 +147,19 @@ class SerialReaderObj(QObject):
 
                 elif message[0] == 'EOF':
                     # EOF is confirmed
+                    self.serialBroadcast.emit(deepcopy(data))
+                    self.data = deepcopy(data)
+                    tag = data['tag']
+                    data = {}
+                    data['tag'] = tag + 1
+                    print('Writing to Serial...')
+                    self.writeToSerial()
                     pass
 
                 else:
                     data['Unknown'] = line
 
-            self.serialBroadcast.emit(deepcopy(data))
-            self.data = deepcopy(data)
-            tag = data['tag']
-            data = {}
-            data['tag'] = tag + 1
-            print('Writing to Serial...')
-            self.writeToSerial()
+
 
         self.finished.emit()
 

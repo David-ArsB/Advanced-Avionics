@@ -392,7 +392,7 @@ class corePrimaryAircraft():
                         self.setOrigin()
 
                 else:
-                    return False
+                    pass
             except Exception as e:
                 print(e)
 
