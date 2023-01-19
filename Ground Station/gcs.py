@@ -18,7 +18,7 @@ from gui.gui_gcs import Ui_MainWindow
 import serial.tools.list_ports
 
 
-
+# pip install PyQt6-WebEngine required
 
 
 

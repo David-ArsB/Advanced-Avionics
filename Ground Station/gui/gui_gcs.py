@@ -709,3 +709,4 @@ class Ui_MainWindow(object):
         self.actionSaveAs.setText(_translate("MainWindow", "Save As"))
         self.actionCruise_thrust_calculator.setText(_translate("MainWindow", "Cruise thrust calculator"))
 from PyQt6 import QtWebEngineWidgets
+#from PySide6 import QtWebEngineWidgets
