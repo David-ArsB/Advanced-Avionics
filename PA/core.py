@@ -538,6 +538,7 @@ class corePrimaryAircraft():
             # Ready Data for transmission
             blocks = core.setupDataForTransmission(data)
             print('GROUND PRESSURE: ' + str(self.altimeter.groundPressure))
+            print(' -> Origin Coordinates: %.5f°N, %.5f°E' % (self.ref_origin[0], self.ref_origin[1]))
             # Transmit sensor data to GCS
             core.transmitToGCS(blocks)
             # Receive any transmissions from the GCS
