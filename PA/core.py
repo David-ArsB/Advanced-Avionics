@@ -461,6 +461,8 @@ class corePrimaryAircraft():
         lats = []
         longs = []
         alts = []
+        print('TEST')
+        time.sleep(10)
 
         for i in range(num):
             lat, long, altGPS = self.gps.getPosition()
@@ -476,8 +478,7 @@ class corePrimaryAircraft():
 
         self.ref_origin = av
         print(' -> Origin Coordinates: %.5f°N, %.5f°E' % (av[0], av[1]))
-        print(av)
-        time.sleep(10)
+
 
     def waitForMissionBegin(self, timeout):
         """
