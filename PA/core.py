@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Main Code for the Avion Cargo Primary Aircraft Localisation System and Data Acquisition System.
 
@@ -474,7 +475,7 @@ class corePrimaryAircraft():
 
 
         self.ref_origin = av
-
+        print(' -> Origin Coordinates: %.5f°N, %.5f°E' % (av[0], av[1]))
 
 
     def waitForMissionBegin(self, timeout):
