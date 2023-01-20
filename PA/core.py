@@ -489,7 +489,7 @@ class corePrimaryAircraft():
 
         # Wait for a command from the ground station
         stat = self.STATUS
-        print('test')
+
         # Wait for status to change
         while stat.upper() == 'STANDBY':
             # Clear terminal on each iteration
