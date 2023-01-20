@@ -528,10 +528,9 @@ class corePrimaryAircraft():
         okRecv = 0
         failedRecv = 0
         stat = self.STATUS
-        detect_target = False
 
         while stat.upper() == 'ARMED':
-
+            detect_target = True
             # Clear terminal on each iteration
             os.system('clear')
             t1 = time.time()
@@ -545,9 +544,9 @@ class corePrimaryAircraft():
                 data['STATUS'] = '@ARMED'
                 # Ready Data for transmission
                 blocks = core.setupDataForTransmission(data)
+                # Transmit sensor data to GCS
+                core.transmitToGCS(blocks)
 
-            # Transmit sensor data to GCS
-            core.transmitToGCS(blocks)
             # Receive any transmissions from the GCS
             recv_blocks = core.receiveFromGCS(timeout)
 
