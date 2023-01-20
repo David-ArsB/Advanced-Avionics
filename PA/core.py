@@ -521,13 +521,16 @@ class corePrimaryAircraft():
 
         return stat
 
+    def analyse_frame(self):
+        pass
     def missionLoop(self, timeout):
         okRecv = 0
         failedRecv = 0
         stat = self.STATUS
+        detect_target = False
 
         while stat.upper() == 'ARMED':
-            #self.missionLoop(timeout)
+
             # Clear terminal on each iteration
             os.system('clear')
             t1 = time.time()
@@ -535,10 +538,12 @@ class corePrimaryAircraft():
             # core.radio.printDetails()
 
             # Fetch sensor data
-            data = core.fetchData()
-            data['STATUS'] = '@ARMED'
-            # Ready Data for transmission
-            blocks = core.setupDataForTransmission(data)
+            while detect_target:
+                data = core.fetchData()
+                detect_target = self.analyse_frame()
+                data['STATUS'] = '@ARMED'
+                # Ready Data for transmission
+                blocks = core.setupDataForTransmission(data)
 
             # Transmit sensor data to GCS
             core.transmitToGCS(blocks)
