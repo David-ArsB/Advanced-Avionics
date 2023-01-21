@@ -69,6 +69,8 @@ class corePrimaryAircraft():
 
         self.STATUS = 'STANDBY'
         self.altMovAverage = []
+        self.headingMovAverage = []
+
         self.failedRecv = 0
         self.okRecv = 0
 
@@ -189,6 +191,15 @@ class corePrimaryAircraft():
         if heading < 0:
             heading += 360
 
+        if len(self.headingMovAverage) < 15:
+            self.headingMovAverage.append(heading)
+        else:
+            for i in range(len(self.headingMovAverage), 1):
+                self.headingMovAverage[i] = self.headingMovAverage[i-1]
+            self.headingMovAverage[0] = heading
+
+        heading = sum(self.headingMovAverage)/len(self.headingMovAverage)
+
         # Fetch IMU Data
         AccX = self.imu.readACCx()
         AccY = self.imu.readACCy()
@@ -242,7 +253,7 @@ class corePrimaryAircraft():
         block5 = list("altGPS:" + str(altGPS))
         block6 = list("Acc: %.1f,%.1f,%.1f" % (round(AccX, 2), round(AccY, 2), round(AccZ, 2)))
         block7 = list("Gyr: %.1f,%.1f,%.1f" % (round(GyrX, 2), round(GyrY, 2), round(GyrZ, 2)))
-        block8 = list("Mag: %.3f,%.3f,%.3f" % (round(magX, 3), round(magY, 3), round(magZ, 3)))
+        block8 = list("Heading: %.1f" % (round(heading, 1)))
         # ADD COMMAND REPLIES AND REMOVE UNNECESSARY DATA FRAMES
         eof = list('EOF')  # Indicates end of message
 
@@ -338,14 +349,21 @@ class corePrimaryAircraft():
                     if self.STATUS != "ARMED":
                         self.STATUS = 'ARMED'
 
+                        # ARMING represents mission begin; set origins
+                        # Expect a few seconds delay here
+
+                        self.calibrateAltimeter()
+                        origin = self.setOrigin()
+
                         # Indicate to GCS that message has been received and that the
                         # PA computer is ready and ARMED
 
                         header = list('BOF')  # Indicates beginning of message
                         block = list('@ARMED')
+                        block2 = list("*LOC_ORIG:%.5f,%.5f" % (round(origin[0]), round(origin[1])))
                         eof = list('EOF')  # Indicates end of message
 
-                        blocks = [header, block, eof]
+                        blocks = [header, block, block2, eof]
 
                         for block in blocks:
                             while len(block) < self.RADIO_PAYLOAD_SIZE:  # Fill remaining bytes with zeros
@@ -353,12 +371,7 @@ class corePrimaryAircraft():
 
                         self.transmitToGCS(blocks)  # write the message to radio
 
-                        # ARMING represents mission begin; set origins
-                        # Expect a few seconds delay here
 
-                        self.calibrateAltimeter()
-
-                        self.setOrigin()
 
                         # Maybe use isAckPayloadAvailable() to confirm message reception
                 elif recv_comm.find("$KILL") != -1:
@@ -476,6 +489,7 @@ class corePrimaryAircraft():
 
         self.ref_origin = av
         print(' -> Origin Coordinates: %.5f°N, %.5f°E' % (av[0], av[1]))
+        return av
 
 
     def waitForMissionBegin(self, timeout):
@@ -540,8 +554,9 @@ class corePrimaryAircraft():
             # Fetch sensor data
             while detect_target:
                 data = core.fetchData()
-                detect_target = self.analyse_frame()
                 data['STATUS'] = '@ARMED'
+                detect_target = self.analyse_frame()
+
                 # Ready Data for transmission
                 blocks = core.setupDataForTransmission(data)
                 # Transmit sensor data to GCS

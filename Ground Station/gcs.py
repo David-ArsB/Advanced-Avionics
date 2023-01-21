@@ -435,19 +435,13 @@ class UI_MW(QMainWindow, Ui_MainWindow):
             else:
                 error.append('Gyr')
 
-            if 'MagX' in data and 'MagY' in data:
-                magX = data['MagX']
-                magY = data['MagY']
-                heading = atan2(magY, magX) * 180 / pi
-
-                if heading < 0:
-                    heading += 360
-
+            if 'heading' in data :
+                heading = data['heading']
                 self.heading_SB.setValue(heading)
                 #print(heading)
 
             else:
-                error.append('Mag')
+                error.append('heading')
 
             if self.enableLogging_CB.isChecked():
                 currentRow = self.dataTelemLog_TW.rowCount()
