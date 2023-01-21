@@ -191,7 +191,7 @@ class corePrimaryAircraft():
         if heading < 0:
             heading += 360
 
-        if len(self.headingMovAverage) < 15:
+        if len(self.headingMovAverage) < 5:
             self.headingMovAverage.append(heading)
         else:
             for i in range(len(self.headingMovAverage), 1):

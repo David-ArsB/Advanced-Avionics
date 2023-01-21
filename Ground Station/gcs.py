@@ -194,8 +194,8 @@ class UI_MW(QMainWindow, Ui_MainWindow):
         self.success_rate = 0
         self.error_rate = 0
 
-        self.AltitudeDisplay = AltitudeDisplay()
-        self.AltitudeDisplay.show()
+        #self.AltitudeDisplay = AltitudeDisplay()
+        #self.AltitudeDisplay.show()
 
         # Initialize some values
         self.init_def_values()
@@ -213,30 +213,29 @@ class UI_MW(QMainWindow, Ui_MainWindow):
         self.PLOT_FIGURES = {}
         self.dispose = 0
         self.setNewFigure('plotA', self.gridLayout_plotA, True)
-        self.setNewFigure('GPS_Acc', self.gridLayout_plotB, True)
-        self.setNewFigure('Altitude', self.gridLayout_plotC, True)
-
-        fig = self.PLOT_FIGURES['Altitude']['fig']
-        ax = fig.gca()
-        ax.plot([], [], 'o')
-        ax.grid()
-        self.PLOT_FIGURES['Altitude']['canvas'].draw()
+        #self.setNewFigure('GPS_Acc', self.gridLayout_plotB, True)
+        #self.setNewFigure('Altitude', self.gridLayout_plotC, True)
+        #fig = self.PLOT_FIGURES['Altitude']['fig']
+        #ax = fig.gca()
+        #ax.plot([], [], '-o')
+        #ax.grid()
+        #self.PLOT_FIGURES['Altitude']['canvas'].draw()
 
         self.serialPort_CB.clear()
         self.serialPort_CB.addItems(self.serial_ports())
         self.serialPort_CB.setCurrentIndex(1)
         self.setSignals()
 
-        c = (45.517449, -73.784236)
-        m = folium.Map(
-            title='GPS Coordinates',
-            zoom_start=13,
-            location=c
-        )
-        data = io.BytesIO()
-        m.save(data,close_file=False)
-        self.webEngineView.setHtml(data.getvalue().decode())
-        self.map = m
+        #c = (45.517449, -73.784236)
+        #m = folium.Map(
+        #    title='GPS Coordinates',
+        #    zoom_start=13,
+        #    location=c
+        #)
+        #data = io.BytesIO()
+        #m.save(data,close_file=False)
+        #self.webEngineView.setHtml(data.getvalue().decode())
+        #self.map = m
 
         lon1 = -73.78810
         lon2 = -73.77935
@@ -257,11 +256,11 @@ class UI_MW(QMainWindow, Ui_MainWindow):
         ax.grid()
         self.PLOT_FIGURES['plotA']['canvas'].draw()
 
-        fig = self.PLOT_FIGURES['GPS_Acc']['fig']
-        ax = fig.gca()
-        ax.plot([], [], 'ro')
-        ax.grid()
-        self.PLOT_FIGURES['GPS_Acc']['canvas'].draw()
+        #fig = self.PLOT_FIGURES['GPS_Acc']['fig']
+        #ax = fig.gca()
+        #ax.plot([], [], 'ro')
+        #ax.grid()
+        #self.PLOT_FIGURES['GPS_Acc']['canvas'].draw()
 
 
     def init_def_values(self):
@@ -416,6 +415,7 @@ class UI_MW(QMainWindow, Ui_MainWindow):
 
             if 'altitude' in data:
                 self.altitude_SB.setValue(data['altitude'])
+                self.altitude_SB_2.setValue(data['altitude'])
             else:
                 error.append('altitude')
 
@@ -454,13 +454,13 @@ class UI_MW(QMainWindow, Ui_MainWindow):
             else:
                 error.append('Gyr')
 
-            if 'heading' in data :
-                heading = data['heading']
+            if 'Heading' in data :
+                heading = data['Heading']
                 self.heading_SB.setValue(heading)
                 #print(heading)
 
             else:
-                error.append('heading')
+                error.append('Heading')
 
             if self.enableLogging_CB.isChecked():
                 currentRow = self.dataTelemLog_TW.rowCount()
@@ -500,18 +500,21 @@ class UI_MW(QMainWindow, Ui_MainWindow):
                 ax.lines[0].set_xdata(np.append(xdata, data['longitude']))
                 ax.lines[0].set_ydata(np.append(ydata, data['latitude']))
                 self.PLOT_FIGURES['plotA']['canvas'].draw()
+                self.PLOT_FIGURES['plotA']['canvas'].flush_events()
 
-                fig = self.PLOT_FIGURES['Altitude']['fig']
-                ax = fig.gca()
-                xdata = ax.lines[0].get_xdata()
-                ydata = ax.lines[0].get_ydata()
-
-                if len(xdata) != 0:
-                    ax.lines[0].set_xdata(np.append(xdata, xdata[-1]+1))
-                else:
-                    ax.lines[0].set_xdata([1])
-                ax.lines[0].set_ydata(np.append(ydata, data['altitude']))
-                self.PLOT_FIGURES['Altitude']['canvas'].draw()
+                #fig = self.PLOT_FIGURES['Altitude']['fig']
+                #ax = fig.gca()
+                #xdata = ax.lines[0].get_xdata()
+                #ydata = ax.lines[0].get_ydata()
+                #if len(xdata) == 0:
+                #    ax.lines[0].set_xdata([1])
+                #else:
+                #    ax.lines[0].set_xdata(np.append(xdata, xdata[-1]+1))
+                #ax.lines[0].set_ydata(np.append(ydata, data['altitude']))
+                #ax.relim()
+                #ax.autoscale_view()
+                #self.PLOT_FIGURES['Altitude']['canvas'].draw()
+                #self.PLOT_FIGURES['Altitude']['canvas'].flush_events()
 
             self.success_rate += 1
 
@@ -635,6 +638,12 @@ class UI_MW(QMainWindow, Ui_MainWindow):
             ax.lines[0].set_xdata(np.array([]))
             ax.lines[0].set_ydata(np.array([]))
             self.PLOT_FIGURES['plotA']['canvas'].draw()
+
+            fig = self.PLOT_FIGURES['Altitude']['fig']
+            ax = fig.gca()
+            ax.lines[0].set_xdata(np.array([]))
+            ax.lines[0].set_ydata(np.array([]))
+            self.PLOT_FIGURES['Altitude']['canvas'].draw()
 
 
     def setSignals(self):
