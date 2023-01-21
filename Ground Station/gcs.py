@@ -617,6 +617,15 @@ class UI_MW(QMainWindow, Ui_MainWindow):
     def transmitCommand(self, com):
         try:
             self.serialReaderObj.tx_buf = com + '\0'
+            if com =='$ARM':
+                self.armPA_PB.setEnabled(False)
+                self.stdbPA_PB.setEnabled(True)
+            elif com == '$STANDBY':
+                self.stdbPA_PB.setEnabled(False)
+                self.armPA_PB.setEnabled(True)
+
+
+
         except:
             message = "No serial port selected, please select a COM port."
             msgBox = QMessageBox()
@@ -639,11 +648,11 @@ class UI_MW(QMainWindow, Ui_MainWindow):
             ax.lines[0].set_ydata(np.array([]))
             self.PLOT_FIGURES['plotA']['canvas'].draw()
 
-            fig = self.PLOT_FIGURES['Altitude']['fig']
-            ax = fig.gca()
-            ax.lines[0].set_xdata(np.array([]))
-            ax.lines[0].set_ydata(np.array([]))
-            self.PLOT_FIGURES['Altitude']['canvas'].draw()
+            #fig = self.PLOT_FIGURES['Altitude']['fig']
+            #ax = fig.gca()
+            #ax.lines[0].set_xdata(np.array([]))
+            #ax.lines[0].set_ydata(np.array([]))
+            #self.PLOT_FIGURES['Altitude']['canvas'].draw()
 
 
     def setSignals(self):
@@ -656,6 +665,7 @@ class UI_MW(QMainWindow, Ui_MainWindow):
         # Commands
         self.releasePADA_PB.clicked.connect(lambda: self.transmitCommand('$RELEASE'))
         self.armPA_PB.clicked.connect(lambda: self.transmitCommand('$ARM'))
+        self.stdbPA_PB.clicked.connect(lambda: self.transmitCommand('$STANDBY'))
         self.resetPA_PB.clicked.connect(lambda: self.transmitCommand('$RESET'))
         self.calibrateAltimeter_PB.clicked.connect(lambda: self.transmitCommand('$CAL_ALTIMETER'))
 

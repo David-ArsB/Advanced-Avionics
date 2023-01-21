@@ -45,7 +45,15 @@
               </property>
               <layout class="QGridLayout" name="gridLayout_8">
                <item row="0" column="0">
-                <layout class="QGridLayout" name="gridLayout_plotA"/>
+                <layout class="QGridLayout" name="gridLayout_plotA">
+                 <item row="0" column="0">
+                  <widget class="QGroupBox" name="groupBox_5">
+                   <property name="title">
+                    <string>GroupBox</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </item>
               </layout>
              </widget>
@@ -448,7 +456,7 @@
   <widget class="QDockWidget" name="dockWidget_4">
    <property name="minimumSize">
     <size>
-     <width>400</width>
+     <width>444</width>
      <height>809</height>
     </size>
    </property>
@@ -1068,39 +1076,16 @@ background-color: rgb(0, 155, 0);</string>
          <height>100</height>
         </size>
        </property>
+       <property name="font">
+        <font>
+         <pointsize>11</pointsize>
+         <bold>true</bold>
+        </font>
+       </property>
        <property name="title">
         <string>PA Commands</string>
        </property>
        <layout class="QGridLayout" name="gridLayout_19">
-        <item row="2" column="0">
-         <widget class="QPushButton" name="releasePADA_PB">
-          <property name="minimumSize">
-           <size>
-            <width>200</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>200</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>12</pointsize>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">color: rgb(255, 255, 255);
-background-color: rgb(255, 0, 0);</string>
-          </property>
-          <property name="text">
-           <string>RELEASE PADA</string>
-          </property>
-         </widget>
-        </item>
         <item row="1" column="0">
          <widget class="QPushButton" name="resetPA_PB">
           <property name="minimumSize">
@@ -1122,8 +1107,7 @@ background-color: rgb(255, 0, 0);</string>
            </font>
           </property>
           <property name="styleSheet">
-           <string notr="true">color: rgb(255, 255, 255);
-background-color: rgb(255, 0, 0);</string>
+           <string notr="true"/>
           </property>
           <property name="text">
            <string>Reset PA</string>
@@ -1151,11 +1135,69 @@ background-color: rgb(255, 0, 0);</string>
            </font>
           </property>
           <property name="styleSheet">
-           <string notr="true">color: rgb(255, 255, 255);
-background-color: rgb(0, 155, 0);</string>
+           <string notr="true"/>
           </property>
           <property name="text">
-           <string>Begin Mission</string>
+           <string>Set to ARMED</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QPushButton" name="stdbPA_PB">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>200</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>200</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>12</pointsize>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true"/>
+          </property>
+          <property name="text">
+           <string>Set to STANDBY</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QPushButton" name="releasePADA_PB">
+          <property name="minimumSize">
+           <size>
+            <width>200</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>200</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>12</pointsize>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true"/>
+          </property>
+          <property name="text">
+           <string>RELEASE PADA</string>
           </property>
          </widget>
         </item>
