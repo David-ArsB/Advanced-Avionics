@@ -5,9 +5,10 @@ import folium, io
 from Modules.GPSFuncs import distCoordsComponentsSigned
 import numpy as np
 from math import atan2, pi
-from PyQt6.QtWidgets import (QApplication, QMainWindow, QTableWidgetItem, QMessageBox)
+from PyQt6.QtWidgets import (QApplication, QMainWindow, QTableWidgetItem, QMessageBox, QWidget)
 from PyQt6.QtGui import QClipboard
 from PyQt6.QtCore import Qt, QSettings, QDir, QThread, QObject, pyqtSignal as Signal, pyqtSlot as Slot
+
 
 import matplotlib.pyplot as plt
 from matplotlib.ticker import (FormatStrFormatter, LinearLocator)
@@ -15,6 +16,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 
 from gui.gui_gcs import Ui_MainWindow
+from gui.Windows.AltitudeDisplay import Ui_AltitudeDisplay
 
 import serial.tools.list_ports
 
@@ -174,6 +176,12 @@ class SerialReaderObj(QObject):
 
         self.finished.emit()
 
+class AltitudeDisplay(QWidget, Ui_AltitudeDisplay):
+    def __init__(self):
+        super(AltitudeDisplay, self).__init__()
+        self.setupUi(self)
+        self.setWindowTitle("Intructions")
+
 class UI_MW(QMainWindow, Ui_MainWindow):
     serialStartRequested = Signal()
     gpsEvalRequested = Signal()
@@ -185,6 +193,10 @@ class UI_MW(QMainWindow, Ui_MainWindow):
         self.workingDirectory = QDir.current().currentPath()
         self.success_rate = 0
         self.error_rate = 0
+
+        self.AltitudeDisplay = AltitudeDisplay()
+        self.AltitudeDisplay.show()
+
         # Initialize some values
         self.init_def_values()
         self.serialReaderObj = None
@@ -202,6 +214,13 @@ class UI_MW(QMainWindow, Ui_MainWindow):
         self.dispose = 0
         self.setNewFigure('plotA', self.gridLayout_plotA, True)
         self.setNewFigure('GPS_Acc', self.gridLayout_plotB, True)
+        self.setNewFigure('Altitude', self.gridLayout_plotC, True)
+
+        fig = self.PLOT_FIGURES['Altitude']['fig']
+        ax = fig.gca()
+        ax.plot([], [], 'o')
+        ax.grid()
+        self.PLOT_FIGURES['Altitude']['canvas'].draw()
 
         self.serialPort_CB.clear()
         self.serialPort_CB.addItems(self.serial_ports())
@@ -481,6 +500,18 @@ class UI_MW(QMainWindow, Ui_MainWindow):
                 ax.lines[0].set_xdata(np.append(xdata, data['longitude']))
                 ax.lines[0].set_ydata(np.append(ydata, data['latitude']))
                 self.PLOT_FIGURES['plotA']['canvas'].draw()
+
+                fig = self.PLOT_FIGURES['Altitude']['fig']
+                ax = fig.gca()
+                xdata = ax.lines[0].get_xdata()
+                ydata = ax.lines[0].get_ydata()
+
+                if len(xdata) != 0:
+                    ax.lines[0].set_xdata(np.append(xdata, xdata[-1]+1))
+                else:
+                    ax.lines[0].set_xdata([1])
+                ax.lines[0].set_ydata(np.append(ydata, data['altitude']))
+                self.PLOT_FIGURES['Altitude']['canvas'].draw()
 
             self.success_rate += 1
 
