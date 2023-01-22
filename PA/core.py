@@ -579,7 +579,7 @@ class corePrimaryAircraft():
             while detect_target:
                 data = core.fetchData()
                 data['STATUS'] = '@ARMED'
-                data['RecvOk'] = str(recvRate)
+                data['RecvOk'] = recvRate
                 detect_target = self.analyse_frame()
 
                 # Ready Data for transmission
