@@ -155,6 +155,9 @@ class SerialReaderObj(QObject):
                     elif message[0].find('@STANDBY') != -1:
                         data['STATUS'] = '@STANDBY'
 
+                    elif message[0].find('@STANDBY') != -1:
+                        data['STATUS'] = '@STANDBY'
+
                     elif message[0].find('@ARMED') != -1:
                         data['STATUS'] = '@ARMED'
 

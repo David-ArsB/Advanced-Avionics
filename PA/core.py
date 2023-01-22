@@ -252,7 +252,7 @@ class corePrimaryAircraft():
         block1 = list("temperature: %.1f" % round(temperature, 1))
         block2 = list("pressure: %.1f" % round(pressure, 1))
         block3 = list("altitude: %.1f" % round(altitude, 1))
-        block4 = list("posGPS:" + str(lat) + ',' + str(long))
+        block4 = list("pos:" + str(lat) + ',' + str(long))
         block5 = list("posLoc:" + str(locN) + ',' + str(locE))
         block6 = list("altGPS:" + str(altGPS))
         block7 = list("Acc: %.1f,%.1f,%.1f" % (round(AccX, 2), round(AccY, 2), round(AccZ, 2)))
@@ -401,7 +401,23 @@ class corePrimaryAircraft():
                         self.transmitToGCS(blocks)  # write the message to radio
 
                 elif recv_comm.find("$RELEASE") != -1:
-                    pass
+                    # Indicate to GCS that message has been received and that the
+                    # PA computer STATUS is set to STANDBY
+
+                    # Do Release
+
+                    header = list('BOF')  # Indicates beginning of message
+                    block = list('@RELEASE')
+                    eof = list('EOF')  # Indicates end of message
+
+                    blocks = [header, block, eof]
+
+                    for block in blocks:
+                        # Fill remaining bytes with zeros
+                        while len(block) < self.RADIO_PAYLOAD_SIZE:
+                            block.append(0)
+
+                    self.transmitToGCS(blocks)  # write the message to radio
 
                 elif recv_comm.find("$CAL_ALTIMETER") != -1:
                     if self.STATUS == 'STANDBY':
