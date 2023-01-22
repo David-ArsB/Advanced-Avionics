@@ -425,7 +425,7 @@ class corePrimaryAircraft():
                         self.calibrate_altimeter()
 
                 elif recv_comm.find("$CAL_GPS") != -1:
-                    if self.STATUS == 'ARMED':
+                    if self.STATUS != 'ARMED':
                         self.STATUS = 'EXP'
                         self.STATUS = self.gps_measure_error(timeout)
 
