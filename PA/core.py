@@ -241,7 +241,7 @@ class corePrimaryAircraft():
         temperature = data['temperature']
         pressure = data['pressure']
         altitude = data['altitude']
-        magX, magY, magZ = data['mag']
+        #magX, magY, magZ = data['mag']
         heading = data['heading']
         AccX, AccY, AccZ = data['acc']
         GyrX, GyrY, GyrZ = data['gyr']
@@ -249,16 +249,16 @@ class corePrimaryAircraft():
         locN, locE = data['Loc']
 
         header = list('BOF')  # Indicates beginning of message
-        block1 = list("temperature: %.1f" % round(temperature, 1))
-        block2 = list("pressure: %.1f" % round(pressure, 1))
-        block3 = list("altitude: %.1f" % round(altitude, 1))
-        block4 = list("GPSLAT:" + str(round(lat, 6)))
-        block5 = list("GPSLONG:" + str(round(long, 6)))
-        block6 = list("posLoc: %.3f, %.3f" % (locN, locE))
-        block7 = list("altGPS:" + str(round(altGPS, 1)))
-        block8 = list("Acc: %.1f,%.1f,%.1f" % (round(AccX, 2), round(AccY, 2), round(AccZ, 2)))
-        block9 = list("Gyr: %.1f,%.1f,%.1f" % (round(GyrX, 2), round(GyrY, 2), round(GyrZ, 2)))
-        block10 = list("Heading: %.1f" % (round(heading, 1)))
+        block1 = list("TEMP_BARO:%.1f" % round(temperature, 1))
+        block2 = list("PRESS_BARO:%.1f" % round(pressure, 1))
+        block3 = list("ALT_BARO:%.1f" % round(altitude, 1))
+        block4 = list("GPS_LAT:" + str(round(lat, 6)))
+        block5 = list("GPS_LONG:" + str(round(long, 6)))
+        block6 = list("GPS_ALT:" + str(round(altGPS, 1)))
+        block7 = list("LOC_POS:%.3f,%.3f" % (locN, locE))
+        block8 = list("Acc:%.2f,%.2f,%.2f" % (AccX, AccY, AccZ))
+        block9 = list("Gyr:%.1f,%.1f,%.1f" % (GyrX, GyrY, GyrZ))
+        block10 = list("Heading:%.1f" % (round(heading, 1)))
         # ADD COMMAND REPLIES AND REMOVE UNNECESSARY DATA FRAMES
         block11 = list("RecvOk: %.1f" % (data['RecvOk']))
         block12 = list("STATUS: " + data['STATUS'])
@@ -335,7 +335,7 @@ class corePrimaryAircraft():
 
         return recv_blocks
 
-    def processRecv(self, recv_blocks, timeout=0.5):
+    def processRecv(self, recv_blocks, timeout=0.25):
         '''
         Process the received buffer in order to execute a command.
         '''
@@ -477,7 +477,7 @@ class corePrimaryAircraft():
 
         return recv_buffer
 
-    def gps_measure_error(self, timeout):
+    def gps_measure_error(self, timeout=0.25):
         '''
         Just a loop to estimate GPS accuracy and error rate.
         '''

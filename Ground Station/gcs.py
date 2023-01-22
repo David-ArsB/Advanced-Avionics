@@ -143,15 +143,29 @@ class SerialReaderObj(QObject):
                     message = line.split(':')
 
                     if message[0] == 'BOF':
-                        pass
+                        tag = data['tag']
+                        data = {}
+                        data['tag'] = tag + 1
 
-                    elif message[0] == 'GPSLAT':
-                        data['latitude'] = float(message[1])
+                    elif message[0] == 'TEMP_BARO':
+                        data['TEMP_BARO'] = float(message[1])
 
-                    elif message[0] == 'GPSLONG':
-                        data['longitude'] = float(message[1])
+                    elif message[0] == 'PRESS_BARO':
+                        data['PRESS_BARO'] = float(message[1])
 
-                    elif message[0] == 'posLoc':
+                    elif message[0] == 'ALT_BARO':
+                        data['ALT_BARO'] = float(message[1])
+
+                    elif message[0] == 'GPS_LAT':
+                        data['GPS_LAT'] = float(message[1])
+
+                    elif message[0] == 'GPS_LONG':
+                        data['GPS_LONG'] = float(message[1])
+
+                    elif message[0] == 'GPS_ALT':
+                        data['GPS_ALT'] = float(message[1])
+
+                    elif message[0] == 'LOCPOS':
                         data['locN'] = float(message[1].split(',')[0])
                         data['locE'] = float(message[1].split(',')[1])
                         print([data['locN'],data['locE']])
@@ -161,14 +175,14 @@ class SerialReaderObj(QObject):
                         data[message[0] + 'Y'] = float(message[1].split(',')[1].strip())
                         data[message[0] + 'Z'] = float(message[1].split(',')[2].strip())
 
-                    elif message[0].find('RecvOk') != -1:
-                        data['RecvOk'] = float(message[1])
-
                     elif message[0].find('@STANDBY') != -1:
                         data['STATUS'] = '@STANDBY'
 
                     elif message[0].find('@ARMED') != -1:
                         data['STATUS'] = '@ARMED'
+
+                    elif message[0].find('RecvOk') != -1:
+                        data['RecvOk'] = float(message[1])
 
                     elif message[0] == 'EOF':
                         # EOF is confirmed
@@ -441,32 +455,32 @@ class UI_MW(QMainWindow, Ui_MainWindow):
             if 'RecvOk' in data:
                 self.PAReceptionRate_DSB.setValue(data['RecvOk'])
 
-            if 'altitude' in data:
-                self.altitude_SB.setValue(data['altitude'])
-                self.altitude_SB_2.setValue(data['altitude'])
+            if 'ALT_BARO' in data:
+                self.altitude_SB.setValue(data['ALT_BARO'])
+                self.altitude_SB_2.setValue(data['ALT_BARO'])
             else:
-                error.append('altitude')
+                error.append('ALT_BARO')
 
-            if 'pressure' in data:
-                self.pressure_SB.setValue(data['pressure'])
+            if 'PRESS_BARO' in data:
+                self.pressure_SB.setValue(data['PRESS_BARO'])
             else:
-                error.append('pressure')
+                error.append('PRESS_BARO')
 
-            if 'temperature' in data:
-                self.temperature_SB.setValue(data['temperature'])
+            if 'TEMP_BARO' in data:
+                self.temperature_SB.setValue(data['TEMP_BARO'])
             else:
-                error.append('temperature')
+                error.append('TEMP_BARO')
 
-            if 'latitude' in data and 'longitude' in data:
-                self.latitude_SB.setValue(data['latitude'])
-                self.longitude_SB.setValue(data['longitude'])
+            if 'GPS_LAT' in data and 'GPS_LONG' in data:
+                self.latitude_SB.setValue(data['GPS_LAT'])
+                self.longitude_SB.setValue(data['GPS_LONG'])
             else:
-                error.append('GPS_pos')
+                error.append('GPS_POS')
 
-            if 'altGPS' in data:
-                self.altitudeGPS_SB.setValue(data['altGPS'])
+            if 'GPS_ALT' in data:
+                self.altitudeGPS_SB.setValue(data['GPS_ALT'])
             else:
-                error.append('altGPS')
+                error.append('GPS_ALT')
 
             if 'AccX' in data and 'AccY' in data and 'AccZ' in data:
                 self.ax_SB.setValue(data['AccX'])
