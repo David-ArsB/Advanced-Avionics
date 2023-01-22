@@ -1,10 +1,8 @@
 import sys, time
-import glob, serial
+import serial
 from copy import deepcopy
-import folium, io
 from Modules.GPSFuncs import distCoordsComponentsSigned
 import numpy as np
-from math import atan2, pi
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QTableWidgetItem, QMessageBox, QWidget)
 from PyQt6.QtGui import QClipboard
 from PyQt6.QtCore import Qt, QSettings, QDir, QThread, QObject, pyqtSignal as Signal, pyqtSlot as Slot
@@ -419,16 +417,20 @@ class UI_MW(QMainWindow, Ui_MainWindow):
         try:
             if 'STATUS' in data:
                 if data['STATUS'] == '@ARMED':
-                    self.PAstat_LE.setText(data['STATUS'])
-                    pass
+                    if self.PAstat_LE.text() == '@STANDBY':
+                        self.PAstat_LE.setText(data['STATUS'])
+                        self.armPA_PB.setEnabled(False)
+                        self.stdbPA_PB.setEnabled(True)
+
                 elif data['STATUS'] == '@STANDBY':
-                    self.PAstat_LE.setText(data['STATUS'])
+                    if self.PAstat_LE.text() == '@ARMED':
+                        self.PAstat_LE.setText(data['STATUS'])
+                        self.armPA_PB.setEnabled(True)
+                        self.stdbPA_PB.setEnabled(False)
                     return None
 
             if 'RecvOk' in data:
                 self.PAReceptionRate_DSB.setValue(data['RecvOk'])
-            else:
-                self.PAReceptionRate_DSB.setValue(0)
 
             if 'altitude' in data:
                 self.altitude_SB.setValue(data['altitude'])
@@ -532,6 +534,7 @@ class UI_MW(QMainWindow, Ui_MainWindow):
                 #ax.autoscale_view()
                 #self.PLOT_FIGURES['Altitude']['canvas'].draw()
                 #self.PLOT_FIGURES['Altitude']['canvas'].flush_events()
+
             fig = self.PLOT_FIGURES['plotA']['fig']
             ax = fig.gca()
             xdata = ax.lines[0].get_xdata()
@@ -694,6 +697,8 @@ class UI_MW(QMainWindow, Ui_MainWindow):
         self.stdbPA_PB.clicked.connect(lambda: self.transmitCommand('$STANDBY'))
         self.resetPA_PB.clicked.connect(lambda: self.transmitCommand('$RESET'))
         self.calibrateAltimeter_PB.clicked.connect(lambda: self.transmitCommand('$CAL_ALTIMETER'))
+        self.calibrateGPS_PB.clicked.connect(lambda: self.transmitCommand('$CAL_GPS'))
+
 
 def except_hook(cls, exception, traceback):
     sys.__excepthook__(cls, exception, traceback)

@@ -4,15 +4,18 @@ Main Code for the Avion Cargo Primary Aircraft Localisation System and Data Acqu
 
 """
 # TODO: - Kalman filtering, 3dim (x-y-z) to track movement (& tilt?) and positioning more accurately
-#       - Increase sensor reading frequency to 5 Htz.
-#       - Shield radio units
+#       - Increase sensor reading frequency to 5 Htz. (check!)
+#       - Shield radio units (check!)
 #       - Work on communication reliability and robustness
-#       - Dedicated PSU for radio units
+#       - Dedicated PSU for radio units (check!)
 #       - Target positioning and computer vision
 
 
 # General modules
 import sys, os, smbus, time
+
+import numpy as np
+
 from misc import detect_model
 import spidev # import SPI
 from math import pi, atan2
@@ -83,8 +86,7 @@ class corePrimaryAircraft():
         Ground pressure is used to calibrate the altimeter.
         """
         print('Setting up altimeter (BMP388) ...')
-        self.calibrateAltimeter()
-
+        self.calibrate_altimeter()
 
     def _initIMU(self):
         print('Setting up IMU (LSM6DSL) ...')
@@ -128,7 +130,7 @@ class corePrimaryAircraft():
         print('Setting up GPS thread ...')
         self.gps.start()
 
-    def kill(self):
+    def _kill(self):
         self.gps.running = False
         self.gps.join()  # wait for the thread to finish what it's doing
         sys.exit()
@@ -220,7 +222,6 @@ class corePrimaryAircraft():
         data['gyr'] = [GyrX, GyrY, GyrZ]
         data['GPS'] = [lat, long, altGPS-self.ref_origin[-1]]
         loc_coords = distCoords2(self.ref_origin[:-1], data['GPS'][:-1])
-        print(loc_coords)
         data['Loc'] = [loc_coords[0], loc_coords[1]]
 
         self.data = data
@@ -247,8 +248,6 @@ class corePrimaryAircraft():
         lat, long, altGPS = data['GPS']
         locN, locE = data['Loc']
 
-        numBlocks = 9
-        # header = list('$b' + str(int(numBlocks)) + ',tph' + ',lat' + ',long')
         header = list('BOF')  # Indicates beginning of message
         block1 = list("temperature: %.1f" % round(temperature, 1))
         block2 = list("pressure: %.1f" % round(pressure, 1))
@@ -269,7 +268,6 @@ class corePrimaryAircraft():
         for block in blocks:
             while len(block) < self.RADIO_PAYLOAD_SIZE: # Fill remaining bytes with zeros
                 block.append(0)
-
 
         return blocks
 
@@ -334,7 +332,7 @@ class corePrimaryAircraft():
 
         return recv_blocks
 
-    def processRecv(self, recv_blocks):
+    def processRecv(self, recv_blocks, timeout=0.5):
         '''
         Process the received buffer in order to execute a command.
         '''
@@ -359,8 +357,8 @@ class corePrimaryAircraft():
                         # ARMING represents mission begin; set origins
                         # Expect a few seconds delay here
 
-                        self.calibrateAltimeter()
-                        origin = self.setOrigin()
+                        self.calibrate_altimeter()
+                        origin = self.set_origin()
 
                         # Indicate to GCS that message has been received and that the
                         # PA computer is ready and ARMED
@@ -382,7 +380,7 @@ class corePrimaryAircraft():
 
                         # Maybe use isAckPayloadAvailable() to confirm message reception
                 elif recv_comm.find("$KILL") != -1:
-                    self.kill()
+                    self._kill()
 
                 elif recv_comm.find("$STANDBY") != -1:
                     if self.STATUS != "STANDBY":
@@ -424,11 +422,16 @@ class corePrimaryAircraft():
 
                 elif recv_comm.find("$CAL_ALTIMETER") != -1:
                     if self.STATUS == 'STANDBY':
-                        self.calibrateAltimeter()
+                        self.calibrate_altimeter()
+
+                elif recv_comm.find("$CAL_GPS") != -1:
+                    if self.STATUS == 'ARMED':
+                        self.STATUS = 'EXP'
+                        self.STATUS = self.gps_measure_error(timeout)
 
                 elif recv_comm.find("$SET_ORIGIN") != -1:
                     if self.STATUS == 'STANDBY':
-                        self.setOrigin()
+                        self.set_origin()
 
                 else:
                     pass
@@ -470,7 +473,68 @@ class corePrimaryAircraft():
 
         return recv_buffer
 
-    def calibrateAltimeter(self, num=100):
+    def gps_measure_error(self, timeout):
+        '''
+        Just a loop to estimate GPS accuracy and error rate.
+        '''
+
+        stat = self.STATUS
+        count = 0
+        data = np.zeros((0, 2))
+
+        while stat.upper() == 'EXP' and count < 100:
+            t1 = time.time()
+
+            # Fetch GPS Data
+            lat, long, altGPS = self.gps.getPosition()
+
+            if lat is None or long is None:
+                input('GPS FIX LOST - Aborting... \n\nPress Enter to continue...')
+                stat = 'STANDBY'
+                return stat
+
+            data = np.append(data, np.array([[lat, long]]), axis=0)
+
+            # Indicate to GCS PA computer status
+            header = list('BOF')  # Indicates beginning of message
+            block = list('@EXP')
+            eof = list('EOF')  # Indicates end of message
+
+            blocks = [header, block, eof]
+
+            for block in blocks:
+                while len(block) < self.RADIO_PAYLOAD_SIZE:  # Fill remaining bytes with zeros
+                    block.append(0)
+
+            self.transmitToGCS(blocks)  # Write the message to radio
+
+            # Receive any transmissions from the GCS
+            recv_blocks = core.receiveFromGCS(timeout)
+
+            # Process the received buffer from the GCS
+            stat = core.processRecv(recv_blocks)
+
+            # Wait a loop timeout before the next transmission
+            dt = time.time() - t1
+            if not (timeout - dt) <= 0:
+                time.sleep(timeout - dt)
+
+            count += 1
+
+        # Process Data
+        CEP = 0.59 * (np.std(data[:, 0]) + np.std(data[:, 1]))
+        r95 = 2.08 * CEP
+
+        input("GPS Evaluation complete!\n -> CEP is " + str(CEP) + " m\n -> r95 is " + str(r95) +
+              " m\n\nPress Enter to continue...")
+
+        stat = 'STANDBY'
+
+        return stat
+
+
+
+    def calibrate_altimeter(self, num=100):
         '''
         Calibrate the altimeter so that the current pressure readings is equal to 0m of altitude.
         Grabs 100 measurements. Cannot be used if vehicle status is "ARMED".
@@ -488,7 +552,7 @@ class corePrimaryAircraft():
         self.altimeter.setGroundPressure(av)
         print(' -> Ground Pressure Level = %.2f Pa' % (av))
 
-    def setOrigin(self, num=10):
+    def set_origin(self, num=10):
         '''
         Set the origin coordinates of the local navigational reference frame (LNRF).
         It is used to calculate the position of the Primary Aircraft in the LNRF.
@@ -514,8 +578,7 @@ class corePrimaryAircraft():
         print(' -> Origin Coordinates: %.5f°N, %.5f°E' % (av[0], av[1]))
         return av
 
-
-    def waitForMissionBegin(self, timeout):
+    def wait_for_mission_begin(self, timeout):
         """
         Wait for mission begin. Mission begins when the radio reads a '$ARM' command.
         Once this command is received, the radio sends a '@ARMED' confirmation message.
@@ -560,26 +623,39 @@ class corePrimaryAircraft():
         return stat
 
     def analyse_frame(self):
-        pass
-    def missionLoop(self, timeout):
+        return False
+    def mission_loop(self, timeout):
+        '''
+        Main mission loop. Runs while vehicle state is "ARMED". Monitors incoming messages and commands.
+        Fetches sensor data and camera images. Analyses each camera frame to test whether the target can be seen.
+        If the target is detected within a frame, the PA will enter an unconstrained loop in order to repeat reading
+        sensor data and analyse camera frames to maximize target visibility.
+        '''
+
         okRecv = 0
         failedRecv = 0
         stat = self.STATUS
         recvRate = 0
 
+        # only run the mission loop while the system is armed
         while stat.upper() == 'ARMED':
-            detect_target = True
+
             # Clear terminal on each iteration
             os.system('clear')
             t1 = time.time()
-            # core.printDataSummary()
-            # core.radio.printDetails()
 
-            # Fetch sensor data
+            # Assume that the target will be in the next frame
+            # so that we engage the loop at least once
+            detect_target = True
             while detect_target:
+                # Fetch sensor data
                 data = core.fetchData()
+
+                # Add Status and Radio Reception information
                 data['STATUS'] = '@ARMED'
                 data['RecvOk'] = recvRate
+
+                # Analyse one frame from the camera, returns false if nothing is seen
                 detect_target = self.analyse_frame()
 
                 # Ready Data for transmission
@@ -590,22 +666,26 @@ class corePrimaryAircraft():
             # Receive any transmissions from the GCS
             recv_blocks = core.receiveFromGCS(timeout)
 
-            if recv_blocks == None:
+            # Calculate reception rate (a message from GCS is expected every loop)
+            if recv_blocks is None:
                 failedRecv += 1
             else:
                 okRecv += 1
-
             recvRate = round((okRecv) / (okRecv + failedRecv) * 100, 1)
             print('Success Rate: ' + str(recvRate) + '%\n')
+
             # Process the received buffer from the GCS
             stat = core.processRecv(recv_blocks)
+
             # Wait a loop timeout before the next transmission
             dt = time.time() - t1
+            if not (timeout - dt) <= 0:
+                time.sleep(timeout - dt)
+
+            # print some information
             print('@Loop dt: ' + str(round(dt, 3)) + ' s\n')
             print('@GROUND PRESSURE: ' + str(self.altimeter.groundPressure))
             print('@REF_ORIGIN: %.5f°N, %.5f°E' % (self.ref_origin[0], self.ref_origin[1]))
-            if not (timeout - dt) <= 0:
-                time.sleep(timeout - dt)
 
         return stat
     def main(self):
@@ -621,11 +701,11 @@ class corePrimaryAircraft():
                     # Enter mission loop;
                     # Begins sending sensor data to GCS
                     # Engage Navigation and Computer Vision
-                    stat = self.missionLoop(timeout)
+                    stat = self.mission_loop(timeout)
 
                 elif stat.upper() == 'STANDBY':
                     # Wait for '$ARM' command from GCS
-                    stat = self.waitForMissionBegin(timeout)
+                    stat = self.wait_for_mission_begin(timeout)
 
                 else:
                     pass

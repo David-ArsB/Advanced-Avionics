@@ -2,7 +2,7 @@ from numpy import pi,sin,cos,arccos,arcsin,sqrt
 import math
 
 def radius (lat):
-    lat=math.radians(lat) #converting into radians
+    lat = math.radians(lat) #converting into radians
     a = 6378.137  #Radius at sea level at equator
     b = 6356.752  #Radius at poles
     c = (a**2*math.cos(lat))**2
@@ -111,11 +111,12 @@ def orientation(cd1, cd2 ):
     print(message)
     # N dlat ; E dlon -> ex: (N 10deg ; E 20deg)
 
-cd1 = [45.51741984466869, -73.78359957335857]
-cd2 = [45.5177399722043, -73.78382801187195]
-earthRadii = radius((cd1[0]+cd2[0])/2) #Km #EARTH RADII VARIES BASED ON LATITUDE
-altitude = 0.233
-print(distCoords(cd1,cd2))
-print(distCoords2(cd1,cd2))
-orientation(cd1,cd2)
+if __name__ == "__main__":
+    cd1 = [45.51741984466869, -73.78359957335857]
+    cd2 = [45.5177399722043, -73.78382801187195]
+    earthRadii = radius((cd1[0]+cd2[0])/2) #Km #EARTH RADII VARIES BASED ON LATITUDE
+    altitude = 0.233
+    print(distCoords(cd1,cd2))
+    print(distCoords2(cd1,cd2))
+    orientation(cd1,cd2)
 
