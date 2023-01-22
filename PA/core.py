@@ -37,7 +37,7 @@ from LIS3MDL import LIS3MDL # Import Compass module
 from lib_nrf24 import NRF24 # Import Radio module
 from GPSPoller import GpsPoller
 
-
+from nav_math import distCoords2
 
 class corePrimaryAircraft():
 
@@ -218,7 +218,9 @@ class corePrimaryAircraft():
         data['heading'] = heading
         data['acc'] = [AccX, AccY, AccZ]
         data['gyr'] = [GyrX, GyrY, GyrZ]
-        data['GPS'] = [lat, long, altGPS]
+        data['GPS'] = [lat, long, altGPS-self.ref_origin[-1]]
+        loc_coords = distCoords2(self.ref_origin[:-2], data['GPS'][:-2])
+        data['Loc'] = [loc_coords[0], loc_coords[1]]
 
         self.data = data
 
@@ -242,6 +244,7 @@ class corePrimaryAircraft():
         AccX, AccY, AccZ = data['acc']
         GyrX, GyrY, GyrZ = data['gyr']
         lat, long, altGPS = data['GPS']
+        locN, locE = data['Loc']
 
         numBlocks = 9
         # header = list('$b' + str(int(numBlocks)) + ',tph' + ',lat' + ',long')
@@ -249,15 +252,16 @@ class corePrimaryAircraft():
         block1 = list("temperature: %.1f" % round(temperature, 1))
         block2 = list("pressure: %.1f" % round(pressure, 1))
         block3 = list("altitude: %.1f" % round(altitude, 1))
-        block4 = list("pos:" + str(lat) + ',' + str(long))
-        block5 = list("altGPS:" + str(altGPS))
-        block6 = list("Acc: %.1f,%.1f,%.1f" % (round(AccX, 2), round(AccY, 2), round(AccZ, 2)))
-        block7 = list("Gyr: %.1f,%.1f,%.1f" % (round(GyrX, 2), round(GyrY, 2), round(GyrZ, 2)))
-        block8 = list("Heading: %.1f" % (round(heading, 1)))
+        block4 = list("posGPS:" + str(lat) + ',' + str(long))
+        block5 = list("posLoc:" + str(locN) + ',' + str(locE))
+        block6 = list("altGPS:" + str(altGPS))
+        block7 = list("Acc: %.1f,%.1f,%.1f" % (round(AccX, 2), round(AccY, 2), round(AccZ, 2)))
+        block8 = list("Gyr: %.1f,%.1f,%.1f" % (round(GyrX, 2), round(GyrY, 2), round(GyrZ, 2)))
+        block9 = list("Heading: %.1f" % (round(heading, 1)))
         # ADD COMMAND REPLIES AND REMOVE UNNECESSARY DATA FRAMES
         eof = list('EOF')  # Indicates end of message
 
-        blocks = [header, block1, block2, block3, block4, block5, block6, block7, block8, eof]
+        blocks = [header, block1, block2, block3, block4, block5, block6, block7, block8, block9, eof]
 
         for block in blocks:
             while len(block) < self.RADIO_PAYLOAD_SIZE: # Fill remaining bytes with zeros

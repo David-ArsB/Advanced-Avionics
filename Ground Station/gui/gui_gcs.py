@@ -101,7 +101,7 @@ class Ui_MainWindow(object):
         self.gridLayout_24 = QtWidgets.QGridLayout()
         self.gridLayout_24.setObjectName("gridLayout_24")
         self.groupBox_9 = QtWidgets.QGroupBox(self.tab)
-        self.groupBox_9.setMinimumSize(QtCore.QSize(0, 100))
+        self.groupBox_9.setMinimumSize(QtCore.QSize(300, 100))
         self.groupBox_9.setObjectName("groupBox_9")
         self.gridLayout_22 = QtWidgets.QGridLayout(self.groupBox_9)
         self.gridLayout_22.setObjectName("gridLayout_22")

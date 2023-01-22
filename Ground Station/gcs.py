@@ -132,47 +132,53 @@ class SerialReaderObj(QObject):
 
             # Process each line into a data dictionary
             for line in messages:
-                message = line.split(':')
+                try:
+                    message = line.split(':')
 
-                if message[0] == 'BOF':
-                    pass
+                    if message[0] == 'BOF':
+                        pass
 
-                elif message[0] == 'pos':
-                    data['latitude'] = float(message[1].split(',')[0])
-                    data['longitude'] = float(message[1].split(',')[1])
+                    elif message[0] == 'pos':
+                        data['latitude'] = float(message[1].split(',')[0])
+                        data['longitude'] = float(message[1].split(',')[1])
 
-                elif message[0] == 'Acc' or message[0] == 'Gyr' or message[0] == 'Mag':
-                    data[message[0] + 'X'] = float(message[1].split(',')[0].strip())
-                    data[message[0] + 'Y'] = float(message[1].split(',')[1].strip())
-                    data[message[0] + 'Z'] = float(message[1].split(',')[2].strip())
+                    elif message[0] == 'posLoc':
+                        data['locN'] = float(message[1].split(',')[0])
+                        data['locE'] = float(message[1].split(',')[1])
+                        print([data['locN'],data['locE']])
 
-                elif message[0].find('@STANDBY') != -1:
-                    data['STATUS'] = '@STANDBY'
+                    elif message[0] == 'Acc' or message[0] == 'Gyr' or message[0] == 'Mag':
+                        data[message[0] + 'X'] = float(message[1].split(',')[0].strip())
+                        data[message[0] + 'Y'] = float(message[1].split(',')[1].strip())
+                        data[message[0] + 'Z'] = float(message[1].split(',')[2].strip())
 
-                elif message[0].find('@ARMED') != -1:
-                    data['STATUS'] = '@ARMED'
+                    elif message[0].find('@STANDBY') != -1:
+                        data['STATUS'] = '@STANDBY'
 
-                elif message[0] == 'EOF':
-                    # EOF is confirmed
-                    self.serialBroadcast.emit(deepcopy(data))
-                    self.data = deepcopy(data)
-                    tag = data['tag']
-                    data = {}
-                    data['tag'] = tag + 1
-                    print('Writing to Serial...\n')
-                    self.writeToSerial()
-                    pass
+                    elif message[0].find('@ARMED') != -1:
+                        data['STATUS'] = '@ARMED'
 
-                else:
-                    try:
-                        if is_number(message[1]):
-                            data[message[0]] = float(message[1])
-                        else:
-                            data[message[0]] = message[1]
-                    except:
-                        data['Unknown'] = line
+                    elif message[0] == 'EOF':
+                        # EOF is confirmed
+                        self.serialBroadcast.emit(deepcopy(data))
+                        self.data = deepcopy(data)
+                        tag = data['tag']
+                        data = {}
+                        data['tag'] = tag + 1
+                        print('Writing to Serial...\n')
+                        self.writeToSerial()
+                        pass
 
-
+                    else:
+                        try:
+                            if is_number(message[1]):
+                                data[message[0]] = float(message[1])
+                            else:
+                                data[message[0]] = message[1]
+                        except:
+                            data['Unknown'] = line
+                except Exception as e:
+                    print(e)
 
         self.finished.emit()
 
@@ -462,7 +468,7 @@ class UI_MW(QMainWindow, Ui_MainWindow):
             else:
                 error.append('Heading')
 
-            if self.enableLogging_CB.isChecked():
+            if self.enableLogging_CB.isChecked() and False:
                 currentRow = self.dataTelemLog_TW.rowCount()
 
                 self.dataTelemLog_TW.setRowCount(currentRow + 1)
@@ -486,9 +492,9 @@ class UI_MW(QMainWindow, Ui_MainWindow):
                 newitem = QTableWidgetItem(str(round(heading, 1)))
                 newitem.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
                 self.dataTelemLog_TW.setItem(currentRow, 4, newitem)
-                self.dataTelemLog_TW.resizeColumnsToContents()
+                #self.dataTelemLog_TW.resizeColumnsToContents()
 
-                self.dataTelemLog_TW.show()
+                #self.dataTelemLog_TW.show()
 
                 #currentColumn = self.dataTelemLog_TW.columnCount() + 1
 
@@ -669,8 +675,11 @@ class UI_MW(QMainWindow, Ui_MainWindow):
         self.resetPA_PB.clicked.connect(lambda: self.transmitCommand('$RESET'))
         self.calibrateAltimeter_PB.clicked.connect(lambda: self.transmitCommand('$CAL_ALTIMETER'))
 
+def except_hook(cls, exception, traceback):
+    sys.__excepthook__(cls, exception, traceback)
 
 if __name__ == "__main__":
+    sys.excepthook = except_hook
     app = QApplication(sys.argv)
     win = UI_MW()
     win.show()
