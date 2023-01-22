@@ -260,9 +260,11 @@ class corePrimaryAircraft():
         block8 = list("Gyr: %.1f,%.1f,%.1f" % (round(GyrX, 2), round(GyrY, 2), round(GyrZ, 2)))
         block9 = list("Heading: %.1f" % (round(heading, 1)))
         # ADD COMMAND REPLIES AND REMOVE UNNECESSARY DATA FRAMES
+        block10 = list("RecvOk: %.1f" % (data['RecvOk']))
+        block11 = list("STATUS: " + data['STATUS'])
         eof = list('EOF')  # Indicates end of message
 
-        blocks = [header, block1, block2, block3, block4, block5, block6, block7, block8, block9, eof]
+        blocks = [header, block1, block2, block3, block4, block5, block6, block7, block8, block9, block10, block11, eof]
 
         for block in blocks:
             while len(block) < self.RADIO_PAYLOAD_SIZE: # Fill remaining bytes with zeros
@@ -576,6 +578,7 @@ class corePrimaryAircraft():
             while detect_target:
                 data = core.fetchData()
                 data['STATUS'] = '@ARMED'
+                data['RecvOk'] = str(round((okRecv) / (okRecv + failedRecv) * 100, 1))
                 detect_target = self.analyse_frame()
 
                 # Ready Data for transmission

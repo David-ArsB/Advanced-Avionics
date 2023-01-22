@@ -154,8 +154,8 @@ class SerialReaderObj(QObject):
                         data[message[0] + 'Y'] = float(message[1].split(',')[1].strip())
                         data[message[0] + 'Z'] = float(message[1].split(',')[2].strip())
 
-                    elif message[0].find('@STANDBY') != -1:
-                        data['STATUS'] = '@STANDBY'
+                    elif message[0].find('RecvOk') != -1:
+                        data['RecvOk'] = float(message[1])
 
                     elif message[0].find('@STANDBY') != -1:
                         data['STATUS'] = '@STANDBY'
@@ -420,11 +420,14 @@ class UI_MW(QMainWindow, Ui_MainWindow):
         try:
             if 'STATUS' in data:
                 if data['STATUS'] == '@ARMED':
+                    self.PAstat_LE.setText(data['STATUS'])
                     pass
                 elif data['STATUS'] == '@STANDBY':
+                    self.PAstat_LE.setText(data['STATUS'])
                     return None
-
-            if 'altitude' in data:
+            elif 'RecvOk' in data:
+                self.PAReceptionRate_DSB.setValue(data['RecvOk'])
+            elif 'altitude' in data:
                 self.altitude_SB.setValue(data['altitude'])
                 self.altitude_SB_2.setValue(data['altitude'])
             else:
