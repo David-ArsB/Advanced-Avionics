@@ -126,7 +126,10 @@ class SerialReaderObj(QObject):
             messages = []
             # Wait for bytes to enter the serial port and register incoming messages
             while self.serialPort.in_waiting:
-                messages.append(self.serialPort.readline().decode().strip())
+                inLine = self.serialPort.readline()
+                print(inLine)
+                inLine= inLine.decode().strip()
+                messages.append(inLine)
                 if messages[-1].find("EOF") != -1:
                     break
 
