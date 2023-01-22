@@ -407,6 +407,7 @@ class corePrimaryAircraft():
 
                     # Do Release
 
+
                     header = list('BOF')  # Indicates beginning of message
                     block = list('@RELEASE')
                     eof = list('EOF')  # Indicates end of message
@@ -483,6 +484,8 @@ class corePrimaryAircraft():
         data = np.zeros((0, 2))
 
         while stat.upper() == 'EXP' and count < 100:
+            # Clear terminal on each iteration
+            os.system('clear')
             t1 = time.time()
 
             # Fetch GPS Data
@@ -594,6 +597,7 @@ class corePrimaryAircraft():
         while stat.upper() == 'STANDBY':
             # Clear terminal on each iteration
             os.system('clear')
+            print('\nstatus: ' + self.STATUS+'\n')
 
             # Start timer
             t1 = time.time()
@@ -641,6 +645,7 @@ class corePrimaryAircraft():
         while stat.upper() == 'ARMED':
 
             # Clear terminal on each iteration
+            print('\nstatus: ' + self.STATUS + '\n')
             os.system('clear')
             t1 = time.time()
 
