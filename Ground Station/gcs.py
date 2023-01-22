@@ -119,6 +119,8 @@ class SerialReaderObj(QObject):
     def readSerial(self):
         data = {}
         data['tag'] = 1
+        t1 = time.time()
+        writes = 0
 
         while self.run:
 
@@ -145,6 +147,8 @@ class SerialReaderObj(QObject):
                         tag = data['tag']
                         data = {}
                         data['tag'] = tag + 1
+                        #self.writeToSerial()
+                        #writes += 1
 
                     elif message[0] == 'TEMP_BARO':
                         data['TEMP_BARO'] = float(message[1])
@@ -189,6 +193,8 @@ class SerialReaderObj(QObject):
                         self.data = deepcopy(data)
                         print('Writing to Serial...\n')
                         self.writeToSerial()
+                        writes += 1
+                        print('write frequency is '+ str(writes/(time.time()-t1)))
 
                     else:
                         try:
@@ -566,7 +572,7 @@ class UI_MW(QMainWindow, Ui_MainWindow):
             #self.PLOT_FIGURES['plotA']['canvas'].draw()
             #self.PLOT_FIGURES['plotA']['canvas'].flush_events()
 
-            self.success_rate += 1
+            #self.success_rate += 1
 
             print('Success Rate: '+str((self.success_rate)/(self.success_rate+self.error_rate))+'\n')
 

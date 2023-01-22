@@ -104,7 +104,7 @@ void transmitToPA(void){
       //}
     
       for (int i = 0; i < 32 ; i++) {
-        message2Transmit[i] = 0;
+        message2Transmit[i] = '\0';
       }
     }
 

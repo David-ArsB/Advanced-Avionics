@@ -312,7 +312,7 @@ class corePrimaryAircraft():
         t1 = time.time()
         while len(recv_blocks) == 0:
             # Check for timeout...
-            if (time.time() - t1) > timeout:
+            if (time.time() - t1) > timeout+0.1:
                 print('Heard nothing from ground station...')
 
                 return None  # Leave function if nothing received
@@ -363,6 +363,7 @@ class corePrimaryAircraft():
 
                         self.calibrate_altimeter()
                         origin = self.set_origin()
+                        time.sleep(1)
 
                         # Indicate to GCS that message has been received and that the
                         # PA computer is ready and ARMED
@@ -376,7 +377,7 @@ class corePrimaryAircraft():
 
                         for block in blocks:
                             while len(block) < self.RADIO_PAYLOAD_SIZE:  # Fill remaining bytes with zeros
-                                block.append(0)
+                                block.append('\0')
 
                         self.transmitToGCS(blocks)  # write the message to radio
 
@@ -401,7 +402,7 @@ class corePrimaryAircraft():
                         for block in blocks:
                             # Fill remaining bytes with zeros
                             while len(block) < self.RADIO_PAYLOAD_SIZE:
-                                block.append(0)
+                                block.append('\0')
 
                         self.transmitToGCS(blocks)  # write the message to radio
 
@@ -512,7 +513,7 @@ class corePrimaryAircraft():
 
             for block in blocks:
                 while len(block) < self.RADIO_PAYLOAD_SIZE:  # Fill remaining bytes with zeros
-                    block.append(0)
+                    block.append('\0')
 
             self.transmitToGCS(blocks)  # Write the message to radio
 
@@ -616,7 +617,7 @@ class corePrimaryAircraft():
 
             for block in blocks:
                 while len(block) < self.RADIO_PAYLOAD_SIZE:  # Fill remaining bytes with zeros
-                    block.append(0)
+                    block.append('\0')
 
             self.transmitToGCS(blocks)  # Write the message to radio
 
