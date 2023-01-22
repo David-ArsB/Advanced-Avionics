@@ -254,7 +254,7 @@ class corePrimaryAircraft():
         block2 = list("pressure: %.1f" % round(pressure, 1))
         block3 = list("altitude: %.1f" % round(altitude, 1))
         block4 = list("pos:" + str(lat) + ',' + str(long))
-        block5 = list("posLoc: %.3f, %.3f" % (round(locN), round(locE)))
+        block5 = list("posLoc: %.3f, %.3f" % (locN, locE))
         block6 = list("altGPS:" + str(altGPS))
         block7 = list("Acc: %.1f,%.1f,%.1f" % (round(AccX, 2), round(AccY, 2), round(AccZ, 2)))
         block8 = list("Gyr: %.1f,%.1f,%.1f" % (round(GyrX, 2), round(GyrY, 2), round(GyrZ, 2)))

@@ -146,6 +146,7 @@ class SerialReaderObj(QObject):
                     elif message[0] == 'posLoc':
                         data['locN'] = float(message[1].split(',')[0])
                         data['locE'] = float(message[1].split(',')[1])
+                        print(message[1])
                         print([data['locN'],data['locE']])
 
                     elif message[0] == 'Acc' or message[0] == 'Gyr' or message[0] == 'Mag':
