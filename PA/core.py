@@ -645,8 +645,9 @@ class corePrimaryAircraft():
         while stat.upper() == 'ARMED':
 
             # Clear terminal on each iteration
-            print('\nstatus: ' + self.STATUS + '\n')
             os.system('clear')
+
+            print('\nstatus: ' + self.STATUS + '\n')
             t1 = time.time()
 
             # Assume that the target will be in the next frame
