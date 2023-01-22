@@ -26,16 +26,13 @@ def distCoords(cd1,cd2):
     lat2 = cd2[0] / 180 * pi
     long2 = cd2[1] / 180 * pi
 
-    pt1 = [lat2, long1]
-    pt2 = [lat1, long2]
-
     # Haversine formula
     dlon = long2 - long1
     dlat = lat2 - lat1
     a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
 
     c = 2 * arcsin(sqrt(a))
-
+    earthRadii = radius((lat1+lat2)/2)
 
     # calculate the result
     return c * earthRadii*1000
