@@ -256,8 +256,8 @@ class corePrimaryAircraft():
         block5 = list("GPS_LONG:" + str(round(long, 6)))
         block6 = list("GPS_ALT:" + str(round(altGPS, 1)))
         block7 = list("LOC_POS:%.3f,%.3f" % (locN, locE))
-        block8 = list("Acc:%.2f,%.2f,%.2f" % (AccX, AccY, AccZ))
-        block9 = list("Gyr:%.1f,%.1f,%.1f" % (GyrX, GyrY, GyrZ))
+        #block8 = list("Acc:%.2f,%.2f,%.2f" % (AccX, AccY, AccZ))
+        #block9 = list("Gyr:%.1f,%.1f,%.1f" % (GyrX, GyrY, GyrZ))
         block10 = list("Heading:%.1f" % (round(heading, 1)))
         # ADD COMMAND REPLIES AND REMOVE UNNECESSARY DATA FRAMES
         block11 = list("RecvOk: %.1f" % (data['RecvOk']))
@@ -265,7 +265,7 @@ class corePrimaryAircraft():
         eof = list('EOF')  # Indicates end of message
 
         blocks = [header, block1, block2, block3, block4,
-                  block5, block6, block7, block8, block9,
+                  block5, block6, block7, 
                   block10, block11, block12, eof]
 
         for block in blocks:
@@ -312,7 +312,7 @@ class corePrimaryAircraft():
         t1 = time.time()
         while len(recv_blocks) == 0:
             # Check for timeout...
-            if (time.time() - t1) > timeout+0.1:
+            if (time.time() - t1) > timeout:
                 print('Heard nothing from ground station...')
 
                 return None  # Leave function if nothing received
