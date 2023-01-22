@@ -146,7 +146,6 @@ class SerialReaderObj(QObject):
                     elif message[0] == 'posLoc':
                         data['locN'] = float(message[1].split(',')[0])
                         data['locE'] = float(message[1].split(',')[1])
-                        print(message[1])
                         print([data['locN'],data['locE']])
 
                     elif message[0] == 'Acc' or message[0] == 'Gyr' or message[0] == 'Mag':
@@ -425,9 +424,13 @@ class UI_MW(QMainWindow, Ui_MainWindow):
                 elif data['STATUS'] == '@STANDBY':
                     self.PAstat_LE.setText(data['STATUS'])
                     return None
-            elif 'RecvOk' in data:
+
+            if 'RecvOk' in data:
                 self.PAReceptionRate_DSB.setValue(data['RecvOk'])
-            elif 'altitude' in data:
+            else:
+                self.PAReceptionRate_DSB.setValue(0)
+
+            if 'altitude' in data:
                 self.altitude_SB.setValue(data['altitude'])
                 self.altitude_SB_2.setValue(data['altitude'])
             else:
