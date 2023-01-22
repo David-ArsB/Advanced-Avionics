@@ -126,9 +126,7 @@ class SerialReaderObj(QObject):
             messages = []
             # Wait for bytes to enter the serial port and register incoming messages
             while self.serialPort.in_waiting:
-                inLine = self.serialPort.readline()
-                print(inLine)
-                inLine= inLine.decode().strip()
+                inLine = self.serialPort.readline().decode().strip()
                 messages.append(inLine)
                 if messages[-1].find("EOF") != -1:
                     break
@@ -527,6 +525,15 @@ class UI_MW(QMainWindow, Ui_MainWindow):
                 #ax.autoscale_view()
                 #self.PLOT_FIGURES['Altitude']['canvas'].draw()
                 #self.PLOT_FIGURES['Altitude']['canvas'].flush_events()
+            fig = self.PLOT_FIGURES['plotA']['fig']
+            ax = fig.gca()
+            xdata = ax.lines[0].get_xdata()
+            ydata = ax.lines[0].get_ydata()
+
+            ax.lines[0].set_xdata(np.append(xdata, data['longitude']))
+            ax.lines[0].set_ydata(np.append(ydata, data['latitude']))
+            self.PLOT_FIGURES['plotA']['canvas'].draw()
+            self.PLOT_FIGURES['plotA']['canvas'].flush_events()
 
             self.success_rate += 1
 
