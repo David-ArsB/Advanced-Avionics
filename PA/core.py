@@ -219,7 +219,7 @@ class corePrimaryAircraft():
         data['acc'] = [AccX, AccY, AccZ]
         data['gyr'] = [GyrX, GyrY, GyrZ]
         data['GPS'] = [lat, long, altGPS-self.ref_origin[-1]]
-        loc_coords = distCoords2(self.ref_origin[:-2], data['GPS'][:-2])
+        loc_coords = distCoords2(self.ref_origin[:-1], data['GPS'][:-1])
         data['Loc'] = [loc_coords[0], loc_coords[1]]
 
         self.data = data
