@@ -513,15 +513,15 @@ class UI_MW(QMainWindow, Ui_MainWindow):
                 newitem.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
                 self.dataTelemLog_TW.setItem(currentRow, 0, newitem)
                 # Column 1: Altitude
-                newitem = QTableWidgetItem(str(data['altitude']))
+                newitem = QTableWidgetItem(str(data['ALT_BARO']))
                 newitem.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
                 self.dataTelemLog_TW.setItem(currentRow, 1, newitem)
                 # Column 2: GPS Latitude
-                newitem = QTableWidgetItem(str(data['latitude']))
+                newitem = QTableWidgetItem(str(data['GPS_LAT']))
                 newitem.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
                 self.dataTelemLog_TW.setItem(currentRow, 2, newitem)
                 # Column 3: GPS Longitude
-                newitem = QTableWidgetItem(str(data['longitude']))
+                newitem = QTableWidgetItem(str(data['GPS_LONG']))
                 newitem.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
                 self.dataTelemLog_TW.setItem(currentRow, 3, newitem)
                 # Column 4: Heading
@@ -563,8 +563,8 @@ class UI_MW(QMainWindow, Ui_MainWindow):
             xdata = ax.lines[0].get_xdata()
             ydata = ax.lines[0].get_ydata()
 
-            ax.lines[0].set_xdata(np.append(xdata, data['longitude']))
-            ax.lines[0].set_ydata(np.append(ydata, data['latitude']))
+            ax.lines[0].set_xdata(np.append(xdata, data['GPS_LONG']))
+            ax.lines[0].set_ydata(np.append(ydata, data['GPS_ALT']))
             self.PLOT_FIGURES['plotA']['canvas'].draw()
             self.PLOT_FIGURES['plotA']['canvas'].flush_events()
 
