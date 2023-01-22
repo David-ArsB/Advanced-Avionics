@@ -145,9 +145,11 @@ class SerialReaderObj(QObject):
                     if message[0] == 'BOF':
                         pass
 
-                    elif message[0] == 'pos':
-                        data['latitude'] = float(message[1].split(',')[0])
-                        data['longitude'] = float(message[1].split(',')[1])
+                    elif message[0] == 'GPSLAT':
+                        data['latitude'] = float(message[1])
+
+                    elif message[0] == 'GPSLONG':
+                        data['longitude'] = float(message[1])
 
                     elif message[0] == 'posLoc':
                         data['locN'] = float(message[1].split(',')[0])

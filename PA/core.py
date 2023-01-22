@@ -252,18 +252,21 @@ class corePrimaryAircraft():
         block1 = list("temperature: %.1f" % round(temperature, 1))
         block2 = list("pressure: %.1f" % round(pressure, 1))
         block3 = list("altitude: %.1f" % round(altitude, 1))
-        block4 = list("posLAT:" + str(round(lat, 5)) + ',' + str(round(long, 5)))
-        block5 = list("posLoc: %.3f, %.3f" % (locN, locE))
-        block6 = list("altGPS:" + str(round(altGPS, 1)))
-        block7 = list("Acc: %.1f,%.1f,%.1f" % (round(AccX, 2), round(AccY, 2), round(AccZ, 2)))
-        block8 = list("Gyr: %.1f,%.1f,%.1f" % (round(GyrX, 2), round(GyrY, 2), round(GyrZ, 2)))
-        block9 = list("Heading: %.1f" % (round(heading, 1)))
+        block4 = list("GPSLAT:" + str(round(lat, 6)))
+        block5 = list("GPSLONG:" + str(round(long, 6)))
+        block6 = list("posLoc: %.3f, %.3f" % (locN, locE))
+        block7 = list("altGPS:" + str(round(altGPS, 1)))
+        block8 = list("Acc: %.1f,%.1f,%.1f" % (round(AccX, 2), round(AccY, 2), round(AccZ, 2)))
+        block9 = list("Gyr: %.1f,%.1f,%.1f" % (round(GyrX, 2), round(GyrY, 2), round(GyrZ, 2)))
+        block10 = list("Heading: %.1f" % (round(heading, 1)))
         # ADD COMMAND REPLIES AND REMOVE UNNECESSARY DATA FRAMES
-        block10 = list("RecvOk: %.1f" % (data['RecvOk']))
-        block11 = list("STATUS: " + data['STATUS'])
+        block11 = list("RecvOk: %.1f" % (data['RecvOk']))
+        block12 = list("STATUS: " + data['STATUS'])
         eof = list('EOF')  # Indicates end of message
 
-        blocks = [header, block1, block2, block3, block4, block5, block6, block7, block8, block9, block10, block11, eof]
+        blocks = [header, block1, block2, block3, block4,
+                  block5, block6, block7, block8, block9,
+                  block10, block11, block12, eof]
 
         for block in blocks:
             while len(block) < self.RADIO_PAYLOAD_SIZE: # Fill remaining bytes with zeros
