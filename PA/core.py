@@ -336,7 +336,7 @@ class corePrimaryAircraft():
 
         return recv_blocks
 
-    def processRecv(self, recv_blocks, timeout=0.25):
+    def processRecv(self, recv_blocks):
         '''
         Process the received buffer in order to execute a command.
         '''
@@ -432,7 +432,7 @@ class corePrimaryAircraft():
                 elif recv_comm.find("$CAL_GPS") != -1:
                     if self.STATUS != 'ARMED':
                         self.STATUS = 'EXP'
-                        self.STATUS = self.gps_measure_error(timeout)
+                        self.STATUS = self.gps_measure_error(1)
 
                 elif recv_comm.find("$SET_ORIGIN") != -1:
                     if self.STATUS == 'STANDBY':
@@ -478,7 +478,7 @@ class corePrimaryAircraft():
 
         return recv_buffer
 
-    def gps_measure_error(self, timeout=0.25):
+    def gps_measure_error(self, timeout=1):
         '''
         Just a loop to estimate GPS accuracy and error rate.
         '''
@@ -490,6 +490,7 @@ class corePrimaryAircraft():
         while stat.upper() == 'EXP' and count < 100:
             # Clear terminal on each iteration
             os.system('clear')
+            print('\nstatus: ' + self.STATUS + '\n')
             t1 = time.time()
 
             # Fetch GPS Data

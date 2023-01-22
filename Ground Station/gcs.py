@@ -121,21 +121,20 @@ class SerialReaderObj(QObject):
         data['tag'] = 1
 
         while self.run:
+
             messages = []
             # Wait for bytes to enter the serial port and register incoming messages
             while self.serialPort.in_waiting:
                 inLine = self.serialPort.readline()
                 try:
                     inLine = inLine.decode().strip()
+                    messages.append(inLine)
+                    if messages[-1].find("EOF") != -1:
+                        break
 
                 except:
                     print('Failed to decode: ')
                     print(inLine)
-
-                messages.append(inLine)
-                if messages[-1].find("EOF") != -1:
-                    break
-
 
             # Process each line into a data dictionary
             for line in messages:
@@ -188,9 +187,6 @@ class SerialReaderObj(QObject):
                         # EOF is confirmed
                         self.serialBroadcast.emit(deepcopy(data))
                         self.data = deepcopy(data)
-                        tag = data['tag']
-                        data = {}
-                        data['tag'] = tag + 1
                         print('Writing to Serial...\n')
                         self.writeToSerial()
 
@@ -204,6 +200,8 @@ class SerialReaderObj(QObject):
                             data['Unknown'] = line
                 except Exception as e:
                     print(e)
+
+
 
         self.finished.emit()
 
@@ -437,15 +435,16 @@ class UI_MW(QMainWindow, Ui_MainWindow):
         if len(data) == 1:
             return
         error = []
+
         try:
             if 'STATUS' in data:
-                if data['STATUS'] == '@ARMED':
+                if data['STATUS'].find('@ARMED') !=-1:
                     if self.PAstat_LE.text() == '@STANDBY':
                         self.PAstat_LE.setText(data['STATUS'])
                         self.armPA_PB.setEnabled(False)
                         self.stdbPA_PB.setEnabled(True)
 
-                elif data['STATUS'] == '@STANDBY':
+                elif data['STATUS'].find('@STANDBY') !=-1:
                     if self.PAstat_LE.text() == '@ARMED':
                         self.PAstat_LE.setText(data['STATUS'])
                         self.armPA_PB.setEnabled(True)
@@ -558,15 +557,14 @@ class UI_MW(QMainWindow, Ui_MainWindow):
                 #self.PLOT_FIGURES['Altitude']['canvas'].draw()
                 #self.PLOT_FIGURES['Altitude']['canvas'].flush_events()
 
-            fig = self.PLOT_FIGURES['plotA']['fig']
-            ax = fig.gca()
-            xdata = ax.lines[0].get_xdata()
-            ydata = ax.lines[0].get_ydata()
-
-            ax.lines[0].set_xdata(np.append(xdata, data['GPS_LONG']))
-            ax.lines[0].set_ydata(np.append(ydata, data['GPS_ALT']))
-            self.PLOT_FIGURES['plotA']['canvas'].draw()
-            self.PLOT_FIGURES['plotA']['canvas'].flush_events()
+            #fig = self.PLOT_FIGURES['plotA']['fig']
+            #ax = fig.gca()
+            #xdata = ax.lines[0].get_xdata()
+            #ydata = ax.lines[0].get_ydata()
+            #ax.lines[0].set_xdata(np.append(xdata, data['GPS_LONG']))
+            #ax.lines[0].set_ydata(np.append(ydata, data['GPS_ALT']))
+            #self.PLOT_FIGURES['plotA']['canvas'].draw()
+            #self.PLOT_FIGURES['plotA']['canvas'].flush_events()
 
             self.success_rate += 1
 
