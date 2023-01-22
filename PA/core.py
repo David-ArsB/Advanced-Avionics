@@ -271,7 +271,7 @@ class corePrimaryAircraft():
         for block in blocks:
             print(str(block) + '//' + str(len(block)))
             while len(block) < self.RADIO_PAYLOAD_SIZE: # Fill remaining bytes with zeros
-                block.append(0)
+                block.append('\0')
 
         return blocks
 
