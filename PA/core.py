@@ -565,6 +565,7 @@ class corePrimaryAircraft():
         okRecv = 0
         failedRecv = 0
         stat = self.STATUS
+        recvRate = 0
 
         while stat.upper() == 'ARMED':
             detect_target = True
@@ -578,7 +579,7 @@ class corePrimaryAircraft():
             while detect_target:
                 data = core.fetchData()
                 data['STATUS'] = '@ARMED'
-                data['RecvOk'] = str(round((okRecv) / (okRecv + failedRecv) * 100, 1))
+                data['RecvOk'] = str(recvRate)
                 detect_target = self.analyse_frame()
 
                 # Ready Data for transmission
@@ -594,7 +595,8 @@ class corePrimaryAircraft():
             else:
                 okRecv += 1
 
-            print('Success Rate: ' + str(round((okRecv) / (okRecv + failedRecv) * 100, 1)) + '%\n')
+            recvRate = round((okRecv) / (okRecv + failedRecv) * 100, 1)
+            print('Success Rate: ' + str(recvRate) + '%\n')
             # Process the received buffer from the GCS
             stat = core.processRecv(recv_blocks)
             # Wait a loop timeout before the next transmission
