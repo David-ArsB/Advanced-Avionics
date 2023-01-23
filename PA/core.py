@@ -210,7 +210,7 @@ class corePrimaryAircraft():
         GyrY = self.imu.readGYRy()
         GyrZ = self.imu.readGYRz()
         # Fetch GPS Data
-        lat, long, altGPS = self.gps.getPosition()
+        lat, long, altGPS = [0,0,0]#self.gps.getPosition()
 
         data = {}
         data['temperature'] = temperature
@@ -728,7 +728,7 @@ class corePrimaryAircraft():
 
             except (KeyboardInterrupt, SystemExit):  # When you press ctrl+c
                 print("\nKilling Core...")
-                sys.exit()
+
                 return False
 
 
