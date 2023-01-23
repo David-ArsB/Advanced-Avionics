@@ -118,96 +118,91 @@ class SerialReaderObj(QObject):
     @Slot()
     def readSerial(self):
         data = {}
-        data['tag'] = 1
+        dataTagOld = 1
+        data['tag'] = dataTagOld
         t1 = time.time()
         writes = 0
 
         while self.run:
 
             messages = []
+            done = False
             # Wait for bytes to enter the serial port and register incoming messages
-            while self.serialPort.in_waiting:
-                inLine = self.serialPort.readline()
-                try:
-                    inLine = inLine.decode().strip()
-                    messages.append(inLine)
-                    if messages[-1].find("EOF") != -1:
-                        break
+            while not done:
+                if self.serialPort.in_waiting:
+                    inLine = self.serialPort.readline()
+                    try:
+                        inLine = inLine.decode().strip()
+                        messages.append(inLine)
+                        if messages[-1].find("EOF") != -1:
+                            done = True
 
-                except:
-                    print('Failed to decode: ')
-                    print(inLine)
+                    except:
+                        print('Failed to decode: ')
+                        print(inLine)
 
             # Process each line into a data dictionary
             for line in messages:
-                try:
-                    message = line.split(':')
+                message = line.split(':')
 
-                    if message[0] == 'BOF':
-                        tag = data['tag']
-                        data = {}
-                        data['tag'] = tag + 1
-                        #self.writeToSerial()
-                        #writes += 1
+                if message[0] == 'BOF':
+                    tag = data['tag']
+                    data = {}
+                    data['tag'] = tag + 1
+                    #self.writeToSerial()
+                    #writes += 1
 
-                    elif message[0] == 'TEMP_BARO':
-                        data['TEMP_BARO'] = float(message[1])
+                elif message[0] == 'TEMP_BARO':
+                    data['TEMP_BARO'] = float(message[1])
 
-                    elif message[0] == 'PRESS_BARO':
-                        data['PRESS_BARO'] = float(message[1])
+                elif message[0] == 'PRESS_BARO':
+                    data['PRESS_BARO'] = float(message[1])
 
-                    elif message[0] == 'ALT_BARO':
-                        data['ALT_BARO'] = float(message[1])
+                elif message[0] == 'ALT_BARO':
+                    data['ALT_BARO'] = float(message[1])
 
-                    elif message[0] == 'GPS_LAT':
-                        data['GPS_LAT'] = float(message[1])
+                elif message[0] == 'GPS_LAT':
+                    data['GPS_LAT'] = float(message[1])
 
-                    elif message[0] == 'GPS_LONG':
-                        data['GPS_LONG'] = float(message[1])
+                elif message[0] == 'GPS_LONG':
+                    data['GPS_LONG'] = float(message[1])
 
-                    elif message[0] == 'GPS_ALT':
-                        data['GPS_ALT'] = float(message[1])
+                elif message[0] == 'GPS_ALT':
+                    data['GPS_ALT'] = float(message[1])
 
-                    elif message[0] == 'LOCPOS':
-                        data['locN'] = float(message[1].split(',')[0])
-                        data['locE'] = float(message[1].split(',')[1])
-                        print([data['locN'],data['locE']])
+                elif message[0] == 'LOCPOS':
+                    data['locN'] = float(message[1].split(',')[0])
+                    data['locE'] = float(message[1].split(',')[1])
+                    print([data['locN'],data['locE']])
 
-                    elif message[0] == 'Acc' or message[0] == 'Gyr' or message[0] == 'Mag':
-                        data[message[0] + 'X'] = float(message[1].split(',')[0].strip())
-                        data[message[0] + 'Y'] = float(message[1].split(',')[1].strip())
-                        data[message[0] + 'Z'] = float(message[1].split(',')[2].strip())
+                elif message[0] == 'Acc' or message[0] == 'Gyr' or message[0] == 'Mag':
+                    data[message[0] + 'X'] = float(message[1].split(',')[0].strip())
+                    data[message[0] + 'Y'] = float(message[1].split(',')[1].strip())
+                    data[message[0] + 'Z'] = float(message[1].split(',')[2].strip())
 
-                    elif message[0].find('@STANDBY') != -1:
-                        data['STATUS'] = '@STANDBY'
+                elif message[0].find('@STANDBY') != -1:
+                    data['STATUS'] = '@STANDBY'
 
-                    elif message[0].find('@ARMED') != -1:
-                        data['STATUS'] = '@ARMED'
+                elif message[0].find('@ARMED') != -1:
+                    data['STATUS'] = '@ARMED'
 
-                    elif message[0].find('RecvOk') != -1:
-                        data['RecvOk'] = float(message[1])
+                elif message[0].find('RecvOk') != -1:
+                    data['RecvOk'] = float(message[1])
 
-                    elif message[0] == 'EOF':
-                        # EOF is confirmed
-                        self.serialBroadcast.emit(deepcopy(data))
-                        self.data = deepcopy(data)
-                        print('Writing to Serial...\n')
-                        self.writeToSerial()
-                        writes += 1
-                        print('write frequency is '+ str(writes/(time.time()-t1)))
+                elif message[0] == 'EOF':
+                    # EOF is confirmed
+                    self.serialBroadcast.emit(deepcopy(data))
+                    print('Writing to Serial...\n')
+                    self.writeToSerial()
 
-                    else:
-                        try:
-                            if is_number(message[1]):
-                                data[message[0]] = float(message[1])
-                            else:
-                                data[message[0]] = message[1]
-                        except:
-                            data['Unknown'] = line
-                except Exception as e:
-                    print(e)
-
-
+                else:
+                    try:
+                        if is_number(message[1]):
+                            data[message[0]] = float(message[1])
+                        else:
+                            data[message[0]] = message[1]
+                    except:
+                        data['Unknown'] = line
 
         self.finished.emit()
 
@@ -412,10 +407,15 @@ class UI_MW(QMainWindow, Ui_MainWindow):
                 msgBox.setWindowTitle('Success')
                 msgBox.exec()
                 return True
+
             elif self.serialPort.is_open:
 
                 self.serialReaderObj.run = False
+                # Stop the previous thread and reset
+                self.serialReaderThread.exit()
+                self.serialReaderThread.wait()
                 self.serialReaderObj = None
+                self.serialReaderThread = None
                 self.serialPort.close()
                 self.serialPort = None
                 self.connectSerialButton.setText('Connect')

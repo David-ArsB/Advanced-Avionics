@@ -256,8 +256,8 @@ class corePrimaryAircraft():
         block5 = list("GPS_LONG:" + str(round(long, 6)))
         block6 = list("GPS_ALT:" + str(round(altGPS, 1)))
         block7 = list("LOC_POS:%.3f,%.3f" % (locN, locE))
-        #block8 = list("Acc:%.2f,%.2f,%.2f" % (AccX, AccY, AccZ))
-        #block9 = list("Gyr:%.1f,%.1f,%.1f" % (GyrX, GyrY, GyrZ))
+        block8 = list("Acc:%.2f,%.2f,%.2f" % (AccX, AccY, AccZ))
+        block9 = list("Gyr:%.1f,%.1f,%.1f" % (GyrX, GyrY, GyrZ))
         block10 = list("Heading:%.1f" % (round(heading, 1)))
         # ADD COMMAND REPLIES AND REMOVE UNNECESSARY DATA FRAMES
         block11 = list("RecvOk: %.1f" % (data['RecvOk']))
@@ -265,7 +265,7 @@ class corePrimaryAircraft():
         eof = list('EOF')  # Indicates end of message
 
         blocks = [header, block1, block2, block3, block4,
-                  block5, block6, block7, 
+                  block5, block6, block7, block8, block9,
                   block10, block11, block12, eof]
 
         for block in blocks:
@@ -534,6 +534,10 @@ class corePrimaryAircraft():
         CEP = 0.59 * (np.std(data[:, 0]) + np.std(data[:, 1]))
         r95 = 2.08 * CEP
 
+        # Convert to meters
+        CEP = distCoords2([0, 0], [CEP, 0])[0]
+        r95 = distCoords2([0, 0], [r95, 0])[0]
+
         input("GPS Evaluation complete!\n -> CEP is " + str(CEP) + " m\n -> r95 is " + str(r95) +
               " m\n\nPress Enter to continue...")
 
@@ -724,6 +728,7 @@ class corePrimaryAircraft():
 
             except (KeyboardInterrupt, SystemExit):  # When you press ctrl+c
                 print("\nKilling Core...")
+                sys.exit()
                 return False
 
 
