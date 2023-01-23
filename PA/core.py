@@ -210,7 +210,7 @@ class corePrimaryAircraft():
         GyrY = self.imu.readGYRy()
         GyrZ = self.imu.readGYRz()
         # Fetch GPS Data
-        lat, long, altGPS = [45.517430, -73.784169,0]#self.gps.getPosition()
+        lat, long, altGPS = self.gps.getPosition()
 
         data = {}
         data['temperature'] = temperature
