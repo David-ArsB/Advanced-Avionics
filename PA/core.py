@@ -268,10 +268,6 @@ class corePrimaryAircraft():
                   block5, block6, block7, block8, block9,
                   block10, block11, block12, eof]
 
-        for block in blocks:
-            print(str(block) + '//' + str(len(block)))
-            while len(block) < self.RADIO_PAYLOAD_SIZE: # Fill remaining bytes with zeros
-                block.append('\0')
 
         return blocks
 
@@ -279,14 +275,18 @@ class corePrimaryAircraft():
         '''
         Transmits sensor data to ground station.
 
-        The nRF24L01+ module can only send a maximum of 32 bytes at a time (i.e one block).
+        The nRF24L01+ module can only send a maximum of 32 bytes at a time (i.e. one block).
         Sensor information must be split in blocks of 32 bytes.
         Header block sends information concerning message structure and contents.
-        One transmission is concluded by an 'EOF' message.
+        One transmission is ALWAYS concluded by an 'EOF' message.
 
         :return: None
         '''
 
+        # Fill remaining bytes with null bytes
+        for block in blocks:
+            while len(block) < self.RADIO_PAYLOAD_SIZE:
+                block.append('\0')
 
         print('Transmitting to ground station...\n')
 
@@ -348,7 +348,6 @@ class corePrimaryAircraft():
                 recv_comm = ''.join(str(e) for e in recv_buffer)
                 if recv_comm.find("$RESET") != -1:
                     # To Define
-                    # Put core in 'STANDBY' mode
                     pass
 
                 elif recv_comm.find("$ARM") != -1:
@@ -358,6 +357,19 @@ class corePrimaryAircraft():
                     if self.STATUS != "ARMED":
                         self.STATUS = 'ARMED'
 
+                        # Indicate to GCS that message has been received and that the
+                        # PA computer is ready and ARMED
+
+                        header = list('BOF')  # Indicates beginning of message
+                        block = list('STATUS: @ARMED')
+                        block2 = list('CONF: @ARMED')
+                        block3 = list("*LOC_ORIG:%.5f,%.5f" % (round(origin[0]), round(origin[1])))
+                        eof = list('EOF')  # Indicates end of message
+
+                        blocks = [header, block, block2, block3, eof]
+
+                        self.transmitToGCS(blocks)  # write the message to radio
+
                         # ARMING represents mission begin; set origins
                         # Expect a few seconds delay here
 
@@ -365,25 +377,8 @@ class corePrimaryAircraft():
                         origin = self.set_origin()
                         time.sleep(1)
 
-                        # Indicate to GCS that message has been received and that the
-                        # PA computer is ready and ARMED
-
-                        header = list('BOF')  # Indicates beginning of message
-                        block = list('@ARMED')
-                        block2 = list("*LOC_ORIG:%.5f,%.5f" % (round(origin[0]), round(origin[1])))
-                        eof = list('EOF')  # Indicates end of message
-
-                        blocks = [header, block, block2, eof]
-
-                        for block in blocks:
-                            while len(block) < self.RADIO_PAYLOAD_SIZE:  # Fill remaining bytes with zeros
-                                block.append('\0')
-
-                        self.transmitToGCS(blocks)  # write the message to radio
 
 
-
-                        # Maybe use isAckPayloadAvailable() to confirm message reception
                 elif recv_comm.find("$KILL") != -1:
                     self._kill()
 
@@ -394,15 +389,11 @@ class corePrimaryAircraft():
                         # Indicate to GCS that message has been received and that the
                         # PA computer STATUS is set to STANDBY
                         header = list('BOF')  # Indicates beginning of message
-                        block = list('@STANDBY')
+                        block = list('STATUS: @STANDBY')
+                        block2 = list('CONF: @STANDBY')
                         eof = list('EOF')  # Indicates end of message
 
-                        blocks = [header, block, eof]
-
-                        for block in blocks:
-                            # Fill remaining bytes with zeros
-                            while len(block) < self.RADIO_PAYLOAD_SIZE:
-                                block.append('\0')
+                        blocks = [header, block, block2, eof]
 
                         self.transmitToGCS(blocks)  # write the message to radio
 
@@ -414,7 +405,7 @@ class corePrimaryAircraft():
 
 
                     header = list('BOF')  # Indicates beginning of message
-                    block = list('@RELEASE')
+                    block = list('CONF: @RELEASE')
                     eof = list('EOF')  # Indicates end of message
 
                     blocks = [header, block, eof]
@@ -511,10 +502,6 @@ class corePrimaryAircraft():
 
             blocks = [header, block, eof]
 
-            for block in blocks:
-                while len(block) < self.RADIO_PAYLOAD_SIZE:  # Fill remaining bytes with zeros
-                    block.append('\0')
-
             self.transmitToGCS(blocks)  # Write the message to radio
 
             # Receive any transmissions from the GCS
@@ -544,8 +531,6 @@ class corePrimaryAircraft():
         stat = 'STANDBY'
 
         return stat
-
-
 
     def calibrate_altimeter(self, num=100):
         '''
@@ -614,14 +599,10 @@ class corePrimaryAircraft():
 
             # Indicate to GCS that PA computer is ready and waiting for commands
             header = list('BOF')  # Indicates beginning of message
-            block = list('@STANDBY')
+            block = list('STATUS: @STANDBY')
             eof = list('EOF')  # Indicates end of message
 
             blocks = [header, block, eof]
-
-            for block in blocks:
-                while len(block) < self.RADIO_PAYLOAD_SIZE:  # Fill remaining bytes with zeros
-                    block.append('\0')
 
             self.transmitToGCS(blocks)  # Write the message to radio
 

@@ -103,17 +103,18 @@ class SerialReaderObj(QObject):
         self.thread = None
         self.run = True
         self.data = {}
-        self.tx_buf = None
+        self.tx_buf = []
 
     def writeToSerial(self):
-        if self.tx_buf != None:
+        if len(self.tx_buf) != 0:
             tx_buf = self.tx_buf
         else:
-            tx_buf = '\0'
+            tx_buf = ['\0']
 
         print(tx_buf)
-        self.serialPort.write(tx_buf.encode())
-        self.tx_buf = None
+        for tx in tx_buf:
+            self.serialPort.write(tx.encode())
+        self.tx_buf = []
 
     @Slot()
     def readSerial(self):
@@ -153,22 +154,22 @@ class SerialReaderObj(QObject):
                     #writes += 1
 
                 elif message[0] == 'TEMP_BARO':
-                    data['TEMP_BARO'] = float(message[1])
+                    data['TEMP_BARO'] = float(message[1].strip())
 
                 elif message[0] == 'PRESS_BARO':
-                    data['PRESS_BARO'] = float(message[1])
+                    data['PRESS_BARO'] = float(message[1].strip())
 
                 elif message[0] == 'ALT_BARO':
-                    data['ALT_BARO'] = float(message[1])
+                    data['ALT_BARO'] = float(message[1].strip())
 
                 elif message[0] == 'GPS_LAT':
-                    data['GPS_LAT'] = float(message[1])
+                    data['GPS_LAT'] = float(message[1].strip())
 
                 elif message[0] == 'GPS_LONG':
-                    data['GPS_LONG'] = float(message[1])
+                    data['GPS_LONG'] = float(message[1].strip())
 
                 elif message[0] == 'GPS_ALT':
-                    data['GPS_ALT'] = float(message[1])
+                    data['GPS_ALT'] = float(message[1].strip())
 
                 elif message[0] == 'LOCPOS':
                     data['locN'] = float(message[1].split(',')[0])
@@ -180,14 +181,14 @@ class SerialReaderObj(QObject):
                     data[message[0] + 'Y'] = float(message[1].split(',')[1].strip())
                     data[message[0] + 'Z'] = float(message[1].split(',')[2].strip())
 
-                elif message[0].find('@STANDBY') != -1:
-                    data['STATUS'] = '@STANDBY'
+                elif message[0].find('STATUS') != -1:
+                    data['STATUS'] = message[1].strip()
 
-                elif message[0].find('@ARMED') != -1:
-                    data['STATUS'] = '@ARMED'
+                elif message[0].find('CONF') != -1:
+                    data['CONF'] = message[1].strip()
 
                 elif message[0].find('RecvOk') != -1:
-                    data['RecvOk'] = float(message[1])
+                    data['RecvOk'] = float(message[1].strip())
 
                 elif message[0] == 'EOF':
                     # EOF is confirmed
@@ -223,6 +224,7 @@ class UI_MW(QMainWindow, Ui_MainWindow):
         self.workingDirectory = QDir.current().currentPath()
         self.success_rate = 0
         self.error_rate = 0
+        self.msgs_wainting_for_conf = []
 
         #self.AltitudeDisplay = AltitudeDisplay()
         #self.AltitudeDisplay.show()
@@ -443,21 +445,39 @@ class UI_MW(QMainWindow, Ui_MainWindow):
         error = []
 
         try:
-            if 'STATUS' in data:
-                if data['STATUS'].find('@ARMED') !=-1:
+            if 'STATUS' in data: # PA status information
+                if data['STATUS'].find('@ARMED') != -1:
                     if self.PAstat_LE.text() == '@STANDBY':
                         self.PAstat_LE.setText(data['STATUS'])
                         self.armPA_PB.setEnabled(False)
                         self.stdbPA_PB.setEnabled(True)
 
-                elif data['STATUS'].find('@STANDBY') !=-1:
+                elif data['STATUS'].find('@STANDBY') != -1:
                     if self.PAstat_LE.text() == '@ARMED':
                         self.PAstat_LE.setText(data['STATUS'])
                         self.armPA_PB.setEnabled(True)
                         self.stdbPA_PB.setEnabled(False)
                     return None
 
-            if 'RecvOk' in data:
+            # Check if any command confirmation data has been received from the PA
+            # This confirms that the appropriate command has been received
+            # If a message confirmation is missing, the message will be broadcast again until reception.
+            if 'CONF' in data:
+                if data['CONF'].find('@ARMED') != -1:
+                    if '$ARMED' in self.msgs_wainting_for_conf:
+                        self.msgs_wainting_for_conf.remove('$ARMED')
+                if data['CONF'].find('@STANDBY') != -1:
+                    if '$STANDBY' in self.msgs_wainting_for_conf:
+                        self.msgs_wainting_for_conf.remove('$STANDBY')
+                if data['CONF'].find('@RELEASE') != -1:
+                    if '$RELEASE' in self.msgs_wainting_for_conf:
+                        self.msgs_wainting_for_conf.remove('$RELEASE')
+
+            # Repeat unheard messages.
+            for msg in self.msgs_wainting_for_conf:
+                self.transmitCommand(msg)
+
+            if 'RecvOk' in data: # PA message reception rate (one message expected per PA loop)
                 self.PAReceptionRate_DSB.setValue(data['RecvOk'])
 
             if 'ALT_BARO' in data:
@@ -672,13 +692,23 @@ class UI_MW(QMainWindow, Ui_MainWindow):
 
     def transmitCommand(self, com):
         try:
-            self.serialReaderObj.tx_buf = com + '\0'
-            if com =='$ARM':
-                self.armPA_PB.setEnabled(False)
-                self.stdbPA_PB.setEnabled(True)
-            elif com == '$STANDBY':
-                self.stdbPA_PB.setEnabled(False)
-                self.armPA_PB.setEnabled(True)
+
+            if (com + '\0') not in self.serialReaderObj.tx_buf:
+                self.serialReaderObj.tx_buf.append(com)
+
+                if com == '$ARM':
+                    self.armPA_PB.setEnabled(False)
+                    self.stdbPA_PB.setEnabled(True)
+                    if '$ARM' not in self.msgs_wainting_for_conf:
+                        self.msgs_wainting_for_conf.append('$ARM')
+                elif com == '$STANDBY':
+                    self.stdbPA_PB.setEnabled(False)
+                    self.armPA_PB.setEnabled(True)
+                    if '$STANDBY' not in self.msgs_wainting_for_conf:
+                        self.msgs_wainting_for_conf.append('$STANDBY')
+                elif com == '$RELEASE':
+                    if '$RELEASE' not in self.msgs_wainting_for_conf:
+                        self.msgs_wainting_for_conf.append('$RELEASE')
 
 
 
