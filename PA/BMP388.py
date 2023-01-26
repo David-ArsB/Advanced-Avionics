@@ -201,15 +201,14 @@ class BMP388(object):
         msb = self._read_byte(BMP388_REG_ADD_TEMP_MSB)
         adc_T = (msb << 0x10) + (lsb << 0x08) + xlsb
         temperature = self.compensate_temperature(adc_T)
+
         xlsb = self._read_byte(BMP388_REG_ADD_PRESS_XLSB)
         lsb = self._read_byte(BMP388_REG_ADD_PRESS_LSB)
         msb = self._read_byte(BMP388_REG_ADD_PRESS_MSB)
-
         adc_P = (msb << 0x10) + (lsb << 0x08) + xlsb
         pressure = self.compensate_pressure(adc_P)
-        #print(pressure)
-        altitude = 4430769.4 * (1 - pow(pressure / 100.0 / self.groundPressure,
-                                         0.190284))
+
+        altitude = 4430769.4 * (1 - pow(pressure / 100.0 / self.groundPressure, 0.190284))
 
         return (temperature/100, pressure/100, altitude/100)
 
