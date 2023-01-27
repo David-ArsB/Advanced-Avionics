@@ -343,6 +343,7 @@ class corePrimaryAircraft():
         if recv_blocks is None:
             return self.STATUS
 
+        rep_blcks = []
         for recv_buffer in recv_blocks:
             try:
                 recv_comm = ''.join(str(e) for e in recv_buffer)
@@ -359,25 +360,13 @@ class corePrimaryAircraft():
 
                         # Indicate to GCS that message has been received and that the
                         # PA computer is ready and ARMED
+                        rep_blcks.append(list('CONF: @ARMED'))
+                        rep_blcks.append(list("*LOC_ORIG:%.5f,%.5f" % (round(origin[0]), round(origin[1]))))
 
-                        header = list('BOF')  # Indicates beginning of message
-                        block = list('STATUS: @ARMED')
-                        block2 = list('CONF: @ARMED')
-                        block3 = list("*LOC_ORIG:%.5f,%.5f" % (round(origin[0]), round(origin[1])))
-                        eof = list('EOF')  # Indicates end of message
-
-                        blocks = [header, block, block2, block3, eof]
-
-                        self.transmitToGCS(blocks)  # write the message to radio
-
-                        # ARMING represents mission begin; set origins
+                        # ARMING represents mission begin; set origins, set ground pressure
                         # Expect a few seconds delay here
-
                         self.calibrate_altimeter()
                         origin = self.set_origin()
-                        time.sleep(1)
-
-
 
                 elif recv_comm.find("$KILL") != -1:
                     self._kill()
@@ -388,14 +377,7 @@ class corePrimaryAircraft():
 
                         # Indicate to GCS that message has been received and that the
                         # PA computer STATUS is set to STANDBY
-                        header = list('BOF')  # Indicates beginning of message
-                        block = list('STATUS: @STANDBY')
-                        block2 = list('CONF: @STANDBY')
-                        eof = list('EOF')  # Indicates end of message
-
-                        blocks = [header, block, block2, eof]
-
-                        self.transmitToGCS(blocks)  # write the message to radio
+                        rep_blcks.append(list('CONF: @STANDBY'))
 
                 elif recv_comm.find("$RELEASE") != -1:
                     # Indicate to GCS that message has been received and that the
@@ -403,19 +385,7 @@ class corePrimaryAircraft():
 
                     # Do Release
 
-
-                    header = list('BOF')  # Indicates beginning of message
-                    block = list('CONF: @RELEASE')
-                    eof = list('EOF')  # Indicates end of message
-
-                    blocks = [header, block, eof]
-
-                    for block in blocks:
-                        # Fill remaining bytes with zeros
-                        while len(block) < self.RADIO_PAYLOAD_SIZE:
-                            block.append(0)
-
-                    self.transmitToGCS(blocks)  # write the message to radio
+                    rep_blcks.append(list('CONF: @RELEASE'))
 
                 elif recv_comm.find("$CAL_ALTIMETER") != -1:
                     if self.STATUS == 'STANDBY':
@@ -426,17 +396,32 @@ class corePrimaryAircraft():
                         self.STATUS = 'EXP'
                         self.STATUS = self.gps_measure_error(1)
 
-                elif recv_comm.find("$SET_ORIGIN") != -1:
-                    if self.STATUS == 'STANDBY':
-                        self.set_origin()
+                elif recv_comm.find("$SET_MISSION_TYPE") != -1:
+                    if recv_comm.split(':')[1] == 'STATIC':
+                        self.MISSION_TYPE = 'STATIC'
+                    if recv_comm.split(':')[1] == 'RANDOM':
+                        self.MISSION_TYPE = 'RANDOM'
+
+                    rep_blcks.append(list('CONF: @SET_MISSION_TYPE'))
+                    print('Mission is set to: ' + self.MISSION_TYPE)
+
+                elif recv_comm.find("$SET_TARGET_COLOR") != -1:
+                    rep_blcks.append(list('CONF: @SET_TARGET_COLOR'))
+                    color = recv_comm.split(':')[1]
 
                 else:
                     pass
             except Exception as e:
                 print(e)
 
+        ## Send all replies to ground station
+        #blocks = [list('BOF')]  # Indicates beginning of message
+        #for block in rep_blcks:
+        #    blocks.append(block)
+        #blocks.append(list('EOF'))  # Indicates end of message
+        #self.transmitToGCS(blocks)  # write the message to radio
 
-        return self.STATUS
+        return self.STATUS, rep_blcks
 
     def receiveFromGCSOld(self):
         """
@@ -478,7 +463,7 @@ class corePrimaryAircraft():
         stat = self.STATUS
         count = 0
         data = np.zeros((0, 2))
-
+        replies = []
         while stat.upper() == 'EXP' and count < 100:
             # Clear terminal on each iteration
             os.system('clear')
@@ -496,11 +481,10 @@ class corePrimaryAircraft():
             data = np.append(data, np.array([[lat, long]]), axis=0)
 
             # Indicate to GCS PA computer status
-            header = list('BOF')  # Indicates beginning of message
-            block = list('@EXP')
-            eof = list('EOF')  # Indicates end of message
-
-            blocks = [header, block, eof]
+            blocks = [list('BOF'), list('@EXP')]
+            for rep in replies:
+                blocks.append(rep)
+            blocks.append(list('EOF'))  # Indicates end of message
 
             self.transmitToGCS(blocks)  # Write the message to radio
 
@@ -508,7 +492,7 @@ class corePrimaryAircraft():
             recv_blocks = core.receiveFromGCS(timeout)
 
             # Process the received buffer from the GCS
-            stat = core.processRecv(recv_blocks)
+            stat, replies = core.processRecv(recv_blocks)
 
             # Wait a loop timeout before the next transmission
             dt = time.time() - t1
@@ -588,6 +572,8 @@ class corePrimaryAircraft():
         # Wait for a command from the ground station
         stat = self.STATUS
 
+        replies = []
+
         # Wait for status to change
         while stat.upper() == 'STANDBY':
             # Clear terminal on each iteration
@@ -597,17 +583,16 @@ class corePrimaryAircraft():
             # Start timer
             t1 = time.time()
 
-            # Indicate to GCS that PA computer is ready and waiting for commands
-            header = list('BOF')  # Indicates beginning of message
-            block = list('STATUS: @STANDBY')
-            eof = list('EOF')  # Indicates end of message
-
-            blocks = [header, block, eof]
+            # Indicate to GCS PA computer status
+            blocks = [list('BOF'), list('STATUS: @STANDBY')]
+            for rep in replies:
+                blocks.append(rep)
+            blocks.append(list('EOF'))  # Indicates end of message
 
             self.transmitToGCS(blocks)  # Write the message to radio
 
             recv_blocks = self.receiveFromGCS(timeout)  # Wait for a message from the GCS
-            stat = self.processRecv(recv_blocks)  # Process any received messages
+            stat, replies = self.processRecv(recv_blocks)  # Process any received messages
 
             # Wait a loop timeout before the next transmission
             dt = time.time() - t1
@@ -631,6 +616,7 @@ class corePrimaryAircraft():
         failedRecv = 0
         stat = self.STATUS
         recvRate = 0
+        replies = []
 
         # only run the mission loop while the system is armed
         while stat.upper() == 'ARMED':
@@ -657,6 +643,9 @@ class corePrimaryAircraft():
 
                 # Ready Data for transmission
                 blocks = core.setupDataForTransmission(data)
+                for rep in replies:
+                    blocks.insert(-1, rep)
+
                 # Transmit sensor data to GCS
                 core.transmitToGCS(blocks)
 
@@ -672,7 +661,7 @@ class corePrimaryAircraft():
             print('Success Rate: ' + str(recvRate) + '%\n')
 
             # Process the received buffer from the GCS
-            stat = core.processRecv(recv_blocks)
+            stat, replies = core.processRecv(recv_blocks)
 
             # Wait a loop timeout before the next transmission
             dt = time.time() - t1

@@ -3,7 +3,7 @@ import serial
 from copy import deepcopy
 from Modules.GPSFuncs import distCoordsComponentsSigned
 import numpy as np
-from PyQt6.QtWidgets import (QApplication, QMainWindow, QTableWidgetItem, QMessageBox, QWidget)
+from PyQt6.QtWidgets import (QApplication, QMainWindow, QTableWidgetItem, QMessageBox, QWidget, QColorDialog)
 from PyQt6.QtGui import QClipboard
 from PyQt6.QtCore import Qt, QSettings, QDir, QThread, QObject, pyqtSignal as Signal, pyqtSlot as Slot
 
@@ -150,6 +150,7 @@ class SerialReaderObj(QObject):
                     tag = data['tag']
                     data = {}
                     data['tag'] = tag + 1
+                    data['CONF'] = []
                     #self.writeToSerial()
                     #writes += 1
 
@@ -185,7 +186,7 @@ class SerialReaderObj(QObject):
                     data['STATUS'] = message[1].strip()
 
                 elif message[0].find('CONF') != -1:
-                    data['CONF'] = message[1].strip()
+                    data['CONF'].append(message[1].strip())
 
                 elif message[0].find('RecvOk') != -1:
                     data['RecvOk'] = float(message[1].strip())
@@ -240,6 +241,7 @@ class UI_MW(QMainWindow, Ui_MainWindow):
         self.dataTelemLog_TW.setHorizontalHeaderLabels(['Time', 'Altitude', 'Latitude', 'Longitude', 'Heading'])
         self.dataTelemLog_TW.resizeColumnsToContents()
         self.loggingChecked()
+        self.missionChanged()
 
         # Initialize plotting area
         self.PLOT_FIGURES = {}
@@ -462,16 +464,22 @@ class UI_MW(QMainWindow, Ui_MainWindow):
             # Check if any command confirmation data has been received from the PA
             # This confirms that the appropriate command has been received
             # If a message confirmation is missing, the message will be broadcast again until reception.
-            if 'CONF' in data:
-                if data['CONF'].find('@ARMED') != -1:
+            for conf in data['CONF']:
+                if conf.find('@ARMED') != -1:
                     if '$ARMED' in self.msgs_wainting_for_conf:
                         self.msgs_wainting_for_conf.remove('$ARMED')
-                if data['CONF'].find('@STANDBY') != -1:
+                elif conf.find('@STANDBY') != -1:
                     if '$STANDBY' in self.msgs_wainting_for_conf:
                         self.msgs_wainting_for_conf.remove('$STANDBY')
-                if data['CONF'].find('@RELEASE') != -1:
+                elif conf.find('@RELEASE') != -1:
                     if '$RELEASE' in self.msgs_wainting_for_conf:
                         self.msgs_wainting_for_conf.remove('$RELEASE')
+                elif conf.find('@SET_TARGET_COLOR') != -1:
+                    if '$SET_TARGET_COLOR' in self.msgs_wainting_for_conf:
+                        self.msgs_wainting_for_conf.remove('$SET_TARGET_COLOR')
+                elif conf.find('@SET_MISSION_TYPE') != -1:
+                    if '$SET_MISSION_TYPE' in self.msgs_wainting_for_conf:
+                        self.msgs_wainting_for_conf.remove('$SET_MISSION_TYPE')
 
             # Repeat unheard messages.
             for msg in self.msgs_wainting_for_conf:
@@ -690,6 +698,12 @@ class UI_MW(QMainWindow, Ui_MainWindow):
         except Exception as e:
             print('[GPS Eval] Exception has occured: ' + str(e))
 
+    def color_picker(self):
+        color = QColorDialog.getColor()
+        self.colorId_LE.setStyleSheet("QLineEdit { background-color: %s}" % color.name())
+        self.TARGET_COLOR = color
+        # Print color value in lineedit
+
     def transmitCommand(self, com):
         try:
 
@@ -701,14 +715,32 @@ class UI_MW(QMainWindow, Ui_MainWindow):
                     self.stdbPA_PB.setEnabled(True)
                     if '$ARM' not in self.msgs_wainting_for_conf:
                         self.msgs_wainting_for_conf.append('$ARM')
+
+                        if self.missionType_CB.currentText() == 'Static Target':
+                            self.transmitCommand('$SET_MISSION_TYPE:STATIC')
+
+                        elif self.missionType_CB.currentText() == 'Random Target':
+                            color = self.TARGET_COLOR
+                            self.transmitCommand('$SET_MISSION_TYPE:RANDOM')
+                            self.transmitCommand('$SET_TARGET_COLOR:0')
+
                 elif com == '$STANDBY':
                     self.stdbPA_PB.setEnabled(False)
                     self.armPA_PB.setEnabled(True)
                     if '$STANDBY' not in self.msgs_wainting_for_conf:
                         self.msgs_wainting_for_conf.append('$STANDBY')
+
                 elif com == '$RELEASE':
                     if '$RELEASE' not in self.msgs_wainting_for_conf:
                         self.msgs_wainting_for_conf.append('$RELEASE')
+
+                elif com.find('$SET_MISSION_TYPE') != -1:
+                    if '$SET_MISSION_TYPE' not in self.msgs_wainting_for_conf:
+                        self.msgs_wainting_for_conf.append('$SET_MISSION_TYPE')
+
+                elif com.find('$SET_TARGET_COLOR') != -1:
+                    if '$SET_TARGET_COLOR' not in self.msgs_wainting_for_conf:
+                        self.msgs_wainting_for_conf.append('$SET_TARGET_COLOR')
 
 
 
@@ -740,13 +772,25 @@ class UI_MW(QMainWindow, Ui_MainWindow):
             #ax.lines[0].set_ydata(np.array([]))
             #self.PLOT_FIGURES['Altitude']['canvas'].draw()
 
-
+    def missionChanged(self):
+        if self.missionType_CB.currentText() == 'Static Target':
+            self.colorPicker_PB.setEnabled(False)
+            self.colorId_LE.setEnabled(False)
+            self.targetLatitude_SB.setReadOnly(False)
+            self.targetLongitude_SB.setReadOnly(False)
+        elif self.missionType_CB.currentText() == 'Random Target':
+            self.colorPicker_PB.setEnabled(True)
+            self.colorId_LE.setEnabled(True)
+            self.targetLatitude_SB.setReadOnly(True)
+            self.targetLongitude_SB.setReadOnly(True)
     def setSignals(self):
         self.connectSerialButton.clicked.connect(lambda: self.connectToSerial())
         self.copycoordinates_TB.clicked.connect(lambda: self.copyGPSToClipboard())
         self.beginGPSAccuracy_PB.clicked.connect(lambda: self.startGPSAccEval())
         self.refresh_COM_TB.clicked.connect(lambda: self.refreshComPorts())
         self.enableLogging_CB.stateChanged.connect(lambda: self.loggingChecked())
+        self.missionType_CB.currentIndexChanged.connect(lambda : self.missionChanged())
+        self.colorPicker_PB.clicked.connect(lambda: self.color_picker())
 
         # Commands
         self.releasePADA_PB.clicked.connect(lambda: self.transmitCommand('$RELEASE'))
