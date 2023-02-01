@@ -91,7 +91,7 @@ varx=0
 vary=0
 
 for i in range(1,m):
-    time.sleep(0.3)
+    time.sleep(0.1)
     print('ok next')
     if i%10==0:
         GPS[i]=True
@@ -105,9 +105,11 @@ for i in range(1,m):
         cord=np.array([[lat,lon]])
         coords=np.append(coords,cord, axis=0)
         x,y=get_xy(coords,atl)
+        
         mpx=np.append(mpx,x)
         mpy=np.append(mpy,y)
-        
+        print(mpx)
+        print(mpy)
         
     else:
         mpx=np.append(mpx,np.array([mpx[i-1]]),axis=0)
