@@ -91,7 +91,7 @@ varx=0
 vary=0
 
 for i in range(1,m):
-    time.sleep(5)
+    time.sleep(1)
     
     if i%10==0:
         GPS[i]=True
