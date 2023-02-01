@@ -99,10 +99,10 @@ for i in range(1,m):
         lat=gpsp.gpsd.fix.latitude
         lon=gpsp.gpsd.fix.longitude
         cord=np.array([lat,lon])
-        print(cord)
+    
 
         coords=np.append(coords,cord)
-        
+        print(coords)
         xy=get_xy(coords)
    else:
         mpx=np.append(mpx,mpx[i-1])
