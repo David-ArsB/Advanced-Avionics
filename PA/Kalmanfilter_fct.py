@@ -136,8 +136,8 @@ def get_xy(x):
     
     
 
-#cd1 = [45.5147478972148, -73.7745783865117]
-#cd2 = [75.48154597970112, -154.3539584108125]
+cd1 = [45.5147478972148, -73.7745783865117]
+cd2 = [75.48154597970112, -154.3539584108125]
 earthRadii = radius((cd1[0]+cd2[0])/2) #Km #EARTH RADII VARIES BASED ON LATITUDE
 #altitude = 0.233
 #distance=distCoords(cd1,cd2)
