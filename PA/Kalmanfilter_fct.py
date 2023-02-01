@@ -111,7 +111,9 @@ def get_xy(x):
         if i!=len(coords):
             
             cord1=coords[i]
+            print(cord1)
             cord2=coords[i+1]
+            print(cord2)
             dist=distCoords(cord1,cord2)
             dists=np.append(dists,dist)
             brng=get_bearing(cord1[0],cord1[1],cord2[0],cord2[1])
