@@ -108,16 +108,15 @@ for i in range(1,m):
         
         mpx=np.append(mpx,x)
         mpy=np.append(mpy,y)
-        print(mpx)
-        print(mpy)
+   
         
     else:
         mpx=np.append(mpx,np.array([mpx[i-1]]),axis=0)
         mpy=np.append(mpy,np.array([mpy[i-1]]),axis=0)
         GPS[i]=False
+    print(mpx)
+    print(mpy)
 
-print(mpx)
-print(mpy)
 #get acceleration data 
 #mx=np.empty(0)
 #my=np.empty(0)
