@@ -78,7 +78,7 @@ def orientation(cd1, cd2 ):
     elif dlon < 0:
         message += 'W '+str(abs(dlon))+' ] '
 
-    print(message)
+    #print(message)
     # N dlat ; E dlon -> ex: (N 10deg ; E 20deg)
     
     
@@ -141,13 +141,13 @@ distance=distCoords(cd1,cd2)
 orient=orientation(cd1,cd2)
 
 
-coords=np.array([[27.974860, -82.027916], [27.974978, -82.020927],[27.979368, -82.020785],[27.979576, -82.027845]])
-x,y=get_xy(coords)
-print(x,y)
+#coords=np.array([[27.974860, -82.027916], [27.974978, -82.020927],[27.979368, -82.020785],[27.979576, -82.027845]])
+#x,y=get_xy(coords)
+#print(x,y)
 
-plt.plot(x,y,marker='o')
+#plt.plot(x,y,marker='o')
 
-plt.ticklabel_format(style='plain')
+#plt.ticklabel_format(style='plain')
 
 #brng=get_bearing(cd1[0],cd1[1],cd2[0],cd2[1])
 #angle=90-brng
