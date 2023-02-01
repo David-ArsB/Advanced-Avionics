@@ -104,6 +104,7 @@ def get_xy(x):
     # x=np.array([[lat1,lon1],[lat2,lon2]....,[latn,lonn]])
     #La fontion retourne deux array x,y représentant dans un plan cartésien les distances en m entre chaque ping gps
     coords=x
+ 
     #coords=np.array([[0,0], [1.9740288191360256e-05,0.0001322460891825204]])
     dists=np.empty(0)
     ori=np.empty(0)

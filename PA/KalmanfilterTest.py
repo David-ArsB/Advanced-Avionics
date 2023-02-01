@@ -6,8 +6,8 @@ Created on Wed Jan 18 10:26:33 2023
 """
 import numpy as np
 from Kalmanfilter_fct import * 
-from GPSPoller import GpsPoller
-from LSM6DSL import LSM6DSL
+#from GPSPoller import GpsPoller
+#from LSM6DSL import LSM6DSL
 
 #initial state
 
@@ -98,15 +98,17 @@ for i in range(1,m):
     
         lat=gpsp.gpsd.fix.latitude
         lon=gpsp.gpsd.fix.longitude
-        cord=np.array([lat,lon])
-    
 
-        coords=np.append(coords,cord)
-        print(coords)
-        xy=get_xy(coords)
+        cord=np.array([[lat,lon]])
+        coords=np.append(coords,cord, axis=0)
+        x,y=get_xy(coords)
+        mpx=np.append(mpx,x)
+        mpy=np.append(mpy,y)
+        
+        
    else:
-        mpx=np.append(mpx,mpx[i-1])
-        mpy=np.append(mpy,mpy[i-1])
+        mpx=np.append(mpx,np.array([mpx[i-1]]),axis=0)
+        mpy=np.append(mpy,np.array([mpy[i-1]]),axis=0)
         GPS[i]=False
 
 
