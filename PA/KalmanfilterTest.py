@@ -6,8 +6,8 @@ Created on Wed Jan 18 10:26:33 2023
 """
 import numpy as np
 from Kalmanfilter_fct import * 
-#from GPSPoller import GpsPoller
-#from LSM6DSL import LSM6DSL
+from GPSPoller import GpsPoller
+from LSM6DSL import LSM6DSL
 
 #initial state
 
