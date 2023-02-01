@@ -100,7 +100,7 @@ for i in range(1,m):
         lon=gpsp.gpsd.fix.longitude
        # print(lat,lon)
 
-        coords=np.append(coords,[lat,lon])
+        coords=np.append(coords,np.array[lat,lon])
         print(coords)
         xy=get_xy(coords)
    else:
