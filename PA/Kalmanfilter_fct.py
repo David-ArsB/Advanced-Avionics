@@ -141,7 +141,7 @@ distance=distCoords(cd1,cd2)
 orient=orientation(cd1,cd2)
 
 
-#coords=np.array([[27.974860, -82.027916], [27.974978, -82.020927],[27.979368, -82.020785],[27.979576, -82.027845]])
+#coords=np.array([[0,0], [0, 0]])
 #x,y=get_xy(coords)
 #print(x,y)
 

@@ -83,7 +83,7 @@ GPS[0]=True
 mpx=np.array([0])
 mpy=np.array([0])
 
-coords=np.empty(0)
+coords=np.array([[0,0]])
 dists=np.empty(0)
 ori=np.empty(0)
 varx=0
@@ -96,7 +96,6 @@ for i in range(1,m):
         gpsp=GpsPoller()
         gpsp.start()
     
-        
         lat=gpsp.gpsd.fix.latitude
         lon=gpsp.gpsd.fix.longitude
         print(lat,lon)
