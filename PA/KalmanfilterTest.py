@@ -78,7 +78,7 @@ cd2 = [75.48154597970112, -154.3539584108125]
 
 
 # GPS readings (position)
-m=500
+m=10
 GPS=np.ndarray(m,dtype=bool)
 GPS[0]=True
 mpx=np.array([0])
@@ -89,14 +89,15 @@ dists=np.empty(0)
 ori=np.empty(0)
 varx=0
 vary=0
+gpsp=GpsPoller()
+gpsp.start()
 
 for i in range(1,m):
     time.sleep(0.1)
     print('ok next')
     if i%10==0:
         GPS[i]=True
-        gpsp=GpsPoller()
-        gpsp.start()
+
     
         lat=gpsp.gpsd.fix.latitude
         lon=gpsp.gpsd.fix.longitude
