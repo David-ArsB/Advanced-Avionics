@@ -91,8 +91,8 @@ varx=0
 vary=0
 
 for i in range(1,m):
-    time.sleep(1)
-    
+    time.sleep(0.3)
+    print('ok next')
     if i%10==0:
         GPS[i]=True
         gpsp=GpsPoller()
