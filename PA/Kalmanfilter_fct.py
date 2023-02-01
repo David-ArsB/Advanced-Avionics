@@ -112,9 +112,9 @@ def get_xy(x):
         if i!=len(coords):
             
             cord1=coords[i]
-            print(cord1)
+            #print(cord1)
             cord2=coords[i+1]
-            print(cord2)
+            #print(cord2)
             dist=distCoords(cord1,cord2)
             dists=np.append(dists,dist)
             brng=get_bearing(cord1[0],cord1[1],cord2[0],cord2[1])
@@ -136,12 +136,12 @@ def get_xy(x):
     
     
 
-cd1 = [45.5147478972148, -73.7745783865117]
-cd2 = [75.48154597970112, -154.3539584108125]
-earthRadii = radius((cd1[0]+cd2[0])/2) #Km #EARTH RADII VARIES BASED ON LATITUDE
-altitude = 0.233
-distance=distCoords(cd1,cd2)
-orient=orientation(cd1,cd2)
+#cd1 = [45.5147478972148, -73.7745783865117]
+#cd2 = [75.48154597970112, -154.3539584108125]
+#earthRadii = radius((cd1[0]+cd2[0])/2) #Km #EARTH RADII VARIES BASED ON LATITUDE
+#altitude = 0.233
+#distance=distCoords(cd1,cd2)
+#orient=orientation(cd1,cd2)
 
 
 #coords=np.array([[0,0], [0, 0]])

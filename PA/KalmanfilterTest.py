@@ -4,6 +4,7 @@ Created on Wed Jan 18 10:26:33 2023
 
 @author: Catherine
 """
+import time
 import numpy as np
 from Kalmanfilter_fct import * 
 from GPSPoller import GpsPoller
@@ -90,8 +91,9 @@ varx=0
 vary=0
 
 for i in range(1,m):
+    time.sleep(5)
     
-   if i%10==0:
+    if i%10==0:
         GPS[i]=True
         gpsp=GpsPoller()
         gpsp.start()
@@ -106,7 +108,7 @@ for i in range(1,m):
         mpy=np.append(mpy,y)
         
         
-   else:
+    else:
         mpx=np.append(mpx,np.array([mpx[i-1]]),axis=0)
         mpy=np.append(mpy,np.array([mpy[i-1]]),axis=0)
         GPS[i]=False
