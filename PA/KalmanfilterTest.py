@@ -78,7 +78,7 @@ cd2 = [75.48154597970112, -154.3539584108125]
 
 
 # GPS readings (position)
-m=10
+m=500
 GPS=np.ndarray(m,dtype=bool)
 GPS[0]=True
 mpx=np.array([0])
