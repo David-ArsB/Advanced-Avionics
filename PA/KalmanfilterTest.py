@@ -100,6 +100,7 @@ for i in range(1,m):
     
         lat=gpsp.gpsd.fix.latitude
         lon=gpsp.gpsd.fix.longitude
+        atl=gpsp.gpsd.fix.altitude
 
         cord=np.array([[lat,lon]])
         coords=np.append(coords,cord, axis=0)

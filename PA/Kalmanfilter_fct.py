@@ -20,13 +20,17 @@ def radius (lat):
     R = math.sqrt((c+d)/(e+f))
     return R # @sea level
 
-def distCoords(cd1,cd2):
+def distCoords(cd1,cd2,altitude):
     '''
     :param cd1: coords1, degrees [lat,long]
     :param cd2:
     :return:
     '''
-
+    
+    earthRadii = radius((cd1[0]+cd2[0])/2) #Km #EARTH RADII VARIES BASED ON LATITUDE
+    #altitude = 0.233
+    
+    
     lat1 = cd1[0] / 180 * pi
     long1 = cd1[1] / 180 * pi
 
@@ -99,7 +103,7 @@ def get_bearing(lat1, long1, lat2, long2):
 
 
 
-def get_xy(x):
+def get_xy(x,alt):
     #Fonction qui prend en entrée un np.array contenant des données gps tel que montré ci-dessous
     # x=np.array([[lat1,lon1],[lat2,lon2]....,[latn,lonn]])
     #La fontion retourne deux array x,y représentant dans un plan cartésien les distances en m entre chaque ping gps
@@ -115,7 +119,7 @@ def get_xy(x):
             #print(cord1)
             cord2=coords[i+1]
             #print(cord2)
-            dist=distCoords(cord1,cord2)
+            dist=distCoords(cord1,cord2,alt)
             dists=np.append(dists,dist)
             brng=get_bearing(cord1[0],cord1[1],cord2[0],cord2[1])
             ori=np.append(ori,brng)
@@ -136,10 +140,7 @@ def get_xy(x):
     
     
 
-cd1 = [45.5147478972148, -73.7745783865117]
-cd2 = [75.48154597970112, -154.3539584108125]
-earthRadii = radius((cd1[0]+cd2[0])/2) #Km #EARTH RADII VARIES BASED ON LATITUDE
-#altitude = 0.233
+
 #distance=distCoords(cd1,cd2)
 #orient=orientation(cd1,cd2)
 
