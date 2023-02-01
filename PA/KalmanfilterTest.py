@@ -99,6 +99,7 @@ for i in range(1,m):
         gpsdata=gpsp.getPosition()
         lat=gpsdata[0]
         lon=gpsdata[1]
+        print(lat,lon)
 
         coords=np.append(coords,[lat,lon])
         xy=get_xy(coords)
