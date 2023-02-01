@@ -96,7 +96,7 @@ for i in range(1,m):
    if i%10==0:
         GPS[i]=True
         
-        gpsd=GPSPoller()
+        gpsp=GPSPoller()
         
         lat,lon=getPosition()
         coords=np.append(coords,[lat,lon])
