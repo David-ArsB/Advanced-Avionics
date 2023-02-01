@@ -96,7 +96,7 @@ for i in range(1,m):
         gpsp=GpsPoller()
         gpsp.start()
     
-        gpsdata=gpsp.getPosition
+        gpsdata=gpsp.getPosition()
         lat=gpsdata[0]
         lon=gpsdata[1]
 
