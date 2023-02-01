@@ -96,7 +96,9 @@ for i in range(1,m):
         gpsp=GpsPoller()
         gpsp.start()
     
-        lat,lon,atl=gpsp.getPosition
+        gpsdata=gpsp.getPosition
+        lat=gpsdata[0]
+        lon=gpsdata[1]
 
         coords=np.append(coords,[lat,lon])
         xy=get_xy(coords)
