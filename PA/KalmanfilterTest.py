@@ -101,7 +101,7 @@ for i in range(1,m):
        # print(lat,lon)
 
         coords=np.append(coords,[lat,lon])
-        #print(coords)
+        print(coords)
         xy=get_xy(coords)
    else:
         mpx=np.append(mpx,mpx[i-1])
