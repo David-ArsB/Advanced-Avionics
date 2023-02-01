@@ -98,7 +98,7 @@ for i in range(1,m):
     
         lat=gpsp.gpsd.fix.latitude
         lon=gpsp.gpsd.fix.longitude
-        cord=np.array[lat,lon]
+        cord=np.array([lat,lon])
         print(cord)
 
         coords=np.append(coords,cord)
