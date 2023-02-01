@@ -12,13 +12,13 @@ from LSM6DSL import LSM6DSL
 #initial state
 
 x = np.matrix([[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]]).T
-print(x, x.shape)
+#print(x, x.shape)
 n=x.size # States
 
 #initial uncertainty
 
 P = np.diag([100.0, 100.0, 10.0, 10.0, 1.0, 1.0])
-print(P, P.shape)
+#print(P, P.shape)
 
 #dynamic matrix
 
@@ -30,7 +30,7 @@ A = np.matrix([[1.0, 0.0, dt, 0.0, 1/2.0*dt**2, 0.0],
               [0.0, 0.0, 0.0, 1.0, 0.0, dt],
               [0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
               [0.0, 0.0, 0.0, 0.0, 0.0, 1.0]])
-print(A, A.shape)
+#print(A, A.shape)
 
 #Measurement matrix
 
@@ -38,7 +38,7 @@ H = np.matrix([[1.0, 0.0, 0.0, 0.0, 0.0, 0.0],
                [0.0, 1.0, 0.0, 0.0, 0.0, 0.0],
                [0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
               [0.0, 0.0, 0.0, 0.0, 0.0, 1.0]])
-print(H, H.shape)
+#print(H, H.shape)
 
 #Measurement noise covariance 
 
@@ -48,7 +48,7 @@ R = np.matrix([[rp, 0.0, 0.0, 0.0],
                [0.0, rp, 0.0, 0.0],
                [0.0, 0.0, ra, 0.0],
                [0.0, 0.0, 0.0, ra]])
-print(R, R.shape)
+#print(R, R.shape)
 
 # processs noise covariance matrix
 
@@ -61,12 +61,12 @@ Q = np.matrix([[(dt**6)/36, 0, (dt**5)/12, 0, (dt**4)/6, 0],
                [(dt**4)/6, 0, (dt**3)/2, 0, (dt**2),0],
                [0, (dt**4)/6, 0, (dt**3)/2, 0, (dt**2)]]) *sj**2
 
-print(Q, Q.shape)
+#print(Q, Q.shape)
 
 #I matrix
 
 I = np.eye(n)
-print(I, I.shape)
+#print(I, I.shape)
 
 #tests
 cd1 = [45.5147478972148, -73.7745783865117]
