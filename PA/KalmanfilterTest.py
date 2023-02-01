@@ -73,61 +73,50 @@ I = np.eye(n)
 cd1 = [45.5147478972148, -73.7745783865117]
 cd2 = [75.48154597970112, -154.3539584108125]
 
-
-
-
-
 # GPS readings (position)
-m=500
+m=100
 GPS=np.ndarray(m,dtype=bool)
 GPS[0]=True
 mpx=np.array([0])
 mpy=np.array([0])
-
 coords=np.array([[0,0]])
 dists=np.empty(0)
 ori=np.empty(0)
 varx=0
 vary=0
+mx=np.empty(0)
+my=np.empty(0)
+
+#initie les sensors
+LSM6DSL = LSM6DSL(smbus.SMBus(i2c_bus))
 gpsp=GpsPoller()
 gpsp.start()
-
+#prend les mesures à 0.1s d'interval
 for i in range(1,m):
     time.sleep(0.1)
-    print('ok next')
+    #prise de mesure
+    ax=readACCx()
+    ay=readACCy()
+    mx=np.append(mx,ax)
+    my=np.append(my,ay)
     if i%10==0:
         GPS[i]=True
-
-    
         lat=gpsp.gpsd.fix.latitude
         lon=gpsp.gpsd.fix.longitude
         atl=gpsp.gpsd.fix.altitude
-
         cord=np.array([[lat,lon]])
         coords=np.append(coords,cord, axis=0)
         x,y=get_xy(coords,atl)
-        
         mpx=np.append(mpx,x)
         mpy=np.append(mpy,y)
-   
-        
     else:
         mpx=np.append(mpx,np.array([mpx[i-1]]),axis=0)
         mpy=np.append(mpy,np.array([mpy[i-1]]),axis=0)
         GPS[i]=False
-    print(mpx)
-    print(mpy)
 
-#get acceleration data 
-#mx=np.empty(0)
-#my=np.empty(0)
-#ax=readACCx()
-#ay=readACCy()
-#mx=np.append(mx,ax)
-#my=np.append(my,ay)
-
-#measurements=np.vstack(mpx,mpy,mx,my)
-#print(measurements.shape)
+measurements=np.vstack(mpx,mpy,mx,my)
+print(measurements)
+print(measurements.shape)
 
 #filter 
 #for filterstep in range(m):
