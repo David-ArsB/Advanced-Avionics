@@ -95,9 +95,7 @@ for i in range(1,m):
     
    if i%10==0:
         GPS[i]=True
-        
         gpsp=GPSPoller()
-        
         lat,lon=getPosition()
         coords=np.append(coords,[lat,lon])
         xy=get_xy(coords)
