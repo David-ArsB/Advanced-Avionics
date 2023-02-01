@@ -8,9 +8,6 @@ import numpy as np
 from Kalmanfilter_fct import * 
 from GPSPoller import GpsPoller
 from LSM6DSL import LSM6DSL
-self.gps = GpsPoller()
-self._initGPS()
-self.gps.start()
 
 #initial state
 
@@ -92,16 +89,14 @@ ori=np.empty(0)
 varx=0
 vary=0
 
-
 for i in range(1,m):
     
    if i%10==0:
         GPS[i]=True
-        self.gps = GpsPoller()
-        self._initGPS()
-        self.gps.start()
-
-        lat, long, altGPS = self.gps.getPosition()
+        gpsp=GpsPoller()
+        gpsp.start()
+    
+        lat,lon,atl=gpsp.getPosition
 
         coords=np.append(coords,[lat,lon])
         xy=get_xy(coords)
