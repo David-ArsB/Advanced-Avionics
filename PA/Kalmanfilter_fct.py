@@ -134,8 +134,8 @@ def get_xy(x,alt):
     for i in range(len(dists)):
         varx+=dists[i]*math.cos(math.radians(angle[i]))
         vary+=dists[i]*math.sin(math.radians(angle[i]))
-        x=np.append(x,varx)
-        y=np.append(y,vary)
+        x=np.array([varx])
+        y=np.array([vary])
     return x,y
     
     
