@@ -97,6 +97,9 @@ for i in range(1,m):
     #prise de mesure
     ax=LSM6DSL.readACCx()
     ay=LSM6DSL.readACCy()
+    print(ax)
+    print(ay)
+    print('next')
     mx=np.append(mx,ax)
     my=np.append(my,ay)
     if i%10==0:
