@@ -84,8 +84,8 @@ dists=np.empty(0)
 ori=np.empty(0)
 varx=0
 vary=0
-mx=np.empty(0)
-my=np.empty(0)
+mx=np.array([0])
+my=np.array([0])
 
 #initie les sensors
 LSM6DSL = LSM6DSL(smbus.SMBus(i2c_bus))
@@ -118,8 +118,7 @@ for i in range(1,m):
 #print('position y', mpy)
 #print('acc x',mx)
 #print('acc y',my)
-print(len(x))
-print(len(y))
+
 print(len(mpx))
 print(len(mpy))
 print(len(mx))
