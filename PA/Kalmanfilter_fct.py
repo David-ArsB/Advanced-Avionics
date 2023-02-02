@@ -115,9 +115,9 @@ def get_xy(x,alt):
     for i in range(0,len(coords)-1):
         if i!=len(coords):
             
-            cord1=coords[-2]
+            cord1=coords[i]
             #print(cord1)
-            cord2=coords[-1]
+            cord2=coords[i+1]
             #print(cord2)
             dist=distCoords(cord1,cord2,alt)
             dists=np.append(dists,dist)
