@@ -88,17 +88,17 @@ mx=np.empty(0)
 my=np.empty(0)
 
 #initie les sensors
-LSM6DSL = LSM6DSL(smbus.SMBus(i2c_bus))
+#LSM6DSL = LSM6DSL(smbus.SMBus(i2c_bus))
 gpsp=GpsPoller()
 gpsp.start()
 #prend les mesures à 0.1s d'interval
 for i in range(1,m):
     time.sleep(0.1)
     #prise de mesure
-    ax=readACCx()
-    ay=readACCy()
-    mx=np.append(mx,ax)
-    my=np.append(my,ay)
+  #  ax=readACCx()
+ #   ay=readACCy()
+   # mx=np.append(mx,ax)
+    #my=np.append(my,ay)
     if i%10==0:
         GPS[i]=True
         lat=gpsp.gpsd.fix.latitude
@@ -114,9 +114,9 @@ for i in range(1,m):
         mpy=np.append(mpy,np.array([mpy[i-1]]),axis=0)
         GPS[i]=False
 
-measurements=np.vstack(mpx,mpy,mx,my)
-print(measurements)
-print(measurements.shape)
+#measurements=np.vstack(mpx,mpy,mx,my)
+#print(measurements)
+#print(measurements.shape)
 
 #filter 
 #for filterstep in range(m):
