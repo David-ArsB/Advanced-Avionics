@@ -107,26 +107,19 @@ for i in range(1,m):
         cord=np.array([[lat,lon]])
         coords=np.append(coords,cord, axis=0)
         x,y=get_xy(coords,atl)
-        print(x,y)
+        
         mpx=np.append(mpx,x)
         mpy=np.append(mpy,y)
     else:
         mpx=np.append(mpx,np.array([mpx[-1]]),axis=0)
         mpy=np.append(mpy,np.array([mpy[-1]]),axis=0)
         GPS[i]=False
-#print('position x',mpx)
-#print('position y', mpy)
-#print('acc x',mx)
-#print('acc y',my)
 
-print(len(mpx))
-print(len(mpy))
-print(len(mx))
-print(len(my))
-print(len(GPS))
-#measurements=np.vstack((mpx,mpy,mx,my))
-#print(measurements)
-#print(measurements.shape)
+
+
+measurements=np.vstack((mpx,mpy,mx,my))
+print(measurements)
+print(measurements.shape)
 
 #filter 
 #for filterstep in range(m):

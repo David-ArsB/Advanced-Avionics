@@ -106,7 +106,7 @@ def get_bearing(lat1, long1, lat2, long2):
 def get_xy(x,alt):
     #Fonction qui prend en entrée un np.array contenant des données gps tel que montré ci-dessous
     # x=np.array([[lat1,lon1],[lat2,lon2]....,[latn,lonn]])
-    #La fontion retourne deux array x,y représentant dans un plan cartésien les distances en m entre chaque ping gps
+    #La fonction retourne la distance entre les 2 derniers ping GPS
     coords=x
  
     #coords=np.array([[0,0], [1.9740288191360256e-05,0.0001322460891825204]])
@@ -127,15 +127,19 @@ def get_xy(x,alt):
     cmb=len(ori)
     angle=np.full(cmb,90)
     angle=np.subtract(angle,ori)
-    x=np.array([[0]])
-    y=np.array([[0]])
+    cumulx=np.array([0])
+    cumuly=np.array([0])
     varx=0
     vary=0
     for i in range(len(dists)):
         varx+=dists[i]*math.cos(math.radians(angle[i]))
         vary+=dists[i]*math.sin(math.radians(angle[i]))
-        x=np.array([varx])
-        y=np.array([vary])
+        cumulx=np.append(cumulx,varx)
+        cumuly=np.append(cumuly,vary)
+        distx=varx+cumulx[-1]
+        disty=vary+cumuly[-1]
+        x=np.array([distx])
+        y=np.array([disty])
     return x,y
     
     
