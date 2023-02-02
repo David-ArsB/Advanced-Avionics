@@ -8,7 +8,7 @@ import time
 import numpy as np
 from Kalmanfilter_fct import * 
 from GPSPoller import GpsPoller
-from LSM6DSL import LSM6DSL
+from LSM6DSL import *
 
 #initial state
 
