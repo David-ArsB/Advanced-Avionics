@@ -110,8 +110,8 @@ for i in range(1,m):
         mpx=np.append(mpx,x)
         mpy=np.append(mpy,y)
     else:
-        mpx=np.append(mpx,np.array([mpx[i-1]]),axis=0)
-        mpy=np.append(mpy,np.array([mpy[i-1]]),axis=0)
+        mpx=np.append(mpx,np.array([mpx[-1]]),axis=0)
+        mpy=np.append(mpy,np.array([mpy[-1]]),axis=0)
         GPS[i]=False
 #print('position x',mpx)
 #print('position y', mpy)
