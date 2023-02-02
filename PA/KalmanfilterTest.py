@@ -12,7 +12,7 @@ from LSM6DSL import *
 
 #initial state
 
-x = np.matrix([[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]]).T
+x = np.matrix([[0.0], [0.0], [0.0], [0.0], [0.0],[ 0.0]])
 #print(x, x.shape)
 n=x.size # States
 
