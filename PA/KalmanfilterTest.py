@@ -116,10 +116,13 @@ for i in range(1,m):
         mpx=np.append(mpx,np.array([mpx[i-1]]),axis=0)
         mpy=np.append(mpy,np.array([mpy[i-1]]),axis=0)
         GPS[i]=False
-
-measurements=np.vstack((mpx,mpy,mx,my))
-print(measurements)
-print(measurements.shape)
+print('position x',mpx)
+print('position y', mpy)
+print('acc x',mx)
+print('acc y',my)
+#measurements=np.vstack((mpx,mpy,mx,my))
+#print(measurements)
+#print(measurements.shape)
 
 #filter 
 #for filterstep in range(m):
