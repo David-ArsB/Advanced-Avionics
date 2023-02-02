@@ -92,7 +92,7 @@ LSM6DSL = LSM6DSL(smbus.SMBus(i2c_bus))
 gpsp=GpsPoller()
 gpsp.start()
 #prend les mesures à 0.1s d'interval
-for i in range(1,m+1):
+for i in range(1,m):
     time.sleep(0.1)
     #prise de mesure
     ax=LSM6DSL.readACCx()
