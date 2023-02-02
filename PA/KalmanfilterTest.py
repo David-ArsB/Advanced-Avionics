@@ -107,7 +107,7 @@ for i in range(1,m):
         cord=np.array([[lat,lon]])
         coords=np.append(coords,cord, axis=0)
         x,y=get_xy(coords,atl)
-        
+        print(x,y)
         mpx=np.append(mpx,x)
         mpy=np.append(mpy,y)
     else:
