@@ -117,7 +117,7 @@ for i in range(1,m):
         mpy=np.append(mpy,np.array([mpy[i-1]]),axis=0)
         GPS[i]=False
 
-measurements=np.vstack(mpx,mpy,mx,my)
+measurements=np.vstack((mpx,mpy,mx,my))
 print(measurements)
 print(measurements.shape)
 
