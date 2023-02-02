@@ -95,8 +95,8 @@ gpsp.start()
 for i in range(1,m):
     time.sleep(0.1)
     #prise de mesure
-    ax=LSM6DSL.imu.readACCx()
-    ay=LSM6DSL.imu.readACCy()
+    ax=LSM6DSL.readACCx()
+    ay=LSM6DSL.readACCy()
     mx=np.append(mx,ax)
     my=np.append(my,ay)
     if i%10==0:
