@@ -97,9 +97,6 @@ for i in range(1,m):
     #prise de mesure
     ax=LSM6DSL.readACCx()
     ay=LSM6DSL.readACCy()
-    print(ax)
-    print(ay)
-    print('next')
     mx=np.append(mx,ax)
     my=np.append(my,ay)
     if i%10==0:
@@ -116,10 +113,14 @@ for i in range(1,m):
         mpx=np.append(mpx,np.array([mpx[i-1]]),axis=0)
         mpy=np.append(mpy,np.array([mpy[i-1]]),axis=0)
         GPS[i]=False
-print('position x',mpx)
-print('position y', mpy)
-print('acc x',mx)
-print('acc y',my)
+#print('position x',mpx)
+#print('position y', mpy)
+#print('acc x',mx)
+#print('acc y',my)
+print(len(mpx))
+print(len(mpy))
+print(len(mx))
+print(len(my))
 #measurements=np.vstack((mpx,mpy,mx,my))
 #print(measurements)
 #print(measurements.shape)
