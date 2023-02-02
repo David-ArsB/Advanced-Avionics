@@ -145,13 +145,13 @@ def get_xy(x,alt):
 #orient=orientation(cd1,cd2)
 
 
-#coords=np.array([[0,0], [0, 0]])
-#x,y=get_xy(coords)
-#print(x,y)
+coords=np.array([[],[],[]])
+x,y=get_xy(coords,0.3)
+print(x,y)
 
-#plt.plot(x,y,marker='o')
+plt.plot(x,y)
 
-#plt.ticklabel_format(style='plain')
+plt.ticklabel_format(style='plain')
 
 #brng=get_bearing(cd1[0],cd1[1],cd2[0],cd2[1])
 #angle=90-brng
