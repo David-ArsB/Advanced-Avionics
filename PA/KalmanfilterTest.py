@@ -107,7 +107,6 @@ for i in range(1,m):
         cord=np.array([[lat,lon]])
         coords=np.append(coords,cord, axis=0)
         x,y=get_xy(coords,atl)
-        print(x,y)
         mpx=np.append(mpx,x)
         mpy=np.append(mpy,y)
     else:
@@ -122,35 +121,36 @@ print(measurements)
 print(measurements.shape)
 
 #filter 
-#for filterstep in range(m):
+for filterstep in range(m):
     
     # Time Update (Prediction)
     # ========================
     # Project the state ahead
- #   x = A*x
+    x = A*x
     
     # Project the error covariance ahead
-  #  P = A*P*A.T + Q    
+    P = A*P*A.T + Q    
     
     
     # Measurement Update (Correction)
     # ===============================
     # if there is a GPS Measurement
-   # if GPS[filterstep]:
+    if GPS[filterstep]:
         # Compute the Kalman Gain
-    #    S = H*P*H.T + R
-     #   K = (P*H.T) * np.linalg.pinv(S)
+        S = H*P*H.T + R
+        K = (P*H.T) * np.linalg.pinv(S)
     
         
         # Update the estimate via z
-      #  Z = measurements[:,filterstep].reshape(H.shape[0],1)
-       # y = Z - (H*x)                            # Innovation or Residual
-        #x = x + (K*y)
+        Z = measurements[:,filterstep].reshape(H.shape[0],1)
+        y = Z - (H*x)                            # Innovation or Residual
+        x = x + (K*y)
         
         # Update the error covariance
-        #P = (I - (K*H))*P
+        P = (I - (K*H))*P
 
    
     
     # Save states for Plotting
-    #savestates(x, Z, P, K)
+    savestates(x, Z, P, K)
+print('ok done')
