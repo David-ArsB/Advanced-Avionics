@@ -6,7 +6,7 @@ Main Code for the Avion Cargo Primary Aircraft Localisation System and Data Acqu
 # TODO: - Kalman filtering, 3dim (x-y-z) to track movement (& tilt?) and positioning more accurately
 #       - Increase sensor reading frequency to 5 Htz. (check!)
 #       - Shield radio units (check!)
-#       - Work on communication reliability and robustness
+#       - Work on communication reliability and robustness (check!)
 #       - Dedicated PSU for radio units (check!)
 #       - Target positioning and computer vision
 
@@ -23,15 +23,25 @@ from math import pi, atan2
 # Board specific modules
 if detect_model() == 'Hardkernel ODROID-C4\x00':
     i2c_bus = 0x00
+    # https://github.com/hhk7734/Odroid.GPIO/blob/master/py_src/Odroid/GPIO/__init__.py
     import Odroid.GPIO as GPIO
     GPIO.setmode(GPIO.WIRINGPI)  # set the gpio mode
+    # https://wiki.odroid.com/odroid-c4/application_note/gpio/wiringpi
+    # https://raspberrypi.stackexchange.com/questions/106858/what-is-the-proper-calculation-of-duty-cycle-range-for-the-sg90-servo
+    # https://forum.odroid.com/viewtopic.php?f=205&p=357260
+    # https://www.savoxusa.com/products/savsw0250mg-waterproof-digital-micro-servo
+
+    # WIRINGPI PIN numbers: https://wiki.odroid.com/odroid-c4/hardware/expansion_connectors
+    # cmd: gpio readall
     spiPin = 6
+    servoPin = 23
 
 elif detect_model() == 'Raspberry Pi 3 Model B Rev 1.2\x00':
     i2c_bus = 0x01
     import RPi.GPIO as GPIO
     GPIO.setmode(GPIO.BCM)  # set the gpio mode
     spiPin = 25
+    servoPin = 13
 
 # Sensor Modules
 from BMP388 import BMP388 # Import Pressure sensor
@@ -53,6 +63,15 @@ class corePrimaryAircraft():
     RADIO_READING_PIPE = [0xF0, 0xF0, 0xF0, 0xF0, 0xF0]
     RADIO_AKPL_BUF = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8]
 
+    # SERVO PINOUT
+    SERVO_PIN = servoPin
+    SERVO_FREQUENCY = 240 # Hz
+    SERVO_IDLE_DUTY_CYCLE = 1100 # Hz
+    SERVO_RELEASE_DUTY_CYCLE = 1400 # Hz (To be determined, experimentally)
+
+    # CAMERA SETTINGS
+    CAMERA_PORT = 0
+
     def __init__(self):
         # Define sensor objects
         self.altimeter = BMP388(smbus.SMBus(i2c_bus))
@@ -61,18 +80,23 @@ class corePrimaryAircraft():
         self.radio = NRF24(GPIO, spidev.SpiDev())
         self.gps = GpsPoller()
 
-        # Initialise sensor objects
+        # Initialise and configure sensors
         self._initRadio()
         self._initAltimeter()
         self._initCompass()
         self._initIMU()
         self._initGPS()
+        self._initServo()
+        self._initCamera()
 
         print('Initialisation Complete! \n')
 
         self.STATUS = 'STANDBY'
         self.altMovAverage = []
         self.headingMovAverage = []
+
+        self.TARGET_COLOR = None
+        self.cap = None
 
         self.failedRecv = 0
         self.okRecv = 0
@@ -130,6 +154,19 @@ class corePrimaryAircraft():
         print('Setting up GPS thread ...')
         self.gps.start()
 
+    def _initServo(self):
+        '''
+        Setup Servo PWM connection.
+        '''
+
+        self.servo = GPIO.PWM(self.SERVO_PIN, self.SERVO_FREQUENCY)
+
+    def _initCamera(self):
+        '''
+        Setup and configure camera and stream.
+        '''
+        self.cap = None
+
     def _kill(self):
         self.gps.running = False
         self.gps.join()  # wait for the thread to finish what it's doing
@@ -174,32 +211,33 @@ class corePrimaryAircraft():
     def fetchData(self):
         # Fetch Altimeter Data
         temperature, pressure, altitude = self.altimeter.get_temperature_and_pressure_and_altitude()
+
+        # Use a moving average to smooth out altitude readings
         if len(self.altMovAverage) < 15:
             self.altMovAverage.append(altitude)
         else:
             for i in range(len(self.altMovAverage), 1):
                 self.altMovAverage[i] = self.altMovAverage[i-1]
             self.altMovAverage[0] = altitude
-
         altitude = sum(self.altMovAverage)/len(self.altMovAverage)
-        #print(self.altMovAverage)
 
         # Fetch Compass Data
         magX = self.compass.readMAGxCorr()
         magY = self.compass.readMAGyCorr()
         magZ = self.compass.readMAGzCorr()
+
         # Calculate Heading
         heading = atan2(magY, magX) * 180 / pi
         if heading < 0:
             heading += 360
 
+        # Use a moving average to smooth out heading readings
         if len(self.headingMovAverage) < 5:
             self.headingMovAverage.append(heading)
         else:
             for i in range(len(self.headingMovAverage), 1):
                 self.headingMovAverage[i] = self.headingMovAverage[i-1]
             self.headingMovAverage[0] = heading
-
         heading = sum(self.headingMovAverage)/len(self.headingMovAverage)
 
         # Fetch IMU Data
@@ -212,6 +250,7 @@ class corePrimaryAircraft():
         # Fetch GPS Data
         lat, long, altGPS = self.gps.getPosition()
 
+        # Create Data dictionary
         data = {}
         data['temperature'] = temperature
         data['pressure'] = pressure
@@ -223,10 +262,15 @@ class corePrimaryAircraft():
         data['GPS'] = [lat, long, altGPS-self.ref_origin[-1]]
         loc_coords = distCoords2(self.ref_origin[:-1], data['GPS'][:-1])
         data['Loc'] = [loc_coords[0], loc_coords[1]]
-
         self.data = data
 
-        return data
+        # Get camera frame
+        if self.cap is not None:
+            res, frame = self.cap.read()
+        else:
+            frame = None
+
+        return data, frame
 
     def setupDataForTransmission(self, data):
         '''
@@ -248,7 +292,9 @@ class corePrimaryAircraft():
         lat, long, altGPS = data['GPS']
         locN, locE = data['Loc']
 
-        header = list('BOF')  # Indicates beginning of message
+        # Indicates beginning of message
+        header = list('BOF')
+        # SENSOR AND LOCATIONAL DATA
         block1 = list("TEMP_BARO:%.1f" % round(temperature, 1))
         block2 = list("PRESS_BARO:%.1f" % round(pressure, 1))
         block3 = list("ALT_BARO:%.1f" % round(altitude, 1))
@@ -262,7 +308,8 @@ class corePrimaryAircraft():
         # ADD COMMAND REPLIES AND REMOVE UNNECESSARY DATA FRAMES
         block11 = list("RecvOk: %.1f" % (data['RecvOk']))
         block12 = list("STATUS: " + data['STATUS'])
-        eof = list('EOF')  # Indicates end of message
+        eof = list('EOF')
+        # Indicates end of message
 
         blocks = [header, block1, block2, block3, block4,
                   block5, block6, block7, block8, block9,
@@ -338,8 +385,11 @@ class corePrimaryAircraft():
 
     def processRecv(self, recv_blocks):
         '''
-        Process the received buffer in order to execute a command.
+        Process the received buffer in order to execute a command. Most critical commands will add an ACK message to 
+        be sent back to the ground station. The Ground Station will be waiting for this ACK. If it is missing, it will
+        send the command again automatically, until acknowledgment.
         '''
+        
         if recv_blocks is None:
             return self.STATUS
 
@@ -382,10 +432,10 @@ class corePrimaryAircraft():
                 elif recv_comm.find("$RELEASE") != -1:
                     # Indicate to GCS that message has been received and that the
                     # PA computer STATUS is set to STANDBY
+                    rep_blcks.append(list('CONF: @RELEASE'))
 
                     # Do Release
-
-                    rep_blcks.append(list('CONF: @RELEASE'))
+                    self.release_pada()
 
                 elif recv_comm.find("$CAL_ALTIMETER") != -1:
                     if self.STATUS == 'STANDBY':
@@ -399,7 +449,7 @@ class corePrimaryAircraft():
                 elif recv_comm.find("$SET_MISSION_TYPE") != -1:
                     if recv_comm.split(':')[1] == 'STATIC':
                         self.MISSION_TYPE = 'STATIC'
-                    if recv_comm.split(':')[1] == 'RANDOM':
+                    elif recv_comm.split(':')[1] == 'RANDOM':
                         self.MISSION_TYPE = 'RANDOM'
 
                     rep_blcks.append(list('CONF: @SET_MISSION_TYPE'))
@@ -407,7 +457,7 @@ class corePrimaryAircraft():
 
                 elif recv_comm.find("$SET_TARGET_COLOR") != -1:
                     rep_blcks.append(list('CONF: @SET_TARGET_COLOR'))
-                    color = recv_comm.split(':')[1]
+                    self.TARGET_COLOR = recv_comm.split(':')[1]
 
                 else:
                     pass
@@ -427,6 +477,7 @@ class corePrimaryAircraft():
         """
         Listen to any transmission coming fromm the ground station.
         Wait one second before timeout.
+        [DEPRECATED]
         """
         print('\nListening to ground station...')
         t1 = time.time()
@@ -602,14 +653,33 @@ class corePrimaryAircraft():
 
         return stat
 
-    def analyse_frame(self):
+    def release_pada(self):
+        '''
+        Release the PADA. Set the servo duty cycle for release.
+        '''
+
+        self.servo.start(self.SERVO_RELEASE_DUTY_CYCLE)
+        time.sleep(1)
+        self.servo.ChangeDutyCycle(self.SERVO_IDLE_DUTY_CYCLE)
+
+    def target_detection(self):
         return False
+    def image_post_processing(self):
+        # filters etc
+        pass
+    def analyse_frame(self, img, data, color):
+        processed_frame = self.image_post_processing()
+        if not self.target_detection():
+            return False
+
+        return True
     def mission_loop(self, timeout):
         '''
         Main mission loop. Runs while vehicle state is "ARMED". Monitors incoming messages and commands.
         Fetches sensor data and camera images. Analyses each camera frame to test whether the target can be seen.
         If the target is detected within a frame, the PA will enter an unconstrained loop in order to repeat reading
-        sensor data and analyse camera frames to maximize target visibility.
+        sensor data and analyse camera frames to maximize target visibility. The loop ends whenever the target is no
+        longer detected.
         '''
 
         okRecv = 0
@@ -617,6 +687,7 @@ class corePrimaryAircraft():
         stat = self.STATUS
         recvRate = 0
         replies = []
+        color = self.TARGET_COLOR
 
         # only run the mission loop while the system is armed
         while stat.upper() == 'ARMED':
@@ -632,14 +703,15 @@ class corePrimaryAircraft():
             detect_target = True
             while detect_target:
                 # Fetch sensor data
-                data = core.fetchData()
+                data, frame = core.fetchData()
 
                 # Add Status and Radio Reception information
                 data['STATUS'] = '@ARMED'
                 data['RecvOk'] = recvRate
 
-                # Analyse one frame from the camera, returns false if nothing is seen
-                detect_target = self.analyse_frame()
+                if color is not None and frame is not None:
+                    # Analyse one frame from the camera, returns false if nothing is seen
+                    detect_target = self.analyse_frame(frame, data, color)
 
                 # Ready Data for transmission
                 blocks = core.setupDataForTransmission(data)

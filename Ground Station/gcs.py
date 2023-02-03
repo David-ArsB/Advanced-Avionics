@@ -17,7 +17,7 @@ from gui.gui_gcs import Ui_MainWindow
 from gui.Windows.AltitudeDisplay import Ui_AltitudeDisplay
 
 import serial.tools.list_ports
-
+from dronekit import connect, VehicleMode, LocationGlobalRelative, LocationGlobal, Command
 
 # pip install PyQt6-WebEngine required
 
@@ -235,6 +235,7 @@ class UI_MW(QMainWindow, Ui_MainWindow):
         self.serialReaderObj = None
         self.serialReaderThread = None
         self.serialPort = None
+        self.drone_pada = None
 
         # Other random initialisations
         self.stackedWidget.setCurrentIndex(0)
@@ -258,6 +259,9 @@ class UI_MW(QMainWindow, Ui_MainWindow):
         self.serialPort_CB.clear()
         self.serialPort_CB.addItems(self.serial_ports())
         self.serialPort_CB.setCurrentIndex(1)
+        self.serialPortSiK_CB.clear()
+        self.serialPortSiK_CB.addItems(self.serial_ports())
+        self.serialPortSiK_CB.setCurrentIndex(1)
         self.setSignals()
 
         #c = (45.517449, -73.784236)
@@ -370,8 +374,70 @@ class UI_MW(QMainWindow, Ui_MainWindow):
         # refresh canvas
         canvas.draw()
 
-    def connectToSerial(self):
+    def connectToSiK(self):
+        serialToArduino = self.serialPort_CB.currentText()
+        serialToSik = self.serialPortSiK_CB.currentText()
+
+        if serialToArduino == serialToSik:
+            message = "Connection error. SiK Radio COM Port cannot be equal to Arduino COM Port."
+            msgBox = QMessageBox()
+            msgBox.setIcon(QMessageBox.Icon.Information)
+            msgBox.setText(message)
+            msgBox.setWindowTitle('Success')
+            msgBox.exec()
+            return False
+        newPort = serialToSik.split(':')[0].strip()
         try:
+            # Setup Serial connection with the SiK Telemetry Radio
+            if self.drone_pada is not None:
+                self.drone_pada.close()
+                self.drone_pada = None
+
+            # Connect
+            self.drone_pada = connect(newPort, wait_ready=False, baud=57600, heartbeat_timeout=120)
+            self.drone_pada.wait_ready(True, timeout=120)
+
+            # Print Some Parameters
+            connectionKey = "Connection To PADA Succesfull.\n\nAutopilot Firmware version: %s\n" % self.drone_pada.version
+            for key, value in self.drone_pada.parameters.iteritems():
+                connectionKey += " - Key:%s Value:%s\n" % (key, value)
+
+            msgBox = QMessageBox()
+            msgBox.setIcon(QMessageBox.Icon.Warning)
+            msgBox.setText(connectionKey)
+            msgBox.setWindowTitle('Success')
+            msgBox.exec()
+
+            cmds = self.drone_pada.commands
+            # Call clear() on Vehicle.commands and upload the command to the vehicle.
+            cmds.clear()
+            cmds.upload()
+            return True
+
+        except Exception as e:
+            message = "Connection Failed:\n" + str(e)
+            msgBox = QMessageBox()
+            msgBox.setIcon(QMessageBox.Icon.Warning)
+            msgBox.setText(message)
+            msgBox.setWindowTitle('Error')
+            msgBox.exec()
+            return False
+
+    def connectToSerial(self):
+        serialToArduino = self.serialPort_CB.currentText()
+        serialToSik = self.serialPortSiK_CB.currentText()
+
+        if serialToArduino == serialToSik:
+            message = "Connection error. SiK Radio COM Port cannot be equal to Arduino COM Port."
+            msgBox = QMessageBox()
+            msgBox.setIcon(QMessageBox.Icon.Information)
+            msgBox.setText(message)
+            msgBox.setWindowTitle('Success')
+            msgBox.exec()
+            return False
+
+        try:
+            # Setup Serial connection with the Arduino
             newPort = self.serialPort_CB.currentText().split(':')[0].strip()
             if self.serialPort == None or self.serialPort.port != newPort:
                 if self.serialPort != None:
@@ -431,6 +497,8 @@ class UI_MW(QMainWindow, Ui_MainWindow):
                 msgBox.setWindowTitle('Success')
                 msgBox.exec()
                 return True
+
+
 
         except Exception as e:
             message = "Connection Failed:\n"+str(e)
@@ -706,7 +774,6 @@ class UI_MW(QMainWindow, Ui_MainWindow):
 
     def transmitCommand(self, com):
         try:
-
             if (com + '\0') not in self.serialReaderObj.tx_buf:
                 self.serialReaderObj.tx_buf.append(com)
 
@@ -742,8 +809,6 @@ class UI_MW(QMainWindow, Ui_MainWindow):
                     if '$SET_TARGET_COLOR' not in self.msgs_wainting_for_conf:
                         self.msgs_wainting_for_conf.append('$SET_TARGET_COLOR')
 
-
-
         except:
             message = "No serial port selected, please select a COM port."
             msgBox = QMessageBox()
@@ -772,6 +837,33 @@ class UI_MW(QMainWindow, Ui_MainWindow):
             #ax.lines[0].set_ydata(np.array([]))
             #self.PLOT_FIGURES['Altitude']['canvas'].draw()
 
+    def releasePADA(self):
+        if self.drone_pada is not None and self.serialPort is not None and self.serialPort.is_open:
+            # ===============#
+            # SETUP MISSION #
+            # ===============#
+            # Pertinent links: https://ardupilot.org/plane/docs/arming-your-plane.html
+            # Get commands object from Vehicle.
+            cmds = self.drone_pada.commands
+            cmds.upload()
+
+            # ===============#
+            # START MISSION #
+            # ===============#
+            # Set mode to AUTO to start mission
+            self.drone_pada.mode = VehicleMode("AUTO")
+
+            # Release the PADA from the PA
+            self.transmitCommand('$RELEASE')
+
+        else:
+            message = "Error: one or more peripherals are missing. Please confirm that the SiK Telemetry Radio and the Arduino are both connected."
+            msgBox = QMessageBox()
+            msgBox.setIcon(QMessageBox.Icon.Warning)
+            msgBox.setText(message)
+            msgBox.setWindowTitle('Error')
+            msgBox.exec()
+
     def missionChanged(self):
         if self.missionType_CB.currentText() == 'Static Target':
             self.colorPicker_PB.setEnabled(False)
@@ -785,6 +877,7 @@ class UI_MW(QMainWindow, Ui_MainWindow):
             self.targetLongitude_SB.setReadOnly(True)
     def setSignals(self):
         self.connectSerialButton.clicked.connect(lambda: self.connectToSerial())
+        self.connectToSiKButton.clicked.connect(lambda: self.connectToSiK())
         self.copycoordinates_TB.clicked.connect(lambda: self.copyGPSToClipboard())
         self.beginGPSAccuracy_PB.clicked.connect(lambda: self.startGPSAccEval())
         self.refresh_COM_TB.clicked.connect(lambda: self.refreshComPorts())
@@ -793,7 +886,7 @@ class UI_MW(QMainWindow, Ui_MainWindow):
         self.colorPicker_PB.clicked.connect(lambda: self.color_picker())
 
         # Commands
-        self.releasePADA_PB.clicked.connect(lambda: self.transmitCommand('$RELEASE'))
+        self.releasePADA_PB.clicked.connect(lambda: self.releasePADA())
         self.armPA_PB.clicked.connect(lambda: self.transmitCommand('$ARM'))
         self.stdbPA_PB.clicked.connect(lambda: self.transmitCommand('$STANDBY'))
         self.resetPA_PB.clicked.connect(lambda: self.transmitCommand('$RESET'))
