@@ -87,9 +87,14 @@ mx=np.array([0])
 my=np.array([0])
 
 #initie les sensors
+#initie le IMU
 LSM6DSL = LSM6DSL(smbus.SMBus(i2c_bus))
+#initie le GPS
 gpsp=GpsPoller()
 gpsp.start()
+#initie le barometer
+
+
 #prend les mesures à 0.1s d'interval
 for i in range(1,m):
     time.sleep(0.1)
@@ -98,6 +103,8 @@ for i in range(1,m):
     ay=LSM6DSL.readACCy()
     mx=np.append(mx,ax)
     my=np.append(my,ay)
+    
+    
     if i%10==0:
         GPS[i]=True
         lat=gpsp.gpsd.fix.latitude
