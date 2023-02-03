@@ -11,8 +11,7 @@ from GPSPoller import GpsPoller
 from LSM6DSL import *
 
 #initial state
-
-x = np.matrix([[0.0], [0.0], [0.0], [0.0], [0.0],[ 0.0]])
+x = np.matrix([[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]]).T
 #print(x, x.shape)
 n=x.size # States
 
@@ -129,7 +128,7 @@ for filterstep in range(m):
     x = A*x
     
     # Project the error covariance ahead
-    P = A*P*A.T + Q    
+    P = A*P*(A.T) + Q    
     
     
     # Measurement Update (Correction)
